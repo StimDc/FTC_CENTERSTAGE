@@ -6,8 +6,9 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.Implementations.Annotations.CatchingBugs;
+import org.firstinspires.ftc.teamcode.Implementations.DebugTools.CatchingBugs;
 import org.firstinspires.ftc.teamcode.Implementations.Annotations.Experimental;
 import org.firstinspires.ftc.teamcode.Implementations.Annotations.ImplementedBy;
 
@@ -17,6 +18,7 @@ public class Sponsori extends OpMode {
     private DcMotor slider;
     private float leftX, leftY, rightX;
     private static final float deadZone = 0.4f;
+    private Servo c1,c2;
     @Override
     public void init() {
 
@@ -35,7 +37,8 @@ public class Sponsori extends OpMode {
 
         slider.setDirection(DcMotorSimple.Direction.REVERSE);
 
-
+        c1= hardwareMap.get(Servo.class, "C1");
+        c2 = hardwareMap.get(Servo.class, "C2");
 
     }
 
@@ -66,7 +69,15 @@ public class Sponsori extends OpMode {
         if(gamepad1.b){
             setPowerSliderMotor(-0.5);
         }
-
+        //TODO: de modificat pozitiile
+        if(gamepad1.x){
+            c1.setPosition(0);
+            c2.setPosition(0.4);
+        }
+        if(gamepad1.y){
+            c1.setPosition(0);
+            c2.setPosition(0.4);
+        }
         slider.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         stopMotor();
         slider.setPower(0);
@@ -95,7 +106,7 @@ public class Sponsori extends OpMode {
      * @param signBackLeft tells if the power fed to the back left motor is positive (+1) or negative(-1 )
      * @param signBackRight tells if the power fed to the back right motor is positive (+1) or negative(-1 )
      */
-    @Experimental
+    //@Experimental
     @ImplementedBy(name = "Andrei", date="18.09.23")
     public void setPowerWheelMotor(float power, int signFrontLeft, int signFrontRight, int signBackLeft, int signBackRight){
         frontLeft.setPower(signFrontLeft *power);
@@ -119,7 +130,7 @@ public class Sponsori extends OpMode {
     public void debug(){
         telemetry.addLine("DEBUG");
         CatchingBugs.getExperimental(telemetry,this.getClass());
-
+        CatchingBugs.getNameReport(telemetry,"Andrei");
         telemetry.update();
     }
 

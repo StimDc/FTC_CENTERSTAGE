@@ -14,5 +14,6 @@ public class ComputerTool {
         ReportBuilder report = new ReportBuilder();
         report.addToReport("da").addToReport("nu");
         CatchingBugs.getExperimental(Sponsori.class,report);
+
     }
 }

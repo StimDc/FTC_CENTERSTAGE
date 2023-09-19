@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.Implementations.DebugTools.CatchingBugs;
@@ -131,7 +132,23 @@ public class Sponsori extends OpMode {
         telemetry.addLine("DEBUG");
         CatchingBugs.getExperimental(telemetry,this.getClass());
         CatchingBugs.getNameReport(telemetry,"Andrei");
+        debugGamepad(gamepad1);
         telemetry.update();
+    }
+
+    public void debugGamepad(Gamepad gamepad){
+        telemetry.addLine("Gamepad debug");
+        telemetry.addLine("Left Stick X : " + gamepad.left_stick_x);
+        telemetry.addLine("Left Stick Y : " + gamepad.left_stick_y);
+        telemetry.addLine("Right Stick X : " + gamepad.right_stick_x);
+        telemetry.addLine("Right Stick Y : " + gamepad.right_stick_y);
+
+        String dpad, button;
+        button = (gamepad.a)? "A" : ((gamepad.b)? "B" : ((gamepad.y)? "Y" : ((gamepad.x)? "X" : "NONE")));
+        dpad = (gamepad.dpad_down)? "DOWN" : ((gamepad.dpad_left)? "LEFT" : ((gamepad.dpad_right)? "RIGHT" : ((gamepad.dpad_up)? "UP" : "NONE")));
+
+        telemetry.addLine("Gamepad dpad :" + dpad);
+        telemetry.addLine("Gamepad button : " + button);
     }
 
 }

@@ -64,23 +64,23 @@ public class Sponsori extends OpMode {
 
         }
 
-        if(gamepad1.a){
+        if(gamepad2.a){
             setPowerSliderMotor(0.7);
         }
-        if(gamepad1.b){
+        if(gamepad2.b){
             setPowerSliderMotor(-0.5);
         }
         //TODO: de modificat pozitiile
         //c1- servo din stanga: 1-deschis la maxim, 0-inchis la maxim
         //c2-servo di dreapta: 1-inchis la maxim, 0-deschis la maxim
 
-        if(gamepad1.x){//inchide
-            c1.setPosition(0.45);
+        if(gamepad2.x){//inchide
+            c1.setPosition(0.42);
             c2.setPosition(0.53);
         }
-        if(gamepad1.y){ //deschide
+        if(gamepad2.y){ //deschide
             c1.setPosition(0.55);
-            c2.setPosition(0.38);
+            c2.setPosition(0.395);
         }
         if(slider.getPower()==0) {
             slider.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);

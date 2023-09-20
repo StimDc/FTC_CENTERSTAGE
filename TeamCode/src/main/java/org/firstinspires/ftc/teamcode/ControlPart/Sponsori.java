@@ -65,21 +65,26 @@ public class Sponsori extends OpMode {
         }
 
         if(gamepad1.a){
-            setPowerSliderMotor(0.5);
+            setPowerSliderMotor(0.7);
         }
         if(gamepad1.b){
             setPowerSliderMotor(-0.5);
         }
         //TODO: de modificat pozitiile
-        if(gamepad1.x){
-            c1.setPosition(0);
-            c2.setPosition(0.4);
+        //c1- servo din stanga: 1-deschis la maxim, 0-inchis la maxim
+        //c2-servo di dreapta: 1-inchis la maxim, 0-deschis la maxim
+
+        if(gamepad1.x){//inchide
+            c1.setPosition(0.45);
+            c2.setPosition(0.53);
         }
-        if(gamepad1.y){
-            c1.setPosition(0);
-            c2.setPosition(0.4);
+        if(gamepad1.y){ //deschide
+            c1.setPosition(0.55);
+            c2.setPosition(0.38);
         }
-        slider.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        if(slider.getPower()==0) {
+            slider.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        }
         stopMotor();
         slider.setPower(0);
         debug();
@@ -91,8 +96,8 @@ public class Sponsori extends OpMode {
      * Sets the power of the motor attached to the slider
      * @param power is the power that feeds the motor, 0 represents 0V, 1 means MAX V and -1 means the same but in reverse
      */
-   @Experimental
-   @ImplementedBy(name = "Andrei", date="18.09.23")
+    @Experimental
+    @ImplementedBy(name = "Andrei", date="18.09.23")
     public void setPowerSliderMotor(double power){
         slider.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         for(float i = 0;i< abs(power);i+=0.05){

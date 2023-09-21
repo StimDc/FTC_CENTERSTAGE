@@ -75,8 +75,8 @@ public class Sponsori extends OpMode {
         //c2-servo di dreapta: 1-inchis la maxim, 0-deschis la maxim
 
         if(gamepad2.x){//inchide
-            c1.setPosition(0.42);
-            c2.setPosition(0.53);
+            c1.setPosition(0.44);
+            c2.setPosition(0.51);
         }
         if(gamepad2.y){ //deschide
             c1.setPosition(0.55);

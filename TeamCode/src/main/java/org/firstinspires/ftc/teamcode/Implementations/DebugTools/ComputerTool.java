@@ -9,11 +9,9 @@ public class ComputerTool {
     Debug code here without uploading to the robot
      */
     public static void main(String args[]){
-        //CatchingBugs.getNameReport("Andrei");
-       // CatchingBugs.getExperimental(Sponsori.class);
-        ReportBuilder report = new ReportBuilder();
-        report.addToReport("da").addToReport("nu");
-        CatchingBugs.getExperimental(Sponsori.class,report);
+        Debugger debugger = new Debugger();
+        debugger.init();
+        debugger.loop();
 
     }
 }

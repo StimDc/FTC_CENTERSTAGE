@@ -3,14 +3,19 @@ package org.firstinspires.ftc.teamcode.ControlPart;
 import static android.os.SystemClock.sleep;
 import static java.lang.Math.abs;
 
+import com.arcrobotics.ftclib.hardware.ServoEx;
+import com.arcrobotics.ftclib.hardware.SimpleServo;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Implementations.DebugTools.CatchingBugs;
 import org.firstinspires.ftc.teamcode.Implementations.Annotations.Experimental;
 import org.firstinspires.ftc.teamcode.Implementations.Annotations.ImplementedBy;
@@ -19,25 +24,33 @@ import org.firstinspires.ftc.teamcode.Implementations.Annotations.ImplementedBy;
 public class Control extends OpMode {
     ///private float leftX, leftY, rightX;
 
-    ///private final double COEFICIENT= 0.0001d;
+    private final double COEFICIENT= 0.001d;
+
+    private double angle=0;
 
 
     static final double C0INCHIS=0.3511111d;
     static final double C0DESCHIS=0.15166666d;
 
-     boolean OKDeschis=true;
-    private double PowerElevator=0.95d, PowerClaw=0.2d;
+     boolean OKDeschis=true,  OKSus=true;
+    private double PowerElevator=0.7d, PowerClaw=0.2d;
 
     static final double TICKS_REVHEX=288;
 
     private final double GEAR_RATIO_CLAW=2; //90teeth:45teeth
 
-     DcMotor frontLeft,frontRight, backLeft, backRight;
+     DcMotor frontLeft,frontRight, backLeft, backRight,viteza;
 
     DcMotor claw;
      DcMotor elevator1, elevator2;
 
+     private double elepower;
+
+     public ServoEx testservo;
+
     private Servo c0;
+
+    private CRServo sgheara;
 
     @Override
     public void init() {
@@ -50,7 +63,15 @@ public class Control extends OpMode {
 
         */
         c0= hardwareMap.get(Servo.class, "c0");
-        claw=hardwareMap.get(DcMotor.class,"gheara");
+        ///claw=hardwareMap.get(DcMotor.class,"gheara");
+        ///sgheara=hardwareMap.get(CRServo.class, "sgheara");
+       //// testservo=hardwareMap.get(Servo.class,"testservo");
+       // testservo=hardwareMap.get(SimpleServo.class,"testservo");
+        testservo = new SimpleServo(hardwareMap,"testservo",0,180,AngleUnit.DEGREES);
+        testservo.setRange(0,300, AngleUnit.DEGREES);
+
+
+        viteza=hardwareMap.get(DcMotor.class,"viteza");
 
         elevator1=hardwareMap.get(DcMotor.class,"ele1");
         elevator2=hardwareMap.get(DcMotor.class,"ele2");
@@ -59,8 +80,8 @@ public class Control extends OpMode {
         claw.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         claw.setDirection(DcMotorSimple.Direction.FORWARD);
 
-        elevator1.setDirection(DcMotorSimple.Direction.FORWARD);
-        elevator2.setDirection(DcMotorSimple.Direction.FORWARD);
+        elevator1.setDirection(DcMotorSimple.Direction.REVERSE);
+        elevator2.setDirection(DcMotorSimple.Direction.REVERSE);
 
         //elevator1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         //elevator2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -82,6 +103,7 @@ public class Control extends OpMode {
         claw.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 
+
         if(gamepad1.dpad_up){
             OKDeschis=!OKDeschis;
             sleep(300);
@@ -92,8 +114,25 @@ public class Control extends OpMode {
             CloseClaw();
         }
 
+        if(gamepad1.a){
+               // testservo.rotateByAngle(250);
+            ///testservo.rotateByAngle(200);
+            c0.setPosition(0);
+        }
 
-        if(gamepad1.a){ // the claw is going down
+        if(gamepad1.b){
+         //   testservo.setPosition(1);
+            c0.setPosition(1);
+        }
+
+        if(gamepad1.x){
+            viteza.setPower(0.95);
+        }else{
+            viteza.setPower(0);
+        }
+
+
+       /* if(gamepad1.a){ // the claw is going down
             sleep(300);
             DownClaw(PowerClaw);
         }else if(gamepad1.b){ //the claw is going up
@@ -101,20 +140,22 @@ public class Control extends OpMode {
             UpClaw(PowerClaw);
         }
 
+*/
         if(gamepad1.left_trigger>0){ //The elevator is going up
 
-            UpElevator(gamepad1.left_trigger);
+            if(gamepad1.left_trigger>0.7){ ///SISTEM ANTI PROST
+                UpElevator(0.7);
+            }else{
+                UpElevator(gamepad1.left_trigger);
+            }
 
-        }else{
-            elevator1.setPower(0);
-            elevator2.setPower(0);
+        }else if(gamepad1.right_trigger>0){//The elevator is going down
 
-
-        }
-
-        if(gamepad1.right_trigger>0){//The elevator is going down
-
-            DownElevator(gamepad1.right_trigger);
+            if(gamepad1.right_trigger>0.7){///SISTEM ANTI PROST HAI ACASA
+                DownElevator(0.7);
+            }else{
+                DownElevator(gamepad1.right_trigger);
+            }
 
         }else{
             elevator1.setPower(0);
@@ -140,6 +181,8 @@ public class Control extends OpMode {
         if(gamepad1.right_trigger >0){
             powerWheelMotors(gamepad1.right_trigger,-1,1,1,-1);
         }
+
+         */
 /*
         if(gamepad1.left_bumper){
             frontRight.setPower(0.6);
@@ -168,7 +211,6 @@ public class Control extends OpMode {
         frontRight.setPower(0);
         backRight.setPower(0);
         backLeft.setPower(0);
-
 
     }
     public void powerWheelMotors(float trip, int sign1, int sign2, int sign3, int sign4){
@@ -286,7 +328,13 @@ public class Control extends OpMode {
      */
     @ImplementedBy(name= "Rares",date="24.10.23")
     public void DownElevator(double power){
-        MoveElevator(power,-1);
+        elevator1.setDirection(DcMotorSimple.Direction.FORWARD);
+        elevator2.setDirection(DcMotorSimple.Direction.FORWARD);
+
+        MoveElevator(power,1);
+
+        elevator1.setDirection(DcMotorSimple.Direction.REVERSE);
+        elevator2.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     @Experimental

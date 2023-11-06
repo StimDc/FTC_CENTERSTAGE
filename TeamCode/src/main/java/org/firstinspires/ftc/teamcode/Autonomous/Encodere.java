@@ -35,6 +35,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -69,7 +70,7 @@ public class Encodere extends LinearOpMode {
 
     /* Declare OpMode members. */
     private DcMotor         leftDrive   = null;
-    private Servo c0,c1,c2;
+    private Servo c0,c1,c2,tests;
 
     private CRServo testservo;
 
@@ -107,16 +108,19 @@ public class Encodere extends LinearOpMode {
     public void runOpMode() {
 
 
-        leftDrive  = hardwareMap.get(DcMotor.class, "motor");
+        //leftDrive  = hardwareMap.get(DcMotor.class, "motor");
         c0=hardwareMap.get(Servo.class,"c0");
         c1=hardwareMap.get(Servo.class, "c1");
         c2=hardwareMap.get(Servo.class, "c2");
+        tests= hardwareMap.get(Servo.class,"testservo");
         testservo= hardwareMap.get(CRServo.class,"CRservo");
         //Adauga functia motor pentru testare encodere sau servo pentru testare servo
 
         waitForStart();
 
-        c0.setPosition(0.5);
+        tests.setPosition(0);
+        sleep(5000);
+        tests.setPosition(1);
 
 
         while(opModeIsActive()){

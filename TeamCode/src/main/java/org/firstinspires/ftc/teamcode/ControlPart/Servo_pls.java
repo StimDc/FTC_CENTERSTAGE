@@ -25,7 +25,7 @@ public class Servo_pls extends OpMode {
     private boolean once=false;
 
     static final double CLAWCLOSED=0.4411111d, CLAWOPEN=0.15166666d;
-    static final double JOINTUP=1, JOINTDOWN=0.15;
+    static final double JOINTUP=1, JOINTDOWN=0.1;
 
     private DcMotor elevator1, elevator2;
 
@@ -87,6 +87,10 @@ public class Servo_pls extends OpMode {
         }
 
 
+        if(gamepad2.dpad_right){
+            joint.setPosition(0.4);
+            OKJoint=false;
+        }
 
         if(gamepad2.a){
             if(OKClaw==false && !PressClaw){
@@ -136,13 +140,18 @@ public class Servo_pls extends OpMode {
         }
 
         if(gamepad1.left_trigger >0){
-            powerWheelMotors(gamepad1.left_trigger,1,-1,-1,1);
+            powerWheelMotors(gamepad1.left_trigger,0,1,0,1);
 
         }
 
         if(gamepad1.right_trigger >0){
-            powerWheelMotors(gamepad1.right_trigger,-1,1,1,-1);
+            powerWheelMotors(gamepad1.right_trigger,1,0,1,0);
         }
+
+        if(gamepad1.left_stick_x >0.4 || gamepad1.left_stick_x <-0.4){
+            powerWheelMotors(gamepad1.left_stick_x, -1,1,1,-1);
+        }
+
 
         stop1();
 

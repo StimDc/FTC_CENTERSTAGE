@@ -16,9 +16,9 @@ import org.firstinspires.ftc.teamcode.Implementations.DebugTools.CatchingBugs;
 import org.firstinspires.ftc.teamcode.Implementations.Annotations.Experimental;
 import org.firstinspires.ftc.teamcode.Implementations.Annotations.ImplementedBy;
 
-@TeleOp(name = "Ceva")
-
-public class ceva extends OpMode {
+@TeleOp(name = "BlueprintControl")
+@Disabled
+public class ControlBlueprint extends OpMode {
 
     @Override
     public void init() {
@@ -32,6 +32,5 @@ public class ceva extends OpMode {
     public void loop() {
 
     }
-
 
 }

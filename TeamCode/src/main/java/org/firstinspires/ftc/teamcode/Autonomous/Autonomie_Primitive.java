@@ -42,14 +42,9 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
+import org.firstinspires.ftc.teamcode.Implementations.Camera.RedPropThreshold;
 import org.firstinspires.ftc.vision.VisionPortal;
-import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
-
-import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /*
  * This OpMode illustrates the concept of driving a path based on encoder counts.
@@ -77,24 +72,45 @@ import java.util.concurrent.TimeUnit;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Camera", group = "Robot")
+@Autonomous(name="Autonomie Primitiva", group = "Robot")
 
-public class Camera extends LinearOpMode {
+public class Autonomie_Primitive extends LinearOpMode {
+
+    private RedPropThreshold redProp;
+    private VisionPortal visionPortal;
     private AprilTagProcessor apriltagProcesor;
-
-    private VisionPortal myVisionPortal;
-
     private int apriltagid;
+    private double distx=999, disty=999;
+
+
+    private static final double PI = 3.14159265d;
+    private static final double GO_TICKS_PER_REV = 537.7d;
+    private DcMotor frontLeft,frontRight, backLeft, backRight;
+    private static final double  WHEEL_CIRCUMFERENCE =  PI * 3.7795275d;
+    private final double POWER=0.3;
+
+
 
     @Override
     public void runOpMode() {
+
+        InitCamera();
+        InitMotors();
+
+        waitForStart();
+
+    }
+
+    public void InitCamera(){
+
+        redProp=new RedPropThreshold();
 
         apriltagProcesor = new AprilTagProcessor.Builder()
                 .setDrawAxes(true)
                 .setDrawCubeProjection(true)
                 .setDrawTagID(true)
                 .setDrawTagOutline(true)
-               //.3 .setLensIntrinsics(1731.46, 1731.46, 119.867, 12.6661)
+                //.3 .setLensIntrinsics(1731.46, 1731.46, 119.867, 12.6661)
 
                 /*
                 NU BUN 640x480 Camera logitech: 1731.46, 1731.46, 119.867, 12.6661
@@ -102,18 +118,18 @@ public class Camera extends LinearOpMode {
                  */
                 .build();
 
-        myVisionPortal = new VisionPortal.Builder()
+        visionPortal = new VisionPortal.Builder()
+                .addProcessor(redProp)
                 .addProcessor(apriltagProcesor)
                 .setCamera(hardwareMap.get(WebcamName.class,"Camera1"))
                 .setCameraResolution(new Size(640,480))
                 .build();
 
-        while(myVisionPortal.getCameraState() != VisionPortal.CameraState.STREAMING){
+        while(visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING){
 
         }
 
-
-        /* CA SA REDUCEM BLURAREA APRIL TAG-ULUI, ATUNCI CAND SE MISCA ROBOTUL
+         /* CA SA REDUCEM BLURAREA APRIL TAG-ULUI, ATUNCI CAND SE MISCA ROBOTUL
 
         ExposureControl exposure =myVisionPortal.getCameraControl(ExposureControl.class);
         exposure.setMode(ExposureControl.Mode.Manual);
@@ -129,65 +145,110 @@ public class Camera extends LinearOpMode {
 
          */
 
-        waitForStart();
+    }
 
-        while (!isStopRequested() && opModeIsActive()) {
+    public void InitMotors(){
 
-            Vector3 april1 = new Vector3();
-            Vector3 april2 = new Vector3();
-            Vector3 april3 = new Vector3();
+        frontLeft = hardwareMap.get(DcMotor.class, "FL");
+        frontRight = hardwareMap.get(DcMotor.class, "FR");
+        backLeft = hardwareMap.get(DcMotor.class, "BL");
+        backRight = hardwareMap.get(DcMotor.class, "BR");
 
+        frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        frontRight.setDirection(DcMotorSimple.Direction.FORWARD);
+        backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        backRight.setDirection(DcMotorSimple.Direction.FORWARD);
 
-            List<AprilTagDetection> AprilDetections;
+        frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-            AprilDetections = apriltagProcesor.getDetections();
+    }
 
-            telemetry.addData("April Tag-uri: ",AprilDetections.size());
+    public void lateral (double pow, int dist){
 
+        int ticks=(int)Inch_To_Ticks(Cm_To_Inch(dist));
 
-            for (AprilTagDetection currentDetection : AprilDetections) {
-
-                if (currentDetection.metadata != null) {
-                    apriltagid = currentDetection.id;
-
-                    switch(apriltagid){
-                        case 1:
-                            april1.setVector(currentDetection.ftcPose.x, currentDetection.ftcPose.y, currentDetection.ftcPose.z);
-
-                            break;
-                        case 2:
-                            april2.setVector(currentDetection.ftcPose.x, currentDetection.ftcPose.y, currentDetection.ftcPose.z);
-
-                            break;
-                        case 3:
-                            april3.setVector(currentDetection.ftcPose.x, currentDetection.ftcPose.y, currentDetection.ftcPose.z);
-                                                        break;
-                    }
-                    telemetry.addLine("AprilTag1: X " + String.valueOf(april1.x) + " Y " + String.valueOf(april1.y) + " Z " + String.valueOf(april1.z));
-                    telemetry.addLine("AprilTag2: X " + String.valueOf(april2.x) + " Y " + String.valueOf(april2.y) + " Z " + String.valueOf(april2.z));
-                    telemetry.addLine("AprilTag3: X " + String.valueOf(april3.x) + " Y " + String.valueOf(april3.y) + " Z " + String.valueOf(april3.z));
+        frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
 
+        frontRight.setTargetPosition(-ticks);
+        frontLeft.setTargetPosition(ticks);
+        backRight.setTargetPosition(ticks);
+        backLeft.setTargetPosition(-ticks);
 
+        frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
+        frontRight.setPower(pow);
+        frontLeft.setPower(pow);
+        backRight.setPower(pow);
+        backLeft.setPower(pow);
 
-                    telemetry.update();
-                    sleep(2000);
-
-                }
-            }
-
+        while(frontRight.isBusy() && frontLeft.isBusy() && backRight.isBusy() && backLeft.isBusy()){
 
         }
 
+        frontRight.setPower(0);
+        frontLeft.setPower(0);
+        backRight.setPower(0);
+        backLeft.setPower(0);
+
     }
 
-    public double Inch_to_Cm (int inch){
+    public void GoFront(double pow, int dist){
 
-        double cm=2.54*inch;
+        int ticks=(int)Inch_To_Ticks(Cm_To_Inch(dist));
 
-        return cm;
+        frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+
+
+        frontRight.setTargetPosition(ticks);
+        frontLeft.setTargetPosition(ticks);
+        backRight.setTargetPosition(ticks);
+        backLeft.setTargetPosition(ticks);
+
+        frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        frontRight.setPower(pow);
+        frontLeft.setPower(pow);
+        backRight.setPower(pow);
+        backLeft.setPower(pow);
+
+        while(frontRight.isBusy() && frontLeft.isBusy() && backRight.isBusy() && backLeft.isBusy()){
+
+        }
+
+        frontRight.setPower(0);
+        frontLeft.setPower(0);
+        backRight.setPower(0);
+        backLeft.setPower(0);
+
     }
 
+    public double Cm_To_Inch (int cm){
+
+        double inch=cm*0.393700787d;
+
+        return inch;
+    }
+
+
+    public int Inch_To_Ticks(double inch){
+        return (int)((inch/WHEEL_CIRCUMFERENCE)*GO_TICKS_PER_REV);
+    }
 
 }

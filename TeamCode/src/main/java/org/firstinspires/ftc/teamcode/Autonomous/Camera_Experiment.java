@@ -42,14 +42,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
+import org.firstinspires.ftc.teamcode.Implementations.Camera.RedPropThreshold;
 import org.firstinspires.ftc.vision.VisionPortal;
-import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
-import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
-
-import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /*
  * This OpMode illustrates the concept of driving a path based on encoder counts.
@@ -77,117 +71,34 @@ import java.util.concurrent.TimeUnit;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Camera", group = "Robot")
+@Autonomous(name="Experimentare Culori", group = "Robot")
 
-public class Camera extends LinearOpMode {
-    private AprilTagProcessor apriltagProcesor;
+public class Camera_Experiment extends LinearOpMode {
 
-    private VisionPortal myVisionPortal;
-
-    private int apriltagid;
+    private RedPropThreshold redProp;
+    private VisionPortal visionPortal;
 
     @Override
     public void runOpMode() {
 
-        apriltagProcesor = new AprilTagProcessor.Builder()
-                .setDrawAxes(true)
-                .setDrawCubeProjection(true)
-                .setDrawTagID(true)
-                .setDrawTagOutline(true)
-               //.3 .setLensIntrinsics(1731.46, 1731.46, 119.867, 12.6661)
+        redProp=new RedPropThreshold();
 
-                /*
-                NU BUN 640x480 Camera logitech: 1731.46, 1731.46, 119.867, 12.6661
-                640x480 Camera No-name:  2475.88, 2475.88, 249.071, 110.786
-                 */
-                .build();
-
-        myVisionPortal = new VisionPortal.Builder()
-                .addProcessor(apriltagProcesor)
+        visionPortal = new VisionPortal.Builder()
+                .addProcessor(redProp)
                 .setCamera(hardwareMap.get(WebcamName.class,"Camera1"))
                 .setCameraResolution(new Size(640,480))
                 .build();
 
-        while(myVisionPortal.getCameraState() != VisionPortal.CameraState.STREAMING){
+        while(visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING){
 
         }
-
-
-        /* CA SA REDUCEM BLURAREA APRIL TAG-ULUI, ATUNCI CAND SE MISCA ROBOTUL
-
-        ExposureControl exposure =myVisionPortal.getCameraControl(ExposureControl.class);
-        exposure.setMode(ExposureControl.Mode.Manual);
-        exposure.setExposure(15, TimeUnit.MILLISECONDS);
-        /// telemetry.addData("Exposure: ",exposure.isExposureSupported());
-
-
-        GainControl gain=myVisionPortal.getCameraControl(GainControl.class);
-        gain.setGain(255);
-        ///telemetry.addData("Min gain: ", gain.getMinGain());
-        ///telemetry.addData("Max gain: ",gain.getMaxGain());
-
-
-         */
 
         waitForStart();
 
-        while (!isStopRequested() && opModeIsActive()) {
-
-            Vector3 april1 = new Vector3();
-            Vector3 april2 = new Vector3();
-            Vector3 april3 = new Vector3();
-
-
-            List<AprilTagDetection> AprilDetections;
-
-            AprilDetections = apriltagProcesor.getDetections();
-
-            telemetry.addData("April Tag-uri: ",AprilDetections.size());
-
-
-            for (AprilTagDetection currentDetection : AprilDetections) {
-
-                if (currentDetection.metadata != null) {
-                    apriltagid = currentDetection.id;
-
-                    switch(apriltagid){
-                        case 1:
-                            april1.setVector(currentDetection.ftcPose.x, currentDetection.ftcPose.y, currentDetection.ftcPose.z);
-
-                            break;
-                        case 2:
-                            april2.setVector(currentDetection.ftcPose.x, currentDetection.ftcPose.y, currentDetection.ftcPose.z);
-
-                            break;
-                        case 3:
-                            april3.setVector(currentDetection.ftcPose.x, currentDetection.ftcPose.y, currentDetection.ftcPose.z);
-                                                        break;
-                    }
-                    telemetry.addLine("AprilTag1: X " + String.valueOf(april1.x) + " Y " + String.valueOf(april1.y) + " Z " + String.valueOf(april1.z));
-                    telemetry.addLine("AprilTag2: X " + String.valueOf(april2.x) + " Y " + String.valueOf(april2.y) + " Z " + String.valueOf(april2.z));
-                    telemetry.addLine("AprilTag3: X " + String.valueOf(april3.x) + " Y " + String.valueOf(april3.y) + " Z " + String.valueOf(april3.z));
-
-
-
-
-
-                    telemetry.update();
-                    sleep(2000);
-
-                }
-            }
-
-
+        while(opModeIsActive() && !isStopRequested()){
+            telemetry.addLine("Position red Prop: "+redProp.getPropPosition());
+            telemetry.update();
         }
 
     }
-
-    public double Inch_to_Cm (int inch){
-
-        double cm=2.54*inch;
-
-        return cm;
-    }
-
-
 }

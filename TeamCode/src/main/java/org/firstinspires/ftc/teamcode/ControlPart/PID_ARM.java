@@ -33,6 +33,8 @@ public class PID_ARM extends OpMode {
 
     public static int target=3;
 
+    public double val=0;
+
     private final double ticks_in_degrees=288/(360.0*0.36); /// gear ratio: 45/125=0.36
 
     private DcMotorEx elevator1, elevator2;
@@ -73,12 +75,15 @@ public class PID_ARM extends OpMode {
         telemetry.update();
 
         if(gamepad2.left_trigger>0){
-            target+=1;
+            val+=gamepad2.left_trigger;
         }
 
         if(gamepad2.right_trigger>0){
-            target-=1;
+            val-=gamepad2.right_trigger;
         }
+
+        target=(int) val;
+
     }
 
 }

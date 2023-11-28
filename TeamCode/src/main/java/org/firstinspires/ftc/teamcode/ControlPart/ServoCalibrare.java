@@ -26,7 +26,7 @@ public class ServoCalibrare extends OpMode {
     @Override
     public void init() {
 
-    test=hardwareMap.get(Servo.class,"test");
+    test=hardwareMap.get(Servo.class,"claw");
 
     }
 

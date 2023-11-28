@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.Implementations.Annotations.Experimental;
 import org.firstinspires.ftc.teamcode.Implementations.Annotations.ImplementedBy;
 
 @TeleOp(name = "Servo pls")
-@Disabled
+
 public class Servo_pls extends OpMode {
 
     private Servo joint, claw;
@@ -25,8 +25,8 @@ public class Servo_pls extends OpMode {
 
     private boolean once=false;
 
-    static final double CLAWCLOSED=0.428111d, CLAWOPEN=0.226111d, CLAWINTERMEDIARY=0.3222222d;
-    static final double JOINTUP=1, JOINTDOWN=0.131555d;
+    static final double CLAWCLOSED=0.393888d, CLAWOPEN=0.1d, CLAWINTERMEDIARY=0.344444d;
+    static final double JOINTUP=1, JOINTDOWN=0.1213333d;
 
     static final double AVIONSTART=0, AVIONRELEASE=0.5d;
 
@@ -47,11 +47,11 @@ public class Servo_pls extends OpMode {
         backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         backRight.setDirection(DcMotorSimple.Direction.FORWARD);
 
-        claw=hardwareMap.get(Servo.class,"c0");
-        joint=hardwareMap.get(Servo.class,"c1");
+        claw=hardwareMap.get(Servo.class,"claw");
+        joint=hardwareMap.get(Servo.class,"joint");
 
-        elevator1=hardwareMap.get(DcMotor.class,"ele1");
-        elevator2=hardwareMap.get(DcMotor.class,"ele2");
+        elevator1=hardwareMap.get(DcMotor.class,"e1");
+        elevator2=hardwareMap.get(DcMotor.class,"e2");
 
         elevator1.setDirection(DcMotorSimple.Direction.REVERSE);
         elevator2.setDirection(DcMotorSimple.Direction.REVERSE);

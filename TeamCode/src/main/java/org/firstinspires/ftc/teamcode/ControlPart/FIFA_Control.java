@@ -25,8 +25,12 @@ import org.firstinspires.ftc.teamcode.Implementations.Annotations.ImplementedBy;
 public class FIFA_Control extends OpMode {
 
     DcMotor frontLeft,backLeft,frontRight,backRight;
-
     IMU imu;
+
+
+    static final double JOINTUP=1, JOINTDOWN=0.131555d;
+    private boolean once=false;
+    private Servo joint, claw;
 
     @Override
     public void init() {
@@ -52,6 +56,10 @@ public class FIFA_Control extends OpMode {
         // Without this, the REV Hub's orientation is assumed to be logo up / USB forward
         imu.initialize(parameters);
 
+
+        joint=hardwareMap.get(Servo.class,"joint");
+
+
     }
 
 
@@ -59,9 +67,14 @@ public class FIFA_Control extends OpMode {
     @Override
     public void loop() {
 
-            double y = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
-            double x = gamepad1.left_stick_x;
-            double rx = gamepad1.right_stick_x;
+        if(!once){
+            joint.setPosition(JOINTUP);
+            once=true;
+        }
+
+            double y = -gamepad1.left_stick_y/1.5; // Remember, Y stick value is reversed
+            double x = gamepad1.left_stick_x/1.5;
+            double rx = gamepad1.right_stick_x/3;
 
             // This button choice was made so that it is hard to hit on accident,
             // it can be freely changed based on preference.
@@ -91,6 +104,8 @@ public class FIFA_Control extends OpMode {
             backLeft.setPower(backLeftPower);
             frontRight.setPower(frontRightPower);
             backRight.setPower(backRightPower);
+
+            telemetry.addLine("Heading: "+imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES));
 
     }
 

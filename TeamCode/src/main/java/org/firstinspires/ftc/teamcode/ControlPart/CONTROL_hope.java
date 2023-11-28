@@ -31,8 +31,8 @@ public class CONTROL_hope extends OpMode {
 
     private boolean once=false;
 
-    static final double CLAWCLOSED=0.428111d, CLAWOPEN=0.226111d, CLAWINTERMEDIARY=0.3222222d;
-    static final double JOINTUP=1, JOINTDOWN=0.131555d;
+    static final double CLAWCLOSED=0.393888d, CLAWOPEN=0.1d, CLAWINTERMEDIARY=0.344444d;
+    static final double JOINTUP=1, JOINTDOWN=0.119333d;
 
     static final double AVIONSTART=0, AVIONRELEASE=0.5d;
 
@@ -47,7 +47,7 @@ public class CONTROL_hope extends OpMode {
     public static double p=0.03, i=0, d=0.00001;
     public static double f=0.05;
 
-    public static int target=3;
+    public static int target=0;
 
     public double val=0;
 
@@ -71,14 +71,20 @@ public class CONTROL_hope extends OpMode {
         backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         backRight.setDirection(DcMotorSimple.Direction.FORWARD);
 
-        claw=hardwareMap.get(Servo.class,"c0");
-        joint=hardwareMap.get(Servo.class,"c1");
+        claw=hardwareMap.get(Servo.class,"claw");
+        joint=hardwareMap.get(Servo.class,"joint");
 
-        elevator1=hardwareMap.get(DcMotorEx.class,"ele1");
-        elevator2=hardwareMap.get(DcMotorEx.class,"ele2");
+        elevator1=hardwareMap.get(DcMotorEx.class,"e1");
+        elevator2=hardwareMap.get(DcMotorEx.class,"e2");
 
         elevator1.setDirection(DcMotorSimple.Direction.REVERSE);
         elevator2.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        elevator1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        elevator2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        elevator1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        elevator2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
 
     }
@@ -142,9 +148,16 @@ public class CONTROL_hope extends OpMode {
         double strafe=0;
         double turn =0;
 
+      /*NORMAL METHOD
         drive=-gamepad1.left_stick_y/2.0;
         strafe=-gamepad1.left_stick_x/2.0;
         turn=-gamepad1.right_stick_x/3.0;
+       */
+
+        ///TRYING METHOD
+        drive=-gamepad1.left_stick_y/1.5;
+        strafe=-gamepad1.left_stick_x*1.1/1.5;
+        turn=-gamepad1.right_stick_x/1.5;
 
         moveRobot(drive,strafe,turn);
         moveElevator();
@@ -198,8 +211,16 @@ public class CONTROL_hope extends OpMode {
             val+=gamepad2.left_trigger;
         }
 
-        if(gamepad2.right_trigger>0){
+        if(gamepad2.right_trigger>0 && val>0){
             val-=gamepad2.right_trigger;
+        }
+
+        if(target==0){
+            elevator1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            elevator2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+            elevator1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            elevator2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
 
         target=(int) val;

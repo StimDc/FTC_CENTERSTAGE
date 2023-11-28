@@ -1,38 +1,37 @@
-/* Copyright (c) 2017 FIRST. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted (subject to the limitations in the disclaimer below) provided that
- * the following conditions are met:
- *
- * Redistributions of source code must retain the above copyright notice, this list
- * of conditions and the following disclaimer.
- *
- * Redistributions in binary form must reproduce the above copyright notice, this
- * list of conditions and the following disclaimer in the documentation and/or
- * other materials provided with the distribution.
- *
- * Neither the name of FIRST nor the names of its contributors may be used to endorse or
- * promote products derived from this software without specific prior written permission.
- *
- * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS
- * LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
- * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
 
-package org.firstinspires.ftc.teamcode.Autonomous;
+        /* Copyright (c) 2017 FIRST. All rights reserved.
+         *
+         * Redistribution and use in source and binary forms, with or without modification,
+         * are permitted (subject to the limitations in the disclaimer below) provided that
+         * the following conditions are met:
+         *
+         * Redistributions of source code must retain the above copyright notice, this list
+         * of conditions and the following disclaimer.
+         *
+         * Redistributions in binary form must reproduce the above copyright notice, this
+         * list of conditions and the following disclaimer in the documentation and/or
+         * other materials provided with the distribution.
+         *
+         * Neither the name of FIRST nor the names of its contributors may be used to endorse or
+         * promote products derived from this software without specific prior written permission.
+         *
+         * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS
+         * LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+         * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+         * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+         * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+         * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+         * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+         * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+         * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+         * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+         * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+         */
+
+        package org.firstinspires.ftc.teamcode.Autonomous;
 
 import android.util.Size;
 
-import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -51,7 +50,7 @@ import org.firstinspires.ftc.teamcode.Implementations.Camera.RedPropThreshold;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
-/*
+        /*
  * This OpMode illustrates the concept of driving a path based on encoder counts.
  * The code is structured as a LinearOpMode
  *
@@ -77,26 +76,22 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-///192.168. 43.1:8080/dash PENTRU DASHBOARD
+@Autonomous(name="Primitiva SMART", group = "Autonomie Primitiva")
 
-@Config
-@Autonomous(name="Autonomie Primitiva", group = "Autonomie Primitiva")
-
-public class Autonomie_Primitive extends LinearOpMode {
+public class Autonomie_PrimitiveSMART extends LinearOpMode {
 
     private RedPropThreshold redProp;
     private VisionPortal visionPortal;
     private AprilTagProcessor apriltagProcesor;
     private int apriltagid;
+    private double distx=999, disty=999;
 
 
     private static final double PI = 3.14159265d;
     private static final double GO_TICKS_PER_REV = 537.7d;
     private DcMotor frontLeft,frontRight, backLeft, backRight;
     private static final double  WHEEL_CIRCUMFERENCE =  PI * 3.7795275d;
-    public static double POWER;
-
-    public static double distx,disty,rot;
+    private final double POWER=0.8;
 
     private IMU imu;
     private double HEADING;
@@ -105,17 +100,11 @@ public class Autonomie_Primitive extends LinearOpMode {
     private boolean once=false;
     private Servo joint, claw;
 
-    FtcDashboard dashboard;
-
-    public static int mode=0;
-
-
-
 
     @Override
     public void runOpMode() {
 
-       // InitCamera();
+        // InitCamera();
         InitMotors();
         InitIMU();
 
@@ -124,8 +113,6 @@ public class Autonomie_Primitive extends LinearOpMode {
         telemetry.addLine("Heading"+ imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES));
         telemetry.update();
 
-        dashboard=FtcDashboard.getInstance();
-
         waitForStart();
 
         if(!once){
@@ -133,29 +120,10 @@ public class Autonomie_Primitive extends LinearOpMode {
             once=true;
         }
 
-        while(!isStopRequested() && opModeIsActive()){
-
-            if(mode==1){
-                GoFront(1,POWER,distx);
-            }else if(mode==2){
-                lateral(1,POWER,disty);
-            }else if(mode==3){
-                Rotate(1,POWER,rot);
-            }else if(mode==4){
-                Forward(1,POWER,distx);
-            }else if(mode==5){
-                Strafing(1,POWER,disty);
-            }else if(mode==6){
-                AllMove(distx,disty,rot);
-            }
-
-            mode=0;
-
-        }
-
 
 
     }
+
 
     public void InitCamera(){
 
@@ -574,85 +542,6 @@ public class Autonomie_Primitive extends LinearOpMode {
 
     }
 
-    public void AllMove(double distx,double disty, double rot){
-
-        distx=(int)(Inch_To_Ticks(Cm_To_Inch(distx)));
-        disty=(int)(Inch_To_Ticks(Cm_To_Inch(disty)));
-        rot=Math.toRadians(rot);
-
-        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-
-        frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        while(!isStopRequested() && opModeIsActive() &&( (Math.abs(frontLeft.getCurrentPosition())<Math.abs(distx)&& Math.abs(frontRight.getCurrentPosition())<Math.abs(distx) && Math.abs(backRight.getCurrentPosition())<Math.abs(distx) && Math.abs(backLeft.getCurrentPosition())<Math.abs(distx)) || (Math.abs(frontLeft.getCurrentPosition())<Math.abs(disty)&& Math.abs(frontRight.getCurrentPosition())<Math.abs(disty) && Math.abs(backRight.getCurrentPosition())<Math.abs(disty) && Math.abs(backLeft.getCurrentPosition())<Math.abs(disty))|| (Math.abs(imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS))-Math.abs(HEADING)<Math.abs(rot)))){
-
-            double x= distx-maxim(backLeft.getCurrentPosition(),backRight.getCurrentPosition(),frontLeft.getCurrentPosition(),frontRight.getCurrentPosition());
-            double y=disty- maxim(backLeft.getCurrentPosition(),backRight.getCurrentPosition(),frontLeft.getCurrentPosition(),frontRight.getCurrentPosition());
-            double z=rot- imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
-
-            moveRobot(x,y,z);
-
-        }
-
-        frontLeft.setPower(0);
-        frontRight.setPower(0);
-        backLeft.setPower(0);
-        backRight.setPower(0);
-
-        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        HEADING=imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
-
-
-    }
-
-    public double maxim(double a, double b, double c, double d){
-
-        return Math.max(Math.max(Math.max(a,b),c),d) ;
-
-    }
-
-    public void moveRobot(double x, double y, double yaw) {
-        // Calculate wheel powers.
-        double leftFrontPower    =  x -y -yaw;
-        double rightFrontPower   =  x +y +yaw;
-        double leftBackPower     =  x +y -yaw;
-        double rightBackPower    =  x -y +yaw;
-
-        // Normalize wheel powers to be less than 1.0
-        double max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
-        max = Math.max(max, Math.abs(leftBackPower));
-        max = Math.max(max, Math.abs(rightBackPower));
-
-        if (max > 1.0) {
-            leftFrontPower /= max;
-            rightFrontPower /= max;
-            leftBackPower /= max;
-            rightBackPower /= max;
-        }
-
-        // Send powers to the wheels.
-        frontLeft.setPower(leftFrontPower);
-        frontRight.setPower(rightFrontPower);
-        backLeft.setPower(leftBackPower);
-        backRight.setPower(rightBackPower);
-    }
-
-
     public double Cm_To_Inch (double cm){
 
         double inch=cm*0.393700787d;
@@ -664,5 +553,6 @@ public class Autonomie_Primitive extends LinearOpMode {
     public int Inch_To_Ticks(double inch){
         return (int)((inch/WHEEL_CIRCUMFERENCE)*GO_TICKS_PER_REV);
     }
+
 
 }

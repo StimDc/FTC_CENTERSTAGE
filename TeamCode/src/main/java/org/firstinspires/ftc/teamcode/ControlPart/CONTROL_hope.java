@@ -20,6 +20,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.Implementations.DebugTools.CatchingBugs;
 import org.firstinspires.ftc.teamcode.Implementations.Annotations.Experimental;
 import org.firstinspires.ftc.teamcode.Implementations.Annotations.ImplementedBy;
+import org.firstinspires.ftc.teamcode.Implementations.Robot.Wheels;
 
 @Config
 @TeleOp(name = "Hope Control")
@@ -31,7 +32,7 @@ public class CONTROL_hope extends OpMode {
 
     private boolean once=false;
 
-    static final double CLAWCLOSED=0.393888d, CLAWOPEN=0.1d, CLAWINTERMEDIARY=0.344444d;
+    static final double CLAWCLOSED=0.655444d, CLAWOPEN=0.377222d, CLAWINTERMEDIARY=0.555d;
     static final double JOINTUP=1, JOINTDOWN=0.119333d;
 
     static final double AVIONSTART=0, AVIONRELEASE=0.5d;
@@ -39,6 +40,8 @@ public class CONTROL_hope extends OpMode {
     private DcMotorEx  elevator1, elevator2;
 
     private DcMotor frontLeft,frontRight, backLeft, backRight;
+
+    public Wheels wheels;
 
  ///PID ARM
 
@@ -51,6 +54,7 @@ public class CONTROL_hope extends OpMode {
 
     public double val=0;
 
+
     private final double ticks_in_degrees=288/(360.0*0.36); /// gear ratio: 45/125=0.36
 
 
@@ -60,16 +64,8 @@ public class CONTROL_hope extends OpMode {
         controller=new PIDController(p,i,d);
         telemetry=new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-
-        frontLeft = hardwareMap.get(DcMotor.class, "FL");
-        frontRight = hardwareMap.get(DcMotor.class, "FR");
-        backRight = hardwareMap.get(DcMotor.class, "BR");
-        backLeft = hardwareMap.get(DcMotor.class, "BL");
-
-        frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        frontRight.setDirection(DcMotorSimple.Direction.FORWARD);
-        backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        backRight.setDirection(DcMotorSimple.Direction.FORWARD);
+        wheels = new Wheels(hardwareMap);
+        wheels.setDirection();
 
         claw=hardwareMap.get(Servo.class,"claw");
         joint=hardwareMap.get(Servo.class,"joint");
@@ -101,12 +97,12 @@ public class CONTROL_hope extends OpMode {
         }
 
         if(gamepad2.b){
-            if(OKJoint==false && !PressJoint){
+            if(!OKJoint && !PressJoint){
                 joint.setPosition(JOINTUP);
                 OKJoint=true;
 
             }
-            else if(OKJoint==true && !PressJoint){
+            else if(OKJoint && !PressJoint){
                 joint.setPosition(JOINTDOWN);
                 OKJoint=false;
 
@@ -129,12 +125,12 @@ public class CONTROL_hope extends OpMode {
         }
 
         if(gamepad2.a){
-            if(OKClaw==false && !PressClaw){
+            if(!OKClaw && !PressClaw){
                 claw.setPosition(CLAWINTERMEDIARY);
                 OKClaw=true;
 
             }
-            else if(OKClaw==true && !PressClaw){
+            else if(OKClaw && !PressClaw){
                 claw.setPosition(CLAWCLOSED);
                 OKClaw=false;
 
@@ -166,28 +162,24 @@ public class CONTROL_hope extends OpMode {
 
     public void moveRobot(double x, double y, double yaw) {
         // Calculate wheel powers.
-        double leftFrontPower    =  x -y -yaw;
-        double rightFrontPower   =  x +y +yaw;
-        double leftBackPower     =  x +y -yaw;
-        double rightBackPower    =  x -y +yaw;
+        double frontLeftPower    =  x -y -yaw;
+        double frontRightPower   =  x +y +yaw;
+        double backLeftPower     =  x +y -yaw;
+        double backRightPower    =  x -y +yaw;
 
         // Normalize wheel powers to be less than 1.0
-        double max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
-        max = Math.max(max, Math.abs(leftBackPower));
-        max = Math.max(max, Math.abs(rightBackPower));
+        double max = Math.max(Math.max(Math.max(frontLeftPower,backLeftPower), backRightPower),frontRightPower);
 
         if (max > 1.0) {
-            leftFrontPower /= max;
-            rightFrontPower /= max;
-            leftBackPower /= max;
-            rightBackPower /= max;
+            frontLeftPower /= max;
+            frontRightPower /= max;
+            backLeftPower /= max;
+            backRightPower /= max;
         }
 
         // Send powers to the wheels.
-        frontLeft.setPower(leftFrontPower);
-        frontRight.setPower(rightFrontPower);
-        backLeft.setPower(leftBackPower);
-        backRight.setPower(rightBackPower);
+        wheels.setPower(frontLeftPower,frontRightPower,backLeftPower,backRightPower);
+
     }
 
     public void moveElevator(){

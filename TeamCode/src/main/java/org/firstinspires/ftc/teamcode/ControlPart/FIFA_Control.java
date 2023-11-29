@@ -19,12 +19,13 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Implementations.DebugTools.CatchingBugs;
 import org.firstinspires.ftc.teamcode.Implementations.Annotations.Experimental;
 import org.firstinspires.ftc.teamcode.Implementations.Annotations.ImplementedBy;
+import org.firstinspires.ftc.teamcode.Implementations.Robot.Wheels;
 
 @TeleOp(name = "FIFA Control")
 
 public class FIFA_Control extends OpMode {
 
-    DcMotor frontLeft,backLeft,frontRight,backRight;
+
     IMU imu;
 
 
@@ -32,20 +33,13 @@ public class FIFA_Control extends OpMode {
     private boolean once=false;
     private Servo joint, claw;
 
+    private Wheels wheels; //MOTORS
+
     @Override
     public void init() {
 
-        // Declare our motors
-        // Make sure your ID's match your configuration
-        frontLeft = hardwareMap.get(DcMotor.class,"FL");
-        backLeft = hardwareMap.get(DcMotor.class,"BL");
-        frontRight = hardwareMap.get(DcMotor.class,"FR");
-        backRight = hardwareMap.get(DcMotor.class,"BR");
-
-        frontLeft.setDirection(DcMotor.Direction.REVERSE);
-        frontRight.setDirection(DcMotor.Direction.FORWARD);
-        backLeft.setDirection(DcMotor.Direction.REVERSE);
-        backRight.setDirection(DcMotor.Direction.FORWARD);
+        wheels = new Wheels(hardwareMap);
+        wheels.setDirection();
 
         // Retrieve the IMU from the hardware map
         imu = hardwareMap.get(IMU.class, "imu");
@@ -100,10 +94,7 @@ public class FIFA_Control extends OpMode {
             double frontRightPower = (rotY - rotX - rx) / denominator;
             double backRightPower = (rotY + rotX - rx) / denominator;
 
-            frontLeft.setPower(frontLeftPower);
-            backLeft.setPower(backLeftPower);
-            frontRight.setPower(frontRightPower);
-            backRight.setPower(backRightPower);
+            wheels.setPower(frontLeftPower,frontRightPower,backLeftPower,backRightPower);
 
             telemetry.addLine("Heading: "+imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES));
 

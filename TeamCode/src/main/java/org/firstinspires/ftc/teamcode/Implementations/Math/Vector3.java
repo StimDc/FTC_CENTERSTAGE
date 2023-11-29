@@ -1,17 +1,17 @@
-package org.firstinspires.ftc.teamcode.Autonomous;
+package org.firstinspires.ftc.teamcode.Implementations.Math;
 
 import org.firstinspires.ftc.teamcode.Implementations.Annotations.ImplementedBy;
 
 
 public class Vector3 {
     public double x, y,z;
-    Vector3(double x, double y, double z){
+    public Vector3(double x, double y, double z){
         setVector(x,y,z);
     }
-    Vector3(){
+    public Vector3(){
 
     }
-    void setVector(double x,double y,double z){
+    public void setVector(double x,double y,double z){
         this.x = x;
         this.y = y;
         this.z = z;

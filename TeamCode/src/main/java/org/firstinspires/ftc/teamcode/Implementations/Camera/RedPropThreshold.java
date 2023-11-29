@@ -102,65 +102,6 @@ public class RedPropThreshold implements VisionProcessor {
             outStr="right";
         }
 
-
-         /*
-
-        if(averageLeftBox> redThreshold){
-            outStr="left";
-        }else if(averageCenterBox> redThreshold){
-            outStr="center";
-        }else if(averageRightBox> redThreshold){
-            outStr="right";
-        }
-
-
-          */
-
-
-        ///METODA 2: trecem manual prin fiecare pixel si ii numaram pe aia buni
-    /*
-
-        int nr1=0,nr2=0,nr3=0;
-
-        for(int i=(int) leftUp1.x;i<=rightDown1.x;i++){
-            for(int j=(int) leftUp1.y;i<=rightDown1.y;j++){
-                if(finalMat.get(i,j)[0]==255){
-                    nr1++;
-                }
-            }
-        }
-
-        for(int i=(int) leftUp2.x;i<=rightDown2.x;i++){
-            for(int j=(int) leftUp2.y;i<=rightDown2.y;j++){
-                if(finalMat.get(i,j)[0]==255){
-                    nr2++;
-                }
-            }
-        }
-
-        for(int i=(int) leftUp3.x;i<=rightDown3.x;i++){
-            for(int j=(int) leftUp3.y;i<=rightDown3.y;j++){
-                if(finalMat.get(i,j)[0]==255){
-                    nr3++;
-                }
-            }
-        }
-
-        int maxim=Math.max(Math.max(nr1,nr2),nr3);
-
-        if(maxim==nr1){
-            outStr="left";
-        }else if(maxim==nr2){
-            outStr="center";
-        }else if(maxim==nr3){
-            outStr="right";
-        }
-
-
-     */
-
-     //   finalMat.copyTo(frame); NU SCRIE ASTA
-
         return null;
     }
 

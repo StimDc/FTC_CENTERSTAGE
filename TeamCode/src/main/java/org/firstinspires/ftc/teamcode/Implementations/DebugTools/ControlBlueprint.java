@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.ControlPart;
+package org.firstinspires.ftc.teamcode.Implementations.DebugTools;
 
 import static java.lang.Math.abs;
 import static android.os.SystemClock.sleep;

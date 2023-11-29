@@ -45,8 +45,8 @@ public class PID_ARM extends OpMode {
         controller=new PIDController(p,i,d);
         telemetry=new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-        elevator1= hardwareMap.get(DcMotorEx.class,"ele1");
-        elevator2= hardwareMap.get(DcMotorEx.class,"ele2");
+        elevator1= hardwareMap.get(DcMotorEx.class,"e1");
+        elevator2= hardwareMap.get(DcMotorEx.class,"e2");
 
 
         elevator1.setDirection(DcMotorSimple.Direction.REVERSE);

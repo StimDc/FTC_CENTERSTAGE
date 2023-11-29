@@ -35,19 +35,16 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Implementations.Camera.RedPropThreshold;
+import org.firstinspires.ftc.teamcode.Implementations.Constants.Joint;
+import org.firstinspires.ftc.teamcode.Implementations.Robot.Wheels;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
@@ -92,16 +89,17 @@ public class Autonomie_Primitive extends LinearOpMode {
 
     private static final double PI = 3.14159265d;
     private static final double GO_TICKS_PER_REV = 537.7d;
-    private DcMotor frontLeft,frontRight, backLeft, backRight;
+    private Wheels wheels;
     private static final double  WHEEL_CIRCUMFERENCE =  PI * 3.7795275d;
     public static double POWER;
 
-    public static double distx,disty,rot;
+    public static double distx,disty,rot, straffingerror=1, lateralerror=1.1904761;
+    public static int sign1=1;
 
     private IMU imu;
     private double HEADING;
 
-    static final double JOINTUP=1, JOINTDOWN=0.131555d;
+
     private boolean once=false;
     private Servo joint, claw;
 
@@ -129,26 +127,31 @@ public class Autonomie_Primitive extends LinearOpMode {
         waitForStart();
 
         if(!once){
-            joint.setPosition(JOINTUP);
+            joint.setPosition(Joint.UP);
             once=true;
         }
 
         while(!isStopRequested() && opModeIsActive()){
-
-            if(mode==1){
-                GoFront(1,POWER,distx);
-            }else if(mode==2){
-                lateral(1,POWER,disty);
-            }else if(mode==3){
-                Rotate(1,POWER,rot);
-            }else if(mode==4){
-                Forward(1,POWER,distx);
-            }else if(mode==5){
-                Strafing(1,POWER,disty);
-            }else if(mode==6){
-                AllMove(distx,disty,rot);
+            switch(mode){
+                case 1:
+                    GoFront(sign1,POWER,distx);
+                    break;
+                case 2:
+                    lateral(sign1,POWER,disty);
+                    break;
+                case 3:
+                    Rotate(sign1,POWER,rot);
+                    break;
+                case 4:
+                    Forward(sign1,POWER,distx);
+                    break;
+                case 5:
+                    Strafing(sign1,POWER,disty);
+                    break;
+                case 6:
+                    AllMove(distx,disty,rot);
+                    
             }
-
             mode=0;
 
         }
@@ -185,6 +188,8 @@ public class Autonomie_Primitive extends LinearOpMode {
 
         }
 
+
+
          /* CA SA REDUCEM BLURAREA APRIL TAG-ULUI, ATUNCI CAND SE MISCA ROBOTUL
 
         ExposureControl exposure =myVisionPortal.getCameraControl(ExposureControl.class);
@@ -204,26 +209,10 @@ public class Autonomie_Primitive extends LinearOpMode {
     }
 
     public void InitMotors(){
-
-        frontLeft = hardwareMap.get(DcMotor.class, "FL");
-        frontRight = hardwareMap.get(DcMotor.class, "FR");
-        backLeft = hardwareMap.get(DcMotor.class, "BL");
-        backRight = hardwareMap.get(DcMotor.class, "BR");
-
-        frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        frontRight.setDirection(DcMotorSimple.Direction.FORWARD);
-        backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        backRight.setDirection(DcMotorSimple.Direction.FORWARD);
-
-        frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        wheels = new Wheels(hardwareMap);
+        wheels.setDirection();
+        wheels.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        wheels.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
     }
 
@@ -258,53 +247,22 @@ public class Autonomie_Primitive extends LinearOpMode {
             sign=-1;
         }
 
+        dist=dist*lateralerror;
+
         int ticks=(int)((Inch_To_Ticks(Cm_To_Inch(dist))*(1/Math.sin(45) ) )*35/42);
 
-        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        wheels.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        wheels.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        wheels.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        wheels.setTargetPosition(ticks*sign,-ticks*sign, -ticks*sign, ticks*sign);
+        wheels.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        wheels.setPower(pow);
 
-        frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        wheels.waitMotors();
 
+        wheels.setPower(0);
 
-        frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        frontRight.setTargetPosition(-ticks*sign);
-        frontLeft.setTargetPosition(ticks*sign);
-        backRight.setTargetPosition(ticks*sign);
-        backLeft.setTargetPosition(-ticks*sign);
-
-        frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        frontRight.setPower(pow);
-        frontLeft.setPower(pow);
-        backRight.setPower(pow);
-        backLeft.setPower(pow);
-
-        while(frontRight.isBusy() && frontLeft.isBusy() && backRight.isBusy() && backLeft.isBusy()){
-
-        }
-
-        frontRight.setPower(0);
-        frontLeft.setPower(0);
-        backRight.setPower(0);
-        backLeft.setPower(0);
-
-        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
+        wheels.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
     public void Strafing(int sign,double pow, double dist){
@@ -316,56 +274,44 @@ public class Autonomie_Primitive extends LinearOpMode {
             sign=-1;
         }
 
-        dist=(int)Inch_To_Ticks(Cm_To_Inch(dist));
+        dist=dist*straffingerror;
 
-        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        dist=(int)(Inch_To_Ticks(Cm_To_Inch(dist))*(1/Math.sin(45) ) );
 
-        frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        wheels.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        wheels.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        wheels.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        
 
-        frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        double x=dist-(int)Inch_To_Ticks(Cm_To_Inch(10*pow/0.6));
 
-        double x=dist-(int)Inch_To_Ticks(Cm_To_Inch(5));
-
-        while(Math.abs(frontLeft.getCurrentPosition())<Math.abs(x)&& Math.abs(frontRight.getCurrentPosition())<Math.abs(x) && Math.abs(backRight.getCurrentPosition())<Math.abs(x) && Math.abs(backLeft.getCurrentPosition())<Math.abs(x)){
-
-            frontRight.setPower(-sign* pow);
-            frontLeft.setPower(sign* pow);
-            backRight.setPower(sign* pow);
-            backLeft.setPower(-sign* pow);
+        while(Math.abs(wheels.frontLeft.getCurrentPosition())<Math.abs(x)&&
+                Math.abs(wheels.frontRight.getCurrentPosition())<Math.abs(x) &&
+                Math.abs(wheels.backRight.getCurrentPosition())<Math.abs(x) &&
+                Math.abs(wheels.backLeft.getCurrentPosition())<Math.abs(x)){
+            wheels.setPower(sign*pow,-sign*pow,-sign*pow,sign*pow);
 
         }
 
-        while(Math.abs(frontLeft.getCurrentPosition())<Math.abs(dist)&& Math.abs(frontRight.getCurrentPosition())<Math.abs(dist) && Math.abs(backRight.getCurrentPosition())<Math.abs(dist) && Math.abs(backLeft.getCurrentPosition())<Math.abs(dist)){
+        while(Math.abs(wheels.frontLeft.getCurrentPosition())<Math.abs(dist)&&
+                Math.abs(wheels.frontRight.getCurrentPosition())<Math.abs(dist) &&
+                Math.abs(wheels.backRight.getCurrentPosition())<Math.abs(dist) &&
+                Math.abs(wheels.backLeft.getCurrentPosition())<Math.abs(dist)){
 
-            if(pow>0.1){
-                pow=pow-0.01;
+            if(pow>0.01){
+                pow=pow-0.4;
+            }
+            if(pow<0.01){
+                pow=0.01;
             }
 
-            frontRight.setPower(-sign* pow);
-            frontLeft.setPower(sign* pow);
-            backRight.setPower(sign* pow);
-            backLeft.setPower(-sign* pow);
+            wheels.setPower(sign*pow,-sign*pow,-sign*pow,sign*pow);
 
         }
 
-        frontRight.setPower(0);
-        frontLeft.setPower(0);
-        backRight.setPower(0);
-        backLeft.setPower(0);
+        wheels.setPower(0);
 
-        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        wheels.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
     }
 
@@ -386,71 +332,45 @@ public class Autonomie_Primitive extends LinearOpMode {
             sign=-1;
         }
 
+        dist=dist*1.1363636;
+
         int ticks=(int)(Inch_To_Ticks(Cm_To_Inch(dist))*35/42);
 
-        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        wheels.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
-        frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        wheels.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        wheels.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        wheels.setPower(ticks*sign);
+        wheels.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        wheels.setPower(pow);
 
-        frontRight.setTargetPosition(ticks*sign);
-        frontLeft.setTargetPosition(ticks*sign);
-        backRight.setTargetPosition(ticks*sign);
-        backLeft.setTargetPosition(ticks*sign);
+        double x=ticks-(int)Inch_To_Ticks(Cm_To_Inch(10));
 
-        frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        while(wheels.frontRight.isBusy() && wheels.frontLeft.isBusy() && wheels.backRight.isBusy() && wheels.backLeft.isBusy()){
 
-        frontRight.setPower(pow);
-        frontLeft.setPower(pow);
-        backRight.setPower(pow);
-        backLeft.setPower(pow);
-
-        double x=(int)Inch_To_Ticks(Cm_To_Inch(10*(pow-0.6)*10*pow/0.6));
-
-        while(frontRight.isBusy() && frontLeft.isBusy() && backRight.isBusy() && backLeft.isBusy()){
-
-            if(Math.abs(frontRight.getCurrentPosition())>Math.abs(x) && Math.abs(frontLeft.getCurrentPosition())>Math.abs(x) && Math.abs(backRight.getCurrentPosition())>Math.abs(x) && Math.abs(backLeft.getCurrentPosition())>Math.abs(x)){
+            if(Math.abs(wheels.frontRight.getCurrentPosition())>Math.abs(x) &&
+                    Math.abs(wheels.frontLeft.getCurrentPosition())>Math.abs(x) &&
+                    Math.abs(wheels.backRight.getCurrentPosition())>Math.abs(x) &&
+                    Math.abs(wheels.backLeft.getCurrentPosition())>Math.abs(x)){
 
                 if(pow>0.01){
-                    pow=pow-0.4;
+                    pow=pow-0.1;
                 }
                 if(pow<0.01){
                     pow=0.01;
                 }
 
-                frontRight.setPower(sign* pow);
-                frontLeft.setPower(sign* pow);
-                backRight.setPower(sign* pow);
-                backLeft.setPower(sign* pow);
+                wheels.setPower(sign*pow);
 
             }
 
         }
 
-        frontRight.setPower(0);
-        frontLeft.setPower(0);
-        backRight.setPower(0);
-        backLeft.setPower(0);
+        wheels.setPower(0);
+        wheels.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-      /*  frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-       */
 
     }
 
@@ -465,33 +385,25 @@ public class Autonomie_Primitive extends LinearOpMode {
 
         dist=(int)(Inch_To_Ticks(Cm_To_Inch(dist)));
 
-        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        wheels.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        wheels.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        wheels.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        double x=dist-(int)Inch_To_Ticks(Cm_To_Inch(10*pow/0.6));
 
-        frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        while(Math.abs(wheels.frontLeft.getCurrentPosition())<Math.abs(x)&&
+                Math.abs(wheels.frontRight.getCurrentPosition())<Math.abs(x) &&
+                Math.abs(wheels.backRight.getCurrentPosition())<Math.abs(x) &&
+                Math.abs(wheels.backLeft.getCurrentPosition())<Math.abs(x)){
 
-        double x=dist-(int)Inch_To_Ticks(Cm_To_Inch(10*(pow-0.6)*10*pow/0.6));
-
-        while(Math.abs(frontLeft.getCurrentPosition())<Math.abs(x)&& Math.abs(frontRight.getCurrentPosition())<Math.abs(x) && Math.abs(backRight.getCurrentPosition())<Math.abs(x) && Math.abs(backLeft.getCurrentPosition())<Math.abs(x)){
-
-            frontRight.setPower(sign* pow);
-            frontLeft.setPower(sign* pow);
-            backRight.setPower(sign* pow);
-            backLeft.setPower(sign* pow);
+            wheels.setPower(sign*pow);
 
         }
 
-        while(Math.abs(frontLeft.getCurrentPosition())<Math.abs(dist)&& Math.abs(frontRight.getCurrentPosition())<Math.abs(dist) && Math.abs(backRight.getCurrentPosition())<Math.abs(dist) && Math.abs(backLeft.getCurrentPosition())<Math.abs(dist)){
+        while(Math.abs(wheels.frontLeft.getCurrentPosition())<Math.abs(dist)&&
+                Math.abs(wheels.frontRight.getCurrentPosition())<Math.abs(dist) &&
+                Math.abs(wheels.backRight.getCurrentPosition())<Math.abs(dist) &&
+                Math.abs(wheels.backLeft.getCurrentPosition())<Math.abs(dist)){
 
             if(pow>0.01){
                 pow=pow-0.4;
@@ -500,22 +412,14 @@ public class Autonomie_Primitive extends LinearOpMode {
                 pow=0.01;
             }
 
-            frontRight.setPower(sign* pow);
-            frontLeft.setPower(sign* pow);
-            backRight.setPower(sign* pow);
-            backLeft.setPower(sign* pow);
+            wheels.setPower(sign*pow);
 
         }
 
-        frontRight.setPower(0);
-        frontLeft.setPower(0);
-        backRight.setPower(0);
-        backLeft.setPower(0);
+        wheels.setPower(0);
+        wheels.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        
 
     }
 
@@ -537,19 +441,13 @@ public class Autonomie_Primitive extends LinearOpMode {
         }
 
         double botHeading=Math.abs(imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS))-Math.abs(HEADING);
-        deg=Math.toRadians(deg)*(90/130);
+        deg=Math.toRadians(deg);
 
-        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        wheels.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         while(Math.abs(botHeading)<Math.abs(deg)){
 
-            frontLeft.setPower(pow*sign);
-            frontRight.setPower(-pow*sign);
-            backLeft.setPower(pow*sign);
-            backRight.setPower(-pow*sign);
+            wheels.setPower(pow*sign, -pow*sign, pow*sign,-pow*sign);
 
             botHeading = Math.abs(imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS))-Math.abs(HEADING);
 
@@ -557,15 +455,8 @@ public class Autonomie_Primitive extends LinearOpMode {
             telemetry.update();
         }
 
-        frontLeft.setPower(0);
-        frontRight.setPower(0);
-        backLeft.setPower(0);
-        backRight.setPower(0);
-
-        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        wheels.setPower(0);
+        wheels.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         HEADING=imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
 
@@ -580,40 +471,33 @@ public class Autonomie_Primitive extends LinearOpMode {
         disty=(int)(Inch_To_Ticks(Cm_To_Inch(disty)));
         rot=Math.toRadians(rot);
 
-        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        wheels.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        wheels.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        wheels.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        while(!isStopRequested() && opModeIsActive() &&
+                ( (Math.abs(wheels.frontLeft.getCurrentPosition())<Math.abs(distx)&&
+                        Math.abs(wheels.frontRight.getCurrentPosition())<Math.abs(distx) &&
+                        Math.abs(wheels.backRight.getCurrentPosition())<Math.abs(distx) &&
+                        Math.abs(wheels.backLeft.getCurrentPosition())<Math.abs(distx)) || 
+                        (Math.abs(wheels.frontLeft.getCurrentPosition())<Math.abs(disty)&&
+                                Math.abs(wheels.frontRight.getCurrentPosition())<Math.abs(disty) &&
+                                Math.abs(wheels.backRight.getCurrentPosition())<Math.abs(disty) &&
+                                Math.abs(wheels.backLeft.getCurrentPosition())<Math.abs(disty))||
+                        (Math.abs(imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS))-Math.abs(HEADING)<Math.abs(rot)))){
 
-        frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        while(!isStopRequested() && opModeIsActive() &&( (Math.abs(frontLeft.getCurrentPosition())<Math.abs(distx)&& Math.abs(frontRight.getCurrentPosition())<Math.abs(distx) && Math.abs(backRight.getCurrentPosition())<Math.abs(distx) && Math.abs(backLeft.getCurrentPosition())<Math.abs(distx)) || (Math.abs(frontLeft.getCurrentPosition())<Math.abs(disty)&& Math.abs(frontRight.getCurrentPosition())<Math.abs(disty) && Math.abs(backRight.getCurrentPosition())<Math.abs(disty) && Math.abs(backLeft.getCurrentPosition())<Math.abs(disty))|| (Math.abs(imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS))-Math.abs(HEADING)<Math.abs(rot)))){
-
-            double x= distx-maxim(backLeft.getCurrentPosition(),backRight.getCurrentPosition(),frontLeft.getCurrentPosition(),frontRight.getCurrentPosition());
-            double y=disty- maxim(backLeft.getCurrentPosition(),backRight.getCurrentPosition(),frontLeft.getCurrentPosition(),frontRight.getCurrentPosition());
+            double x= distx-maxim(wheels.backLeft.getCurrentPosition(),wheels.backRight.getCurrentPosition(),
+                    wheels.frontLeft.getCurrentPosition(),wheels.frontRight.getCurrentPosition());
+            double y=disty- maxim(wheels.backLeft.getCurrentPosition(),wheels.backRight.getCurrentPosition(),
+                    wheels.frontLeft.getCurrentPosition(),wheels.frontRight.getCurrentPosition());
             double z=rot- imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
 
             moveRobot(x,y,z);
 
         }
 
-        frontLeft.setPower(0);
-        frontRight.setPower(0);
-        backLeft.setPower(0);
-        backRight.setPower(0);
-
-        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        wheels.setPower(0);
+        wheels.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         HEADING=imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
 
@@ -628,36 +512,31 @@ public class Autonomie_Primitive extends LinearOpMode {
 
     public void moveRobot(double x, double y, double yaw) {
         // Calculate wheel powers.
-        double leftFrontPower    =  x -y -yaw;
-        double rightFrontPower   =  x +y +yaw;
-        double leftBackPower     =  x +y -yaw;
-        double rightBackPower    =  x -y +yaw;
+        double frontLeftPower    =  x -y -yaw;
+        double frontRightPower   =  x +y +yaw;
+        double backLeftPower     =  x +y -yaw;
+        double backRightPower    =  x -y +yaw;
 
         // Normalize wheel powers to be less than 1.0
-        double max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
-        max = Math.max(max, Math.abs(leftBackPower));
-        max = Math.max(max, Math.abs(rightBackPower));
+        double max = Math.max(Math.abs(frontLeftPower), Math.abs(frontRightPower));
+        max = Math.max(max, Math.abs(backLeftPower));
+        max = Math.max(max, Math.abs(backRightPower));
 
         if (max > 1.0) {
-            leftFrontPower /= max;
-            rightFrontPower /= max;
-            leftBackPower /= max;
-            rightBackPower /= max;
+            frontLeftPower /= max;
+            frontRightPower /= max;
+            backLeftPower /= max;
+            backRightPower /= max;
         }
 
-        // Send powers to the wheels.
-        frontLeft.setPower(leftFrontPower);
-        frontRight.setPower(rightFrontPower);
-        backLeft.setPower(leftBackPower);
-        backRight.setPower(rightBackPower);
+        wheels.setPower(frontLeftPower,frontRightPower,backLeftPower,backRightPower);
     }
 
 
     public double Cm_To_Inch (double cm){
 
-        double inch=cm*0.393700787d;
+        return cm*0.393700787d;
 
-        return inch;
     }
 
 

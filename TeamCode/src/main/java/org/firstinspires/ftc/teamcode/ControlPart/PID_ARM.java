@@ -74,6 +74,8 @@ public class PID_ARM extends OpMode {
         telemetry.addData("target ", target);
         telemetry.update();
 
+        /*
+
         if(gamepad2.left_trigger>0){
             val+=gamepad2.left_trigger;
         }
@@ -82,7 +84,9 @@ public class PID_ARM extends OpMode {
             val-=gamepad2.right_trigger;
         }
 
-        target=(int) val;
+         */
+
+       // target=(int) val;
 
     }
 

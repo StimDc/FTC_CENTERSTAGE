@@ -93,7 +93,7 @@ public class Autonomie_Primitive extends LinearOpMode {
     private static final double  WHEEL_CIRCUMFERENCE =  PI * 3.7795275d;
     public static double POWER;
 
-    public static double distx,disty,rot, straffingerror=1, lateralerror=1.1904761;
+    public static double distx,disty,rot, straffingerror=1, lateralerror=1.1904761d, roterror=0.825d;
     public static int sign1=1;
 
     private IMU imu;
@@ -132,6 +132,9 @@ public class Autonomie_Primitive extends LinearOpMode {
         }
 
         while(!isStopRequested() && opModeIsActive()){
+            telemetry.addData("Rotation: ", imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES));
+            telemetry.update();
+
             switch(mode){
                 case 1:
                     GoFront(sign1,POWER,distx);
@@ -152,7 +155,18 @@ public class Autonomie_Primitive extends LinearOpMode {
                     AllMove(distx,disty,rot);
                     
             }
+            sleep(1000);
             mode=0;
+
+            if(imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS)<HEADING){
+                Rotate(-1,POWER,-Math.abs(imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS))+ Math.abs(HEADING));
+            }else if(imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS)>HEADING){
+                Rotate(1,POWER,Math.abs(imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS))-Math.abs(HEADING));
+            }
+
+            HEADING=imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+
+            sleep(1000);
 
         }
 
@@ -340,7 +354,7 @@ public class Autonomie_Primitive extends LinearOpMode {
 
         wheels.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         wheels.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        wheels.setPower(ticks*sign);
+        wheels.setTargetPosition(ticks*sign,ticks*sign,ticks*sign,ticks*sign);
         wheels.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         wheels.setPower(pow);
@@ -439,6 +453,8 @@ public class Autonomie_Primitive extends LinearOpMode {
         if(sign<-1){
             sign=-1;
         }
+
+        deg=deg*roterror;
 
         double botHeading=Math.abs(imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS))-Math.abs(HEADING);
         deg=Math.toRadians(deg);

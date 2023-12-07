@@ -104,6 +104,7 @@ public class Camera extends LinearOpMode {
         }
 
 
+
         /* CA SA REDUCEM BLURAREA APRIL TAG-ULUI, ATUNCI CAND SE MISCA ROBOTUL
 
         ExposureControl exposure =myVisionPortal.getCameraControl(ExposureControl.class);

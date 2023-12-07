@@ -93,6 +93,8 @@ public class Camera_Experiment extends LinearOpMode {
 
         }
 
+
+
         waitForStart();
 
         while(opModeIsActive() && !isStopRequested()){

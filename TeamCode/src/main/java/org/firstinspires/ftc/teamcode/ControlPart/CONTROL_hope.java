@@ -17,6 +17,8 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.teamcode.Implementations.Constants.Claw;
+import org.firstinspires.ftc.teamcode.Implementations.Constants.Joint;
 import org.firstinspires.ftc.teamcode.Implementations.DebugTools.CatchingBugs;
 import org.firstinspires.ftc.teamcode.Implementations.Annotations.Experimental;
 import org.firstinspires.ftc.teamcode.Implementations.Annotations.ImplementedBy;
@@ -28,6 +30,10 @@ import org.firstinspires.ftc.teamcode.Implementations.Robot.Wheels;
 public class CONTROL_hope extends OpMode {
 
     private Servo joint, claw;
+
+    private Claw clawpos;
+
+    private Joint jointpos;
     private boolean OKJoint=true,OKClaw=true, PressClaw=false, PressJoint=false;
 
     private boolean once=false;
@@ -47,8 +53,9 @@ public class CONTROL_hope extends OpMode {
 
     private PIDController controller;
 
-    public static double p=0.03, i=0, d=0.00001;
-    public static double f=0.05;
+    public static double p=0.03, i=0, d=0.0006
+            ;
+    public static double f=0.04;
 
     public static int target=0;
 
@@ -63,6 +70,8 @@ public class CONTROL_hope extends OpMode {
 
         controller=new PIDController(p,i,d);
         telemetry=new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+        clawpos=new Claw();
+        jointpos=new Joint();
 
         wheels = new Wheels(hardwareMap);
         wheels.setDirection();
@@ -91,19 +100,19 @@ public class CONTROL_hope extends OpMode {
     public void loop() {
 
         if(!once){
-            joint.setPosition(JOINTUP);
-            claw.setPosition(CLAWINTERMEDIARY);
+            joint.setPosition(jointpos.UP);
+            claw.setPosition(clawpos.INTERMEDIARY);//CLAWINTERMEDIARY
             once=true;
         }
 
         if(gamepad2.b){
             if(!OKJoint && !PressJoint){
-                joint.setPosition(JOINTUP);
+                joint.setPosition(jointpos.UP);
                 OKJoint=true;
 
             }
             else if(OKJoint && !PressJoint){
-                joint.setPosition(JOINTDOWN);
+                joint.setPosition(jointpos.DOWN);
                 OKJoint=false;
 
             }
@@ -120,18 +129,18 @@ public class CONTROL_hope extends OpMode {
         }
 
         if(gamepad2.dpad_left){
-            claw.setPosition(CLAWOPEN);
+            claw.setPosition(clawpos.OPEN);//CLAWOPEN
             OKClaw=false;
         }
 
         if(gamepad2.a){
             if(!OKClaw && !PressClaw){
-                claw.setPosition(CLAWINTERMEDIARY);
+                claw.setPosition(clawpos.INTERMEDIARY);//CLAWINTERMEDIARY
                 OKClaw=true;
 
             }
             else if(OKClaw && !PressClaw){
-                claw.setPosition(CLAWCLOSED);
+                claw.setPosition(clawpos.CLOSED);//CLAWCLOSED
                 OKClaw=false;
 
             }
@@ -200,11 +209,11 @@ public class CONTROL_hope extends OpMode {
         telemetry.update();
 
         if(gamepad2.left_trigger>0){
-            val+=gamepad2.left_trigger;
+            val+=gamepad2.left_trigger*2;
         }
 
         if(gamepad2.right_trigger>0 && val>0){
-            val-=gamepad2.right_trigger;
+            val-=gamepad2.right_trigger*2;
         }
 
         if(target==0){

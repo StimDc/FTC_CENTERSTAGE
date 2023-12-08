@@ -160,9 +160,9 @@ public class CONTROL_hope extends OpMode {
        */
 
         ///TRYING METHOD
-        drive=-gamepad1.left_stick_y/1.5;
-        strafe=-gamepad1.left_stick_x*1.1/1.5;
-        turn=-gamepad1.right_stick_x/1.5;
+        drive=-gamepad1.left_stick_y/1.75;
+        strafe=-gamepad1.left_stick_x*1.1/1.75;
+        turn=-gamepad1.right_stick_x/2.5;
 
         moveRobot(drive,strafe,turn);
         moveElevator();
@@ -209,19 +209,22 @@ public class CONTROL_hope extends OpMode {
         telemetry.update();
 
         if(gamepad2.left_trigger>0){
-            val+=gamepad2.left_trigger*2;
+            val+=gamepad2.left_trigger*1.25;
         }
 
         if(gamepad2.right_trigger>0 && val>0){
             val-=gamepad2.right_trigger*2;
         }
 
-        if(target==0){
+        if(target==0 && elepos>=-5 && elepos<=5){
             elevator1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             elevator2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
             elevator1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             elevator2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+            elevator1.setPower(0);
+            elevator2.setPower(0);
         }
 
         target=(int) val;

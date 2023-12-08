@@ -21,7 +21,7 @@ public class RedPropThreshold implements VisionProcessor {
 
     double redThreshold=0.1;
 
-    String outStr="Nope :(";
+    String outStr="nope";
 
     Point leftUp1= new Point(0,0);
     Point rightDown1=new Point(213,480);

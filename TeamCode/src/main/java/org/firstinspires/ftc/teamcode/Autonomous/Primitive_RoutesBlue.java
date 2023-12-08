@@ -29,8 +29,14 @@
 
 package org.firstinspires.ftc.teamcode.Autonomous;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.Servo;
+
+import org.firstinspires.ftc.teamcode.Implementations.Constants.Claw;
+import org.firstinspires.ftc.teamcode.Implementations.Constants.Joint;
 
 /*
  * This OpMode illustrates the concept of driving a path based on encoder counts.
@@ -58,39 +64,98 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@Autonomous(name="AUTONOMIE PEIMITIVE", group = "Robot")
+@Autonomous(name="Primitive Routes Blue", group = "Robot")
+@Disabled
+public class Primitive_RoutesBlue extends LinearOpMode {
 
-public class Autonomie_Primitive extends LinearOpMode {
+    private int apriltagid,idTarget=-1;
 
-    private Primitive_RoutesRed routeRed;
-    private Primitive_RoutesBlue routeBlue;
+    private Servo joint, claw;
 
-    private int alliance; // RED=1 && BLUE=2
-    private int startpoint; // FRONTSTAGE=1 && BACKSTAGE=2
-    private int parking; // LEFT=1 && RIGHT=2
-    private int wait;//how much to wait in seconds
+    Joint jointPos;
+    Claw clawPos;
 
+    Primitive_Movement move;
+
+    FtcDashboard dashboard;
 
     @Override
     public void runOpMode() {
 
-        if(alliance==1 && startpoint==1){
+    }
 
-            routeRed.RED_FRONTSTAGE(parking,wait);
+    public void BLUE_BACKSTAGE(int parking, int waittimer){
 
-        }else if(alliance==1 && startpoint==2){
+        while(move.Red_Prop_Pos()=="nope") {
+            switch (move.Red_Prop_Pos()) {
 
-            routeRed.RED_BACKSTAGE(parking,wait);
+                case "left":
+                    idTarget = 1;
+                    Backstage_LeftProp_Blue(parking,waittimer);
+                    break;
 
-        }else if(alliance==2 && startpoint==1){
+                case "center":
+                    idTarget = 2;
+                    Backstage_CenterProp_Blue(parking,waittimer);
+                    break;
 
-            routeBlue.BLUE_FRONTSTAGE(parking,wait);
+                case "right":
+                    idTarget = 3;
+                    Backstage_RightProp_Blue(parking,waittimer);
+                    break;
 
-        }else if(alliance==2 && startpoint==2){
-
-            routeBlue.BLUE_BACKSTAGE(parking,wait);
-
+            }
         }
 
     }
+
+    public void BLUE_FRONTSTAGE(int parking, int waittimer){
+
+        while(move.Red_Prop_Pos()=="nope") {
+            switch (move.Red_Prop_Pos()) {
+
+                case "left":
+                    idTarget = 1;
+                    Frontstage_LeftProp_Blue(parking,waittimer);
+                    break;
+
+                case "center":
+                    idTarget = 2;
+                    Frontstage_CenterProp_Blue(parking,waittimer);
+                    break;
+
+                case "right":
+                    idTarget = 3;
+                    Frontstage_RightProp_Blue(parking,waittimer);
+                    break;
+
+            }
+        }
+
+    }
+    public void Backstage_CenterProp_Blue(int parking, int waittimer) {
+        
+
+    }
+
+    public void Backstage_LeftProp_Blue(int parking, int waittimer){
+
+    }
+
+    public void Backstage_RightProp_Blue(int parking, int waittimer){
+
+    }
+
+    public void Frontstage_CenterProp_Blue(int parking, int waittimer){
+
+    }
+
+    public void Frontstage_LeftProp_Blue(int parking, int waittimer){
+
+    }
+
+    public void Frontstage_RightProp_Blue(int parking, int waittimer){
+
+    }
+
 }

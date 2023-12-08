@@ -31,6 +31,7 @@ public class CameraView extends OpMode {
     private VisionPortal visionPortal1,visionPortal2;
     private AprilTagProcessor apriltagProcesor;
 
+    private boolean PressX=false, PressO=false;
 
     @Override
     public void init() {
@@ -51,6 +52,7 @@ public class CameraView extends OpMode {
                 .setCameraResolution(new Size(640,480))
                 .build();
 
+        visionPortal2.stopStreaming();
 
         while(visionPortal1.getCameraState() != VisionPortal.CameraState.STREAMING){
 
@@ -62,6 +64,59 @@ public class CameraView extends OpMode {
     @Experimental()
     @Override
     public void loop() {
+
+        if(gamepad1.a){
+            if(!PressX){
+                Cam_Front();
+            }
+            PressX=true;
+
+        }else {
+            PressX=false;
+        }
+
+        if(gamepad1.b){
+
+            if(!PressO){
+                Cam_Back();
+            }
+            PressO=true;
+
+        }else{
+            PressO=false;
+        }
+
+        telemetry.addLine("Front Camera: X");
+        telemetry.addLine("Back Camera: O");
+        telemetry.update();
+
+    }
+
+    public void Cam_Front(){
+
+        visionPortal1.stopStreaming();
+        while(visionPortal1.getCameraState() != VisionPortal.CameraState.STOPPING_STREAM){
+
+        }
+        sleep(500);
+        visionPortal2.resumeStreaming();
+        while(visionPortal2.getCameraState() != VisionPortal.CameraState.STREAMING){
+
+        }
+
+    }
+
+    public void Cam_Back(){
+
+        visionPortal2.stopStreaming();
+        while(visionPortal2.getCameraState() != VisionPortal.CameraState.STOPPING_STREAM){
+
+        }
+        sleep(500);
+        visionPortal1.resumeStreaming();
+        while(visionPortal1.getCameraState() != VisionPortal.CameraState.STREAMING){
+
+        }
 
     }
 

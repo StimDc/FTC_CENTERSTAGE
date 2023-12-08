@@ -120,9 +120,12 @@ public class Autonomie_Primitive extends LinearOpMode {
         joint=hardwareMap.get(Servo.class,"joint");
 
         telemetry.addLine("Heading"+ imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES));
-        telemetry.update();
+
 
         dashboard=FtcDashboard.getInstance();
+
+
+
 
         waitForStart();
 

@@ -169,6 +169,7 @@ public class CONTROL_hope extends OpMode {
 
     }
 
+
     public void moveRobot(double x, double y, double yaw) {
         // Calculate wheel powers.
         double frontLeftPower    =  x -y -yaw;

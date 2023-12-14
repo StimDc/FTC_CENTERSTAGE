@@ -38,6 +38,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.Implementations.Constants.Claw;
 import org.firstinspires.ftc.teamcode.Implementations.Constants.Joint;
 
+import javax.tools.ForwardingFileObject;
+
 /*
  * This OpMode illustrates the concept of driving a path based on encoder counts.
  * The code is structured as a LinearOpMode
@@ -215,23 +217,149 @@ public class Primitive_RoutesRed extends LinearOpMode {
     }
 
     public void Backstage_LeftProp_Red(String parking, int waittimer){
+        move.InitMotors();
+        move.InitIMU();
 
+
+        joint=hardwareMap.get(Servo.class,"joint");
+
+
+        claw= hardwareMap.get(Servo.class,"claw");
+
+        dashboard=FtcDashboard.getInstance();
+
+
+        move.CamBack_Open();
+
+        waitForStart();
+
+        joint.setPosition(Joint.UP);
+        claw.setPosition(Claw.CLOSED);
+        move.Forward(1,0,0);
+        move.Rotate(-1,0,90);
+        move.moveRobot(0,0,move.Correcting_Yaw());
+        joint.setPosition(Joint.DOWN);
+        claw.setPosition(Claw.OPEN);
+        move.moveRobot(0,0,move.Correcting_Yaw());
+        claw.setPosition(Claw.CLOSED);
+        joint.setPosition(Joint.UP);
+
+        move.moveRobot(0,0,move.Correcting_Yaw());
     }
 
     public void Backstage_RightProp_Red(String parking, int waittimer){
+        move.InitMotors();
+        move.InitIMU();
+
+
+        joint=hardwareMap.get(Servo.class,"joint");
+
+        claw= hardwareMap.get(Servo.class,"claw");
+
+        dashboard=FtcDashboard.getInstance();
+
+
+        move.CamBack_Open();
+
+        waitForStart();
+
+        joint.setPosition(Joint.UP);
+        claw.setPosition(Claw.CLOSED);
+        move.Forward(1,0,0);
+        move.Rotate(-1,0,90);
+
+        //camera back???
+        joint.setPosition(Joint.DOWN);
+        claw.setPosition(Claw.OPEN);
+        //camera back??? Rares efectiv cplm????
+
+        claw.setPosition(Claw.CLOSED);
+        joint.setPosition(Joint.UP);
+
+        //camera back??? Nici nu mai incerc
+
+
 
     }
 
     public void Frontstage_CenterProp_Red(String parking, int waittimer){
+        move.InitMotors();
+        move.InitIMU();
+        joint=hardwareMap.get(Servo.class,"joint");
+        claw = hardwareMap.get(Servo.class,"claw");
+        dashboard = FtcDashboard.getInstance();
+        move.CamBack_Open();
 
+        waitForStart();
+
+        joint.setPosition(Joint.UP);
+        claw.setPosition(Claw.CLOSED);
+        move.Forward(1,0,0);
+        joint.setPosition(Joint.DOWN);
+        claw.setPosition(Claw.OPEN);
+        move.Forward(-1,0,0);
+        claw.setPosition(Claw.CLOSED);
+        joint.setPosition(Joint.UP);
+        move.Rotate(-1,0,90);
+        move.lateral(-1,0,0);
+        move.Forward(-1,0,0);
+
+        //Camera tag idk ce a vrut sa scrie domnul Rares doamne dami rabdare ca daca imi dai putere ma arunc de pe geam
     }
 
-    public void Frontstage_LeftProp_Red(String parking, int waittimer){
 
+
+    public void Frontstage_LeftProp_Red(String parking, int waittimer){
+        move.InitMotors();
+        move.InitIMU();
+        joint = hardwareMap.get(Servo.class,"joint");
+        claw=hardwareMap.get(Servo.class,"claw");
+        dashboard = FtcDashboard.getInstance();
+        move.CamBack_Open();
+
+        waitForStart();
+
+        joint.setPosition(Joint.UP);
+        claw.setPosition(Claw.CLOSED);
+        move.Forward(1,0,0);
+        move.Rotate(-1,0,90);
+        move.Forward(-1,0,0);
+        joint.setPosition(Joint.DOWN);
+        claw.setPosition(Claw.OPEN);
+        move.Forward(-1,0,0);
+        claw.setPosition(Claw.CLOSED);
+        joint.setPosition(Joint.UP);
+        move.Forward(1,0,0);
+        move.lateral(-1,0,0);
+        move.Forward(-1,0,0);
+        move.moveRobot(0,0,move.Correcting_Yaw());
     }
 
     public void Frontstage_RightProp_Red(String parking, int waittimer){
 
+        move.InitMotors();
+        move.InitIMU();
+        joint=hardwareMap.get(Servo.class,"joint");
+        claw = hardwareMap.get(Servo.class,"claw");
+        dashboard = FtcDashboard.getInstance();
+        move.CamBack_Open();
+
+        waitForStart();
+
+        joint.setPosition(Joint.UP);
+        claw.setPosition(Claw.CLOSED);
+        move.Forward(1,0,0);
+        move.Rotate(1,0,90);
+        move.Forward(-1,0,0);
+        joint.setPosition(Joint.DOWN);
+        claw.setPosition(Claw.OPEN);
+        move.Forward(-1,0,0);
+        claw.setPosition(Claw.CLOSED);
+        joint.setPosition(Joint.UP);
+        move.Rotate(1,0,180);
+        move.lateral(-1,0,0);
+        move.Forward(-1,0,0);
+        move.moveRobot(0,0,move.Correcting_Yaw());
     }
 
 }

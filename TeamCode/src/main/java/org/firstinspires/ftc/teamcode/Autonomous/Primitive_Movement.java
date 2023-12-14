@@ -599,7 +599,55 @@ public class Primitive_Movement extends LinearOpMode {
 
         }
 
-        return Range.clip(desiredTag.ftcPose.yaw* 0.825d, -0.6, 0.6) ;
+        return Range.clip(desiredTag.ftcPose.yaw* 0.825d, -0.7, 0.7) ;
+    }
+
+    public void Move_To_April(int atagID){
+
+        AprilTagDetection desiredTag = null;
+        boolean targetFound = false;;
+        boolean ok=false;
+
+        double rangeError=10,headingError=10,yawError=10;
+
+        while(!ok){
+
+            List<AprilTagDetection> currentDetections = apriltagProcesor.getDetections();
+            for (AprilTagDetection detection : currentDetections) {
+                if ((detection.metadata != null) && (detection.id==atagID)){
+                    targetFound = true;
+                    desiredTag = detection;
+                    break;  // don't look any further.
+                }
+            }
+
+            if(targetFound){
+
+                rangeError      = (desiredTag.ftcPose.range - 5);
+                headingError    = desiredTag.ftcPose.bearing;
+                yawError        = desiredTag.ftcPose.yaw;
+
+                // Use the speed and turn "gains" to calculate how we want the robot to move.
+                double drive  = Range.clip(rangeError * 1, -0.7, 0.7);
+                double turn   = Range.clip(headingError * 1, -0.7, 0.7) ;
+                double strafe = Range.clip(-yawError * 1, -0.7, 0.7);
+
+
+                moveRobot(drive,turn,strafe);
+
+            }
+
+            if(rangeError>=-4 && rangeError<=4 && headingError>=0 && headingError<=4 && yawError>=0 && yawError<=0.){
+
+                ok=true;
+
+            }
+
+
+        }
+
+
+
     }
 
     public double Cm_To_Inch (double cm){

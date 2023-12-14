@@ -32,6 +32,11 @@ package org.firstinspires.ftc.teamcode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.teamcode.Implementations.ChoiceMenu.ChoiceMenu;
+
+import java.io.IOException;
+import java.util.Dictionary;
+
 /*
  * This OpMode illustrates the concept of driving a path based on encoder counts.
  * The code is structured as a LinearOpMode
@@ -61,36 +66,56 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 @Autonomous(name="AUTONOMIE PEIMITIVE", group = "Robot")
 
 public class Autonomie_Primitive extends LinearOpMode {
+    Dictionary<String,String> paramaters;
 
     private Primitive_RoutesRed routeRed;
     private Primitive_RoutesBlue routeBlue;
 
-    private int alliance; // RED=1 && BLUE=2
-    private int startpoint; // FRONTSTAGE=1 && BACKSTAGE=2
-    private int parking; // LEFT=1 && RIGHT=2
+    private String alliance; // RED=1 && BLUE=2
+    private String startpoint; // FRONTSTAGE=1 && BACKSTAGE=2
+    private String parking; // LEFT=1 && RIGHT=2
     private int wait;//how much to wait in seconds
 
 
     @Override
     public void runOpMode() {
 
-        if(alliance==1 && startpoint==1){
+        try {
+            paramaters = ChoiceMenu.readFromFile();
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        alliance=paramaters.get("alliance"); //RED or BLUE
+        startpoint=paramaters.get("position");//FRONT_STAGE or BACK_STAGE
+        parking=paramaters.get("parking");//LEFT or RIGHT
+
+        String timer=paramaters.get("timer");// HOW TO CONVERT FROM STRING TO INT???
+
+        try{
+            wait = Integer.parseInt(timer);
+        }
+        catch (NumberFormatException ex){
+            ex.printStackTrace();
+        }
+
+        if(alliance=="RED" && startpoint=="FRONT_STAGE"){
 
             routeRed.RED_FRONTSTAGE(parking,wait);
 
-        }else if(alliance==1 && startpoint==2){
+        }else if(alliance=="RED" && startpoint=="BACK_STAGE"){
 
             routeRed.RED_BACKSTAGE(parking,wait);
 
-        }else if(alliance==2 && startpoint==1){
+        }else if(alliance=="BLUE" && startpoint=="FRONT_STAGE"){
 
-            routeBlue.BLUE_FRONTSTAGE(parking,wait);
+           routeBlue.BLUE_FRONTSTAGE(parking,wait);
 
-        }else if(alliance==2 && startpoint==2){
+        }else if(alliance=="BLUE" && startpoint=="BACK_STAGE"){
 
-            routeBlue.BLUE_BACKSTAGE(parking,wait);
+           routeBlue.BLUE_BACKSTAGE(parking,wait);
 
         }
-
     }
 }

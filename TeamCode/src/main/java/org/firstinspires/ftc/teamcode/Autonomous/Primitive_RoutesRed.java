@@ -84,7 +84,9 @@ public class Primitive_RoutesRed extends LinearOpMode {
 
     }
 
-    public void RED_BACKSTAGE(int parking, int waittimer){
+    public void RED_BACKSTAGE(String parking, int waittimer){
+
+        move.InitCamera();
 
         while(move.Red_Prop_Pos()=="nope") {
             switch (move.Red_Prop_Pos()) {
@@ -109,7 +111,9 @@ public class Primitive_RoutesRed extends LinearOpMode {
 
     }
 
-    public void RED_FRONTSTAGE(int parking, int waittimer){
+    public void RED_FRONTSTAGE(String parking, int waittimer){
+
+        move.InitCamera();
 
         while(move.Red_Prop_Pos()=="nope") {
             switch (move.Red_Prop_Pos()) {
@@ -142,9 +146,8 @@ public class Primitive_RoutesRed extends LinearOpMode {
 
     }
 
-    public void Backstage_CenterProp_Red(int parking, int waittimer) {
+    public void Backstage_CenterProp_Red(String parking, int waittimer) {
 
-        move.InitCamera();
         move.InitMotors();
         move.InitIMU();
 
@@ -156,6 +159,8 @@ public class Primitive_RoutesRed extends LinearOpMode {
 
         dashboard=FtcDashboard.getInstance();
 
+
+        move.CamBack_Open();
 
         waitForStart();
 
@@ -183,6 +188,9 @@ public class Primitive_RoutesRed extends LinearOpMode {
         move.Rotate(-1,0,90);
         sleep(500);
 
+        move.moveRobot(0,0,move.Correcting_Yaw());
+        sleep(500);
+
         move.lateral(-1,0,0);
         sleep(500);
 
@@ -194,11 +202,11 @@ public class Primitive_RoutesRed extends LinearOpMode {
 
         //CAMERA
 
-        if(parking==1){
+        if(parking=="LEFT"){
 
             move.lateral(-1,0,0);
 
-        }else if(parking==2){
+        }else if(parking=="RIGHT"){
 
             move.lateral(1,0,0);
 
@@ -206,23 +214,23 @@ public class Primitive_RoutesRed extends LinearOpMode {
 
     }
 
-    public void Backstage_LeftProp_Red(int parking, int waittimer){
+    public void Backstage_LeftProp_Red(String parking, int waittimer){
 
     }
 
-    public void Backstage_RightProp_Red(int parking, int waittimer){
+    public void Backstage_RightProp_Red(String parking, int waittimer){
 
     }
 
-    public void Frontstage_CenterProp_Red(int parking, int waittimer){
+    public void Frontstage_CenterProp_Red(String parking, int waittimer){
 
     }
 
-    public void Frontstage_LeftProp_Red(int parking, int waittimer){
+    public void Frontstage_LeftProp_Red(String parking, int waittimer){
 
     }
 
-    public void Frontstage_RightProp_Red(int parking, int waittimer){
+    public void Frontstage_RightProp_Red(String parking, int waittimer){
 
     }
 

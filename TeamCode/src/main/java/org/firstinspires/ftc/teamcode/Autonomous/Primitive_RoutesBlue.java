@@ -84,7 +84,9 @@ public class Primitive_RoutesBlue extends LinearOpMode {
 
     }
 
-    public void BLUE_BACKSTAGE(int parking, int waittimer){
+    public void BLUE_BACKSTAGE(String parking, int waittimer){
+
+        move.InitCamera();
 
         while(move.Red_Prop_Pos()=="nope") {
             switch (move.Red_Prop_Pos()) {
@@ -109,7 +111,9 @@ public class Primitive_RoutesBlue extends LinearOpMode {
 
     }
 
-    public void BLUE_FRONTSTAGE(int parking, int waittimer){
+    public void BLUE_FRONTSTAGE(String parking, int waittimer){
+
+        move.InitCamera();
 
         while(move.Red_Prop_Pos()=="nope") {
             switch (move.Red_Prop_Pos()) {
@@ -133,28 +137,28 @@ public class Primitive_RoutesBlue extends LinearOpMode {
         }
 
     }
-    public void Backstage_CenterProp_Blue(int parking, int waittimer) {
+    public void Backstage_CenterProp_Blue(String parking, int waittimer) {
         
 
     }
 
-    public void Backstage_LeftProp_Blue(int parking, int waittimer){
+    public void Backstage_LeftProp_Blue(String parking, int waittimer){
 
     }
 
-    public void Backstage_RightProp_Blue(int parking, int waittimer){
+    public void Backstage_RightProp_Blue(String parking, int waittimer){
 
     }
 
-    public void Frontstage_CenterProp_Blue(int parking, int waittimer){
+    public void Frontstage_CenterProp_Blue(String parking, int waittimer){
 
     }
 
-    public void Frontstage_LeftProp_Blue(int parking, int waittimer){
+    public void Frontstage_LeftProp_Blue(String parking, int waittimer){
 
     }
 
-    public void Frontstage_RightProp_Blue(int parking, int waittimer){
+    public void Frontstage_RightProp_Blue(String parking, int waittimer){
 
     }
 

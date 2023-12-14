@@ -44,6 +44,7 @@ public class CONTROL_hope extends OpMode {
     static final double AVIONSTART=0, AVIONRELEASE=0.5d;
 
     private DcMotorEx  elevator1, elevator2;
+    private DcMotorEx viper,hang;
 
     private DcMotor frontLeft,frontRight, backLeft, backRight;
 
@@ -79,6 +80,7 @@ public class CONTROL_hope extends OpMode {
         claw=hardwareMap.get(Servo.class,"claw");
         joint=hardwareMap.get(Servo.class,"joint");
 
+
         elevator1=hardwareMap.get(DcMotorEx.class,"e1");
         elevator2=hardwareMap.get(DcMotorEx.class,"e2");
 
@@ -91,7 +93,13 @@ public class CONTROL_hope extends OpMode {
         elevator1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         elevator2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+        viper=hardwareMap.get(DcMotorEx.class,"v");
+        viper.setDirection(DcMotorSimple.Direction.FORWARD);
+        viper.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+        hang=hardwareMap.get(DcMotorEx.class,"s");
+        hang.setDirection(DcMotorSimple.Direction.FORWARD);
+        hang.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
 
@@ -149,6 +157,45 @@ public class CONTROL_hope extends OpMode {
             PressClaw=false;
         }
 
+        if(gamepad2.right_stick_y<0){
+
+
+                hang.setPower(-gamepad2.right_stick_y);
+
+
+
+        }else if(gamepad2.right_stick_y>0){
+
+            if(gamepad2.right_stick_y>0.25){
+                hang.setPower(0.25);
+            }else{
+                hang.setPower(-gamepad2.right_stick_y);
+                
+            }
+
+        }else if(gamepad2.right_stick_y<0){
+
+            hang.setPower(-0.25);
+
+        }else if(gamepad2.y){
+
+            viper.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+            viper.setPower(0.3);
+            hang.setPower(-0.7);
+
+        }else if(gamepad2.x){
+
+            viper.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+            viper.setPower(-0.3);
+
+        }else{
+
+            hang.setPower(0);
+            viper.setPower(0);
+            viper.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        }
+
         double drive =0;
         double strafe=0;
         double turn =0;
@@ -168,7 +215,6 @@ public class CONTROL_hope extends OpMode {
         moveElevator();
 
     }
-
 
     public void moveRobot(double x, double y, double yaw) {
         // Calculate wheel powers.

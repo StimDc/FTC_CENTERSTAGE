@@ -85,7 +85,7 @@ public class ChoiceMenu extends LinearOpMode {
             telemetry.addLine(timer + "ms");
             if(gamepad1.a){
                 timerChange = true;
-                ChoiceItem timerChoice = new ChoiceItem("Timer", String.valueOf(timer));
+                ChoiceItem timerChoice = new ChoiceItem("timer", String.valueOf(timer));
                 buffer.add(timerChoice);
                 telemetry.addLine("TIMER CHOSEN: " + timer);
             }

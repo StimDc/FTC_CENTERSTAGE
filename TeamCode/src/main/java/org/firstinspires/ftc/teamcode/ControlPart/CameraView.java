@@ -31,14 +31,11 @@ public class CameraView extends OpMode {
     private VisionPortal visionPortal1,visionPortal2;
     private AprilTagProcessor apriltagProcesor;
 
-    private boolean PressX=false, PressO=false;
+    private boolean PressX=false, PressO=false,once=true;
 
     @Override
     public void init() {
 
-
-
-        redProp=new RedPropThreshold();
 
         visionPortal1 = new VisionPortal.Builder()
                 .addProcessor(apriltagProcesor)
@@ -46,15 +43,20 @@ public class CameraView extends OpMode {
                 .setCameraResolution(new Size(640,480))
                 .build();
 
+        while(visionPortal1.getCameraState() != VisionPortal.CameraState.STREAMING){
+
+        }
+
+        visionPortal1.stopStreaming();
+
+
         visionPortal2=new VisionPortal.Builder()
                 .addProcessor(redProp)
                 .setCamera(hardwareMap.get(WebcamName.class,"Camera2"))
                 .setCameraResolution(new Size(640,480))
                 .build();
 
-        visionPortal2.stopStreaming();
-
-        while(visionPortal1.getCameraState() != VisionPortal.CameraState.STREAMING){
+        while(visionPortal2.getCameraState() != VisionPortal.CameraState.STREAMING){
 
         }
 
@@ -66,7 +68,7 @@ public class CameraView extends OpMode {
     public void loop() {
 
         if(gamepad1.a){
-            if(!PressX){
+            if(!PressX && visionPortal1.getCameraState()== VisionPortal.CameraState.STREAMING){
                 Cam_Front();
             }
             PressX=true;
@@ -77,7 +79,7 @@ public class CameraView extends OpMode {
 
         if(gamepad1.b){
 
-            if(!PressO){
+            if(!PressO && visionPortal2.getCameraState()== VisionPortal.CameraState.STREAMING){
                 Cam_Back();
             }
             PressO=true;

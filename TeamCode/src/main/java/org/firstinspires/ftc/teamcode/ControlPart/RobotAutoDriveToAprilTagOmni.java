@@ -203,7 +203,7 @@ public class RobotAutoDriveToAprilTagOmni extends LinearOpMode
             telemetry.update();
 
             // Apply desired axes motions to the drivetrain.
-            moveRobot(drive, strafe, turn);
+            moveRobot(-drive, -strafe, -turn);
             sleep(10);
         }
     }
@@ -253,7 +253,7 @@ public class RobotAutoDriveToAprilTagOmni extends LinearOpMode
         // Create the vision portal by using a builder.
         if (USE_WEBCAM) {
             visionPortal = new VisionPortal.Builder()
-                    .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
+                    .setCamera(hardwareMap.get(WebcamName.class, "Camera1"))
                     .addProcessor(aprilTag)
                     .build();
         } else {

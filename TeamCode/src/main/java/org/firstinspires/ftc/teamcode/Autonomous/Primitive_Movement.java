@@ -599,7 +599,7 @@ public class Primitive_Movement extends LinearOpMode {
 
         }
 
-        return Range.clip(desiredTag.ftcPose.yaw* 0.825d, -0.7, 0.7) ;
+        return Range.clip(desiredTag.ftcPose.bearing* 1, -0.7, 0.7) ;
     }
 
     public void Move_To_April(int atagID){
@@ -645,7 +645,6 @@ public class Primitive_Movement extends LinearOpMode {
 
 
         }
-
 
 
     }

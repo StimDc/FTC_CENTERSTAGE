@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.ControlPart;
 import static java.lang.Math.abs;
 import static android.os.SystemClock.sleep;
 
+import android.util.Size;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -16,13 +18,21 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.Implementations.Camera.RedPropThreshold;
 import org.firstinspires.ftc.teamcode.Implementations.Constants.Claw;
 import org.firstinspires.ftc.teamcode.Implementations.Constants.Joint;
 import org.firstinspires.ftc.teamcode.Implementations.DebugTools.CatchingBugs;
 import org.firstinspires.ftc.teamcode.Implementations.Annotations.Experimental;
 import org.firstinspires.ftc.teamcode.Implementations.Annotations.ImplementedBy;
 import org.firstinspires.ftc.teamcode.Implementations.Robot.Wheels;
+import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+
+import java.util.List;
 
 @Config
 @TeleOp(name = "Hope Control")
@@ -50,6 +60,8 @@ public class CONTROL_hope extends OpMode {
 
     public Wheels wheels;
 
+    private  final double GO_TICKS_117=1425.1d;
+
  ///PID ARM
 
     private PIDController controller;
@@ -65,10 +77,17 @@ public class CONTROL_hope extends OpMode {
 
     private final double ticks_in_degrees=288/(360.0*0.36); /// gear ratio: 45/125=0.36
 
+    private VisionPortal camBack;
+    private AprilTagProcessor apriltagProcesor;
+
+    private AprilTagDetection desiredTag;
+
+
 
     @Override
     public void init() {
 
+        InitCamera();
         controller=new PIDController(p,i,d);
         telemetry=new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         clawpos=new Claw();
@@ -96,6 +115,10 @@ public class CONTROL_hope extends OpMode {
         viper=hardwareMap.get(DcMotorEx.class,"v");
         viper.setDirection(DcMotorSimple.Direction.FORWARD);
         viper.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        viper.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        viper.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
 
         hang=hardwareMap.get(DcMotorEx.class,"s");
         hang.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -177,13 +200,13 @@ public class CONTROL_hope extends OpMode {
 
             hang.setPower(-0.25);
 
-        }else if(gamepad2.y){
+        }else if(gamepad2.y && viper.getCurrentPosition()<1620){
 
             viper.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
             viper.setPower(0.3);
-            hang.setPower(-0.7);
+            hang.setPower(-0.9);
 
-        }else if(gamepad2.x){
+        }else if(gamepad2.x && viper.getCurrentPosition()>0){
 
             viper.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
             viper.setPower(-0.3);
@@ -206,13 +229,64 @@ public class CONTROL_hope extends OpMode {
         turn=-gamepad1.right_stick_x/3.0;
        */
 
-        ///TRYING METHOD
-        drive=-gamepad1.left_stick_y/1.75;
-        strafe=-gamepad1.left_stick_x*1.1/1.75;
-        turn=-gamepad1.right_stick_x/2.5;
+
+        boolean targetFound = false;
+        desiredTag  = null;
+
+        // Step through the list of detected tags and look for a matching tag
+        List<AprilTagDetection> currentDetections = apriltagProcesor.getDetections();
+        for (AprilTagDetection detection : currentDetections) {
+            if (detection.metadata != null){
+                targetFound = true;
+                desiredTag = detection;
+                break;  // don't look any further.
+            } else {
+                telemetry.addData("Unknown Target", "Tag ID %d is not in TagLibrary\n", detection.id);
+            }
+        }
+
+        // If Left Bumper is being pressed, AND we have found the desired target, Drive to target Automatically .
+        if (gamepad1.y && targetFound) {
+
+            // Determine heading, range and Yaw (tag image rotation) error so we can use them to control the robot automatically.
+            double  rangeError      = (desiredTag.ftcPose.range - 5);
+            double  headingError    = desiredTag.ftcPose.bearing;
+            double  yawError        = desiredTag.ftcPose.yaw;
+
+            // Use the speed and turn "gains" to calculate how we want the robot to move.
+            drive  = Range.clip(rangeError * 1, -0.7, 0.7);
+            turn   = Range.clip(headingError * 1.1, -0.7, 0.7) ;
+            strafe = Range.clip(-yawError * 1, -0.7, 0.7);
+
+            drive*=(-1);
+            turn*=(-1);
+            strafe*=(-1);
+        }else if(gamepad1.a){
+
+            drive=-gamepad1.left_stick_y/1.75;
+
+        }else if(gamepad1.b){
+
+            strafe=-gamepad1.left_stick_x*1.1/1.75;
+
+        }else {
+
+            drive=-gamepad1.left_stick_y/1.75;
+            strafe=-gamepad1.left_stick_x*1.1/1.75;
+            turn=-gamepad1.right_stick_x/2.5;
+        }
+
+        if(gamepad1.x && targetFound){
+
+            double  headingError    = desiredTag.ftcPose.bearing;
+            turn   = Range.clip(headingError * 1, -0.7, 0.7) ;
+            turn*=(-1);
+
+        }
 
         moveRobot(drive,strafe,turn);
         moveElevator();
+
 
     }
 
@@ -256,11 +330,11 @@ public class CONTROL_hope extends OpMode {
         telemetry.update();
 
         if(gamepad2.left_trigger>0){
-            val+=gamepad2.left_trigger*1.25;
+            val+=gamepad2.left_trigger*0.5;
         }
 
         if(gamepad2.right_trigger>0 && val>0){
-            val-=gamepad2.right_trigger*2;
+            val-=gamepad2.right_trigger*1.25;
         }
 
         if(target==0 && elepos>=-5 && elepos<=5){
@@ -275,6 +349,53 @@ public class CONTROL_hope extends OpMode {
         }
 
         target=(int) val;
+
+    }
+
+    public void InitCamera(){
+
+        apriltagProcesor = new AprilTagProcessor.Builder()
+                .setDrawAxes(true)
+                .setDrawCubeProjection(true)
+                .setDrawTagID(true)
+                .setDrawTagOutline(true)
+                //.3 .setLensIntrinsics(1731.46, 1731.46, 119.867, 12.6661)
+
+                /*
+                NU BUN 640x480 Camera logitech: 1731.46, 1731.46, 119.867, 12.6661
+                640x480 Camera No-name:  2475.88, 2475.88, 249.071, 110.786
+                 */
+                .build();
+
+
+        camBack=new VisionPortal.Builder()
+                .addProcessor(apriltagProcesor)
+                .setCamera(hardwareMap.get(WebcamName.class,"Camera1"))
+                .setCameraResolution(new Size(640,480))
+                .build();
+
+
+        while(camBack.getCameraState() != VisionPortal.CameraState.STREAMING){
+
+        }
+
+
+
+         /* CA SA REDUCEM BLURAREA APRIL TAG-ULUI, ATUNCI CAND SE MISCA ROBOTUL
+
+        ExposureControl exposure =myVisionPortal.getCameraControl(ExposureControl.class);
+        exposure.setMode(ExposureControl.Mode.Manual);
+        exposure.setExposure(15, TimeUnit.MILLISECONDS);
+        /// telemetry.addData("Exposure: ",exposure.isExposureSupported());
+
+
+        GainControl gain=myVisionPortal.getCameraControl(GainControl.class);
+        gain.setGain(255);
+        ///telemetry.addData("Min gain: ", gain.getMinGain());
+        ///telemetry.addData("Max gain: ",gain.getMaxGain());
+
+
+         */
 
     }
 

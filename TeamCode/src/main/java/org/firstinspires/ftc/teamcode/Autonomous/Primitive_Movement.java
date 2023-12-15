@@ -33,15 +33,21 @@ import android.util.Size;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Implementations.Camera.RedPropThreshold;
@@ -88,7 +94,7 @@ import java.util.List;
 public class Primitive_Movement extends LinearOpMode {
 
     private RedPropThreshold redProp;
-    private VisionPortal camBack,camFront;
+    private VisionPortal camBack,camFront,visionPortal;
     private AprilTagProcessor apriltagProcesor;
     private int apriltagid,idTarget;
 
@@ -115,7 +121,23 @@ public class Primitive_Movement extends LinearOpMode {
     FtcDashboard dashboard;
 
 
+    private WebcamName webcam1, webcam2;
 
+    private boolean oldLeftBumper;
+    private boolean oldRightBumper;
+
+    private PIDController controller;
+
+    public static double p=0.03, i=0, d=0.00001;
+    public static double f=0.05;
+
+    public static int target=3;
+
+    public double val=0;
+
+    private final double ticks_in_degrees=288/(360.0*0.36); /// gear ratio: 45/125=0.36
+
+    private DcMotorEx elevator1, elevator2;
     public void runOpMode(){
     }
 
@@ -136,6 +158,17 @@ public class Primitive_Movement extends LinearOpMode {
                  */
                 .build();
 
+        webcam1 = hardwareMap.get(WebcamName.class,"Camera1");
+        webcam2 = hardwareMap.get(WebcamName.class,"Camera2");
+        CameraName switchableCamera = ClassFactory.getInstance()
+                .getCameraManager().nameForSwitchableCamera(webcam1,webcam2);
+        visionPortal = new VisionPortal.Builder()
+                .setCamera(switchableCamera)
+                .addProcessor(apriltagProcesor)
+                .addProcessor(redProp)
+                //.addProcessor(blueProp)
+                .build();
+        /*
         camFront = new VisionPortal.Builder()
                 .addProcessor(redProp)
                 .setCamera(hardwareMap.get(WebcamName.class,"Camera2"))
@@ -157,6 +190,8 @@ public class Primitive_Movement extends LinearOpMode {
 
         }
 
+         */
+
 
 
          /* CA SA REDUCEM BLURAREA APRIL TAG-ULUI, ATUNCI CAND SE MISCA ROBOTUL
@@ -177,37 +212,80 @@ public class Primitive_Movement extends LinearOpMode {
 
     }
 
+    private void telemetryCameraSwitching(){
+        if(visionPortal.getActiveCamera().equals(webcam1)){
+            telemetry.addData("ActiveCamera","Webcam 1");
+            telemetry.addData("Press RightBumper", "to switch to Webcam 2");
+        }
+        else{
+            telemetry.addData("ActiveCamera", "Webcam2");
+            telemetry.addData("Press LeftBumper", "to switch to Webcam 1");
+        }
+    }
+
+    private void telemetryAprilTag(){
+        List<AprilTagDetection> currentDetections = apriltagProcesor.getDetections();
+        telemetry.addData("# AprilTags Detected", currentDetections.size());
+
+        for (AprilTagDetection detection : currentDetections) {
+            if (detection.metadata != null) {
+                telemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
+                telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.z));
+                telemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)", detection.ftcPose.pitch, detection.ftcPose.roll, detection.ftcPose.yaw));
+                telemetry.addLine(String.format("RBE %6.1f %6.1f %6.1f  (inch, deg, deg)", detection.ftcPose.range, detection.ftcPose.bearing, detection.ftcPose.elevation));
+            } else {
+                telemetry.addLine(String.format("\n==== (ID %d) Unknown", detection.id));
+                telemetry.addLine(String.format("Center %6.0f %6.0f   (pixels)", detection.center.x, detection.center.y));
+            }
+        }   // end for() loop
+        telemetry.addLine("\nkey:\nXYZ = X (Right), Y (Forward), Z (Up) dist.");
+        telemetry.addLine("PRY = Pitch, Roll & Yaw (XYZ Rotation)");
+        telemetry.addLine("RBE = Range, Bearing & Elevation");
+    }
+
+    public void initArm(){
+        controller = new PIDController(p,i,d);
+        telemetry = new MultipleTelemetry(telemetry,FtcDashboard.getInstance().getTelemetry());
+
+        elevator1 = hardwareMap.get(DcMotorEx.class,"e1");
+        elevator2 = hardwareMap.get(DcMotorEx.class,"e2");
+
+        elevator1.setDirection(DcMotorSimple.Direction.REVERSE);
+        elevator2.setDirection(DcMotorSimple.Direction.REVERSE);
+    }
+
+    public void moveArm(int desiredTarget){//TODO: RESCRIS
+       for(target = 0;target<=desiredTarget;target++){
+            controller.setPID(p, i, d);
+            int elepos = elevator1.getCurrentPosition();
+            double pid = controller.calculate(elepos, target);
+            double ff = Math.cos(Math.toRadians(target / ticks_in_degrees));
+
+            double power = pid + ff;
+
+            elevator1.setPower(power);
+            elevator2.setPower(power);
+            sleep(250);
+        }
+
+    }
+
     public void CamBack_Open(){
 
-        camFront.stopStreaming();
-        camFront.setProcessorEnabled(redProp,false);
-        while(camFront.getCameraState() != VisionPortal.CameraState.STOPPING_STREAM){
+        visionPortal.setActiveCamera(webcam1);
 
-        }
-        sleep(500);
+        visionPortal.setProcessorEnabled(apriltagProcesor,true);
+        visionPortal.setProcessorEnabled(redProp,false);
 
-        camBack.resumeStreaming();
-        while(camBack.getCameraState() != VisionPortal.CameraState.STREAMING){
-
-        }
-        camBack.setProcessorEnabled(apriltagProcesor,true);
 
     }
 
     public void CamFront_Open(){
 
-        camBack.stopStreaming();
-        camBack.setProcessorEnabled(apriltagProcesor,false);
-        while(camFront.getCameraState() != VisionPortal.CameraState.STOPPING_STREAM){
+        visionPortal.setActiveCamera(webcam2);
 
-        }
-        sleep(500);
-
-        camFront.resumeStreaming();
-        while(camBack.getCameraState() != VisionPortal.CameraState.STREAMING){
-
-        }
-        camBack.setProcessorEnabled(redProp,true);
+        visionPortal.setProcessorEnabled(apriltagProcesor,false);
+        visionPortal.setProcessorEnabled(redProp,true);
 
     }
 

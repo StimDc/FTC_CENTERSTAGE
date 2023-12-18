@@ -117,7 +117,7 @@ public class A_Primitiva_Calibrare extends LinearOpMode {
     @Override
     public void runOpMode() {
 
-       // InitCamera();
+        InitCamera();
         InitMotors();
         InitIMU();
 
@@ -160,6 +160,23 @@ public class A_Primitiva_Calibrare extends LinearOpMode {
                     break;
                 case 7:
                     Field_Movement_Forward(sign1,distx);
+                    break;
+                case 8:
+                    moveRobot(0,0,Correcting_Yaw());
+                    break;
+                case 9:
+                    Please_Yaw(POWER);
+                    break;
+                case 10:
+                    Move_To_April(5);
+                    break;
+                case 11:
+                    Go_To_April(POWER,5);
+                    break;
+                case 12:
+                    April_Please(POWER,5);
+                    break;
+
 
             }
             sleep(1000);
@@ -589,16 +606,17 @@ public class A_Primitiva_Calibrare extends LinearOpMode {
 
     }
 
+
     public double Correcting_Yaw(){
 
         AprilTagDetection desiredTag = null;
         boolean targetFound = false;;
 
-        while(!targetFound){
+        while(!targetFound && !isStopRequested() && opModeIsActive()){
 
             List<AprilTagDetection> currentDetections = apriltagProcesor.getDetections();
             for (AprilTagDetection detection : currentDetections) {
-                if ((detection.metadata != null)){
+                if ((detection.metadata != null && (detection.id==5 || detection.id==2))){
                     targetFound = true;
                     desiredTag = detection;
                     break;  // don't look any further.
@@ -607,8 +625,201 @@ public class A_Primitiva_Calibrare extends LinearOpMode {
 
         }
 
-        return Range.clip(desiredTag.ftcPose.yaw* 0.825d, -0.6, 0.6) ;
+        return Range.clip(desiredTag.ftcPose.bearing* 1, -0.7, 0.7) ;
     }
+
+    public void Please_Yaw(double pow){
+
+        AprilTagDetection desiredTag = null;
+        boolean targetFound = false;;
+        int sign=1;
+
+        while(!targetFound && !isStopRequested() && opModeIsActive()){
+
+            List<AprilTagDetection> currentDetections = apriltagProcesor.getDetections();
+            for (AprilTagDetection detection : currentDetections) {
+                if ((detection.metadata != null && (detection.id==5 || detection.id==2))){
+                    targetFound = true;
+                    desiredTag = detection;
+                    break;  // don't look any further.
+                }
+            }
+
+        }
+
+        if(desiredTag.ftcPose.yaw>0){
+
+            sign=-1;
+
+        }
+
+        Rotate(sign,pow,desiredTag.ftcPose.yaw);
+        sleep(500);
+
+    }
+
+    public void April_Please(double pow, int atagID){
+
+        AprilTagDetection desiredTag = null;
+        boolean targetFound = false;;
+        boolean ok=false;
+
+        double rangeError=10,headingError=10,yawError=10;
+        int signforward=1,signstrafe=1,signturn=1;
+
+        while(!targetFound && !isStopRequested() && opModeIsActive()){
+
+            List<AprilTagDetection> currentDetections = apriltagProcesor.getDetections();
+            for (AprilTagDetection detection : currentDetections) {
+                if ((detection.metadata != null) && (detection.id==atagID)){
+                    targetFound = true;
+                    desiredTag = detection;
+                    break;  // don't look any further.
+                }
+            }
+
+        }
+
+        rangeError=desiredTag.ftcPose.y-5;
+        headingError=desiredTag.ftcPose.yaw;
+        yawError=desiredTag.ftcPose.x;
+
+        if(rangeError>0){
+            signforward=-1;
+        }
+
+        if(headingError<0){
+
+            signturn=-1;
+
+        }
+
+        if(yawError>0){
+            signstrafe=-1;
+        }
+
+        Forward(signforward,pow,rangeError);
+        sleep(500);
+
+        lateral(signstrafe,pow,yawError);
+        sleep(500);
+
+        Rotate(signturn,pow,headingError);
+        sleep(500);
+
+    }
+
+    public void Go_To_April(double pow, int atagID){
+
+        AprilTagDetection desiredTag = null;
+        boolean targetFound = false;;
+        boolean ok=false;
+
+        double rangeError=10,headingError=10,yawError=10;
+        int signforward=1,signstrafe=1,signturn=1;
+
+        while(!targetFound && !isStopRequested() && opModeIsActive()){
+
+            List<AprilTagDetection> currentDetections = apriltagProcesor.getDetections();
+            for (AprilTagDetection detection : currentDetections) {
+                if ((detection.metadata != null) && (detection.id==atagID)){
+                    targetFound = true;
+                    desiredTag = detection;
+                    telemetry.addLine("Arpil found: "+detection.id);
+                    break;  // don't look any further.
+                }else{
+
+                    telemetry.addLine("Nope, no april :(");
+
+                }
+                telemetry.update();
+            }
+
+        }
+
+        rangeError=desiredTag.ftcPose.range-5;
+        headingError=desiredTag.ftcPose.bearing;
+        yawError=desiredTag.ftcPose.yaw;
+
+        if(rangeError>0){
+            signforward=-1;
+        }
+
+        if(headingError<0){
+
+            signturn=-1;
+
+        }
+
+        if(yawError>0){
+            signstrafe=-1;
+        }
+
+        Forward(signforward,pow,rangeError);
+        sleep(500);
+
+        lateral(signstrafe,pow,yawError);
+        sleep(500);
+
+        Rotate(signturn,pow,headingError);
+        sleep(500);
+
+    }
+
+    public void Move_To_April(int atagID){
+
+        AprilTagDetection desiredTag = null;
+        boolean targetFound = false;;
+        boolean ok=false;
+
+        double rangeError=10,headingError=10,yawError=10;
+
+        while(!ok && !isStopRequested() && opModeIsActive()){
+
+            List<AprilTagDetection> currentDetections = apriltagProcesor.getDetections();
+            for (AprilTagDetection detection : currentDetections) {
+                if ((detection.metadata != null) && (detection.id==atagID)){
+                    targetFound = true;
+                    desiredTag = detection;
+                    telemetry.addLine("Arpil found: "+detection.id);
+                    break;  // don't look any further.
+                }else{
+
+
+                    telemetry.addLine("Nope, no april tag:(");
+                }
+
+                telemetry.update();
+            }
+
+            if(targetFound){
+
+                rangeError      = (desiredTag.ftcPose.range - 5);
+                headingError    = desiredTag.ftcPose.bearing;
+                yawError        = desiredTag.ftcPose.yaw;
+
+                // Use the speed and turn "gains" to calculate how we want the robot to move.
+                double drive  = Range.clip(rangeError * 1, -0.7, 0.7);
+                double turn   = Range.clip(headingError * 1, -0.7, 0.7) ;
+                double strafe = Range.clip(yawError * 1, -0.7, 0.7);
+
+
+                moveRobot(-drive,-strafe,-turn);
+
+            }
+
+            if(rangeError<=2){
+
+                ok=true;
+
+            }
+
+
+        }
+
+
+    }
+
 
     public double Cm_To_Inch (double cm){
 

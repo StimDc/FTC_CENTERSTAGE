@@ -29,8 +29,6 @@
 
 package org.firstinspires.ftc.teamcode.Autonomous;
 
-import android.util.Size;
-
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -41,10 +39,13 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.Implementations.Camera.BluePropThreshold;
 import org.firstinspires.ftc.teamcode.Implementations.Camera.RedPropThreshold;
 import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 /*
  * This OpMode illustrates the concept of driving a path based on encoder counts.
@@ -72,42 +73,90 @@ import org.firstinspires.ftc.vision.VisionPortal;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Experimentare Culori", group = "Robot")
+@Autonomous(name="Camera Switch", group = "Robot")
 
-public class Camera_Experiment extends LinearOpMode {
+public class Camera_Switch extends LinearOpMode {
+
+    private WebcamName webcam1, webcam2;
 
     private RedPropThreshold redProp;
 
     private BluePropThreshold blueProp;
+
+    private AprilTagProcessor atag;
+
+
     private VisionPortal visionPortal;
 
     @Override
     public void runOpMode() {
 
-        redProp=new RedPropThreshold();
-        blueProp=new BluePropThreshold();
-
-        visionPortal = new VisionPortal.Builder()
-                .addProcessors(redProp,blueProp)
-                .setCamera(hardwareMap.get(WebcamName.class,"Camera2"))
-                .setCameraResolution(new Size(640,480))
-                .build();
-
-        while(visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING){
-
-        }
-
-
+        Init_Cameras();
 
         waitForStart();
 
         while(opModeIsActive() && !isStopRequested()){
-            telemetry.addLine("Position red Prop: "+redProp.getPropPosition());
-            telemetry.addLine("--------");
-            telemetry.addLine("Left side: " +redProp.PrintLeft());
-            telemetry.addLine("Center side: "+redProp.PrintCenter());
-            telemetry.update();
+
+            sleep(5000);
+
+            Open_Cam2();
+
+            sleep(5000);
+
+            Open_Cam1();
+
         }
 
     }
+
+    public void Init_Cameras(){
+
+        atag= new AprilTagProcessor.Builder().build();
+
+        redProp=new RedPropThreshold();
+        blueProp=new BluePropThreshold();
+
+        webcam1 = hardwareMap.get(WebcamName.class, "Camera1");
+        webcam2 = hardwareMap.get(WebcamName.class, "Camera2");
+        CameraName switchableCamera = ClassFactory.getInstance()
+                .getCameraManager().nameForSwitchableCamera(webcam1, webcam2);
+
+        visionPortal = new VisionPortal.Builder()
+                .setCamera(switchableCamera)
+                .addProcessors(atag,redProp,blueProp)
+                .build();
+
+        while(visionPortal.getCameraState()!= VisionPortal.CameraState.STREAMING){
+
+        }
+
+        visionPortal.setProcessorEnabled(redProp,false);
+        visionPortal.setProcessorEnabled(blueProp,false);
+
+    }
+
+    public void Open_Cam1(){
+
+        if (visionPortal.getCameraState() == VisionPortal.CameraState.STREAMING) {
+                visionPortal.setActiveCamera(webcam1);
+        }
+
+        visionPortal.setProcessorEnabled(atag,true);
+        visionPortal.setProcessorEnabled(redProp,false);
+        visionPortal.setProcessorEnabled(blueProp,false);
+
+    }
+
+    public void Open_Cam2(){
+
+        if (visionPortal.getCameraState() == VisionPortal.CameraState.STREAMING) {
+            visionPortal.setActiveCamera(webcam2);
+        }
+
+        visionPortal.setProcessorEnabled(atag,false);
+        visionPortal.setProcessorEnabled(redProp,true);
+        visionPortal.setProcessorEnabled(blueProp,true);
+
+    }
+
 }

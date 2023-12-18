@@ -203,10 +203,11 @@ public class CONTROL_hope extends OpMode {
         }else if(gamepad2.y && viper.getCurrentPosition()<1620){
 
             viper.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-            viper.setPower(0.3);
-            hang.setPower(-0.9);
+            viper.setPower(0.2);
+            hang.setPower(-0.5);
 
-        }else if(gamepad2.x && viper.getCurrentPosition()>0){
+        }
+        else if(gamepad2.x && viper.getCurrentPosition()>0){
 
             viper.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
             viper.setPower(-0.3);
@@ -236,7 +237,7 @@ public class CONTROL_hope extends OpMode {
         // Step through the list of detected tags and look for a matching tag
         List<AprilTagDetection> currentDetections = apriltagProcesor.getDetections();
         for (AprilTagDetection detection : currentDetections) {
-            if (detection.metadata != null){
+            if (detection.metadata != null && (detection.id==5 || detection.id==2)){
                 targetFound = true;
                 desiredTag = detection;
                 break;  // don't look any further.
@@ -263,24 +264,23 @@ public class CONTROL_hope extends OpMode {
             strafe*=(-1);
         }else if(gamepad1.a){
 
-            drive=-gamepad1.left_stick_y/1.75;
+            drive=-gamepad1.left_stick_y/1.25;
 
         }else if(gamepad1.b){
 
-            strafe=-gamepad1.left_stick_x*1.1/1.75;
+            strafe=-gamepad1.left_stick_x*1.1/1.25;
 
         }else {
 
-            drive=-gamepad1.left_stick_y/1.75;
-            strafe=-gamepad1.left_stick_x*1.1/1.75;
+            drive=-gamepad1.left_stick_y/1.25;
+            strafe=-gamepad1.left_stick_x*1.1/1.25;
             turn=-gamepad1.right_stick_x/2.5;
         }
 
         if(gamepad1.x && targetFound){
 
-            double  headingError    = desiredTag.ftcPose.bearing;
+            double  headingError    = desiredTag.ftcPose.yaw;
             turn   = Range.clip(headingError * 1, -0.7, 0.7) ;
-            turn*=(-1);
 
         }
 
@@ -330,7 +330,7 @@ public class CONTROL_hope extends OpMode {
         telemetry.update();
 
         if(gamepad2.left_trigger>0){
-            val+=gamepad2.left_trigger*0.5;
+            val+=gamepad2.left_trigger*0.75;
         }
 
         if(gamepad2.right_trigger>0 && val>0){

@@ -50,6 +50,7 @@ import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.Implementations.Camera.BluePropThreshold;
 import org.firstinspires.ftc.teamcode.Implementations.Camera.RedPropThreshold;
 import org.firstinspires.ftc.teamcode.Implementations.Constants.Claw;
 import org.firstinspires.ftc.teamcode.Implementations.Constants.Joint;
@@ -90,10 +91,11 @@ import java.util.List;
 
 @Config
 @Autonomous(name="Primitive Movement", group = "Autonomie Primitiva")
-@Disabled
+
 public class Primitive_Movement extends LinearOpMode {
 
     private RedPropThreshold redProp;
+    private BluePropThreshold blueProp;
     private VisionPortal camBack,camFront,visionPortal;
     private AprilTagProcessor apriltagProcesor;
     private int apriltagid,idTarget;
@@ -166,6 +168,7 @@ public class Primitive_Movement extends LinearOpMode {
                 .setCamera(switchableCamera)
                 .addProcessor(apriltagProcesor)
                 .addProcessor(redProp)
+                .addProcessor(blueProp)
                 //.addProcessor(blueProp)
                 .build();
         /*
@@ -255,18 +258,39 @@ public class Primitive_Movement extends LinearOpMode {
     }
 
     public void moveArm(int desiredTarget){//TODO: RESCRIS
-       for(target = 0;target<=desiredTarget;target++){
-            controller.setPID(p, i, d);
-            int elepos = elevator1.getCurrentPosition();
-            double pid = controller.calculate(elepos, target);
-            double ff = Math.cos(Math.toRadians(target / ticks_in_degrees));
 
-            double power = pid + ff;
+        if(elevator1.getCurrentPosition()<desiredTarget){
 
-            elevator1.setPower(power);
-            elevator2.setPower(power);
-            sleep(250);
+            for(target = elevator1.getCurrentPosition();target<=desiredTarget;target++){
+                controller.setPID(p, i, d);
+                int elepos = elevator1.getCurrentPosition();
+                double pid = controller.calculate(elepos, target);
+                double ff = Math.cos(Math.toRadians(target / ticks_in_degrees));
+
+                double power = pid + ff;
+
+                elevator1.setPower(power);
+                elevator2.setPower(power);
+                sleep(250);
+            }
+
+        }else if(elevator1.getCurrentPosition()>desiredTarget){
+
+            for(target = elevator1.getCurrentPosition();target>=0;target--){
+                controller.setPID(p, i, d);
+                int elepos = elevator1.getCurrentPosition();
+                double pid = controller.calculate(elepos, target);
+                double ff = Math.cos(Math.toRadians(target / ticks_in_degrees));
+
+                double power = pid + ff;
+
+                elevator1.setPower(power);
+                elevator2.setPower(power);
+                sleep(250);
+            }
+
         }
+
 
     }
 
@@ -280,12 +304,24 @@ public class Primitive_Movement extends LinearOpMode {
 
     }
 
-    public void CamFront_Open(){
+    public void CamFront_Open_Red(){
 
         visionPortal.setActiveCamera(webcam2);
 
+        visionPortal.setProcessorEnabled(blueProp,false);
         visionPortal.setProcessorEnabled(apriltagProcesor,false);
         visionPortal.setProcessorEnabled(redProp,true);
+
+    }
+
+    public void CamFront_Open_Blue(){
+
+        visionPortal.setActiveCamera(webcam2);
+
+        visionPortal.setProcessorEnabled(redProp,false);
+        visionPortal.setProcessorEnabled(apriltagProcesor,false);
+        visionPortal.setProcessorEnabled(blueProp,true);
+
 
     }
 
@@ -668,7 +704,7 @@ public class Primitive_Movement extends LinearOpMode {
 
             List<AprilTagDetection> currentDetections = apriltagProcesor.getDetections();
             for (AprilTagDetection detection : currentDetections) {
-                if ((detection.metadata != null)){
+                if ((detection.metadata != null && (detection.id==5 || detection.id==2))){
                     targetFound = true;
                     desiredTag = detection;
                     break;  // don't look any further.
@@ -678,6 +714,138 @@ public class Primitive_Movement extends LinearOpMode {
         }
 
         return Range.clip(desiredTag.ftcPose.bearing* 1, -0.7, 0.7) ;
+    }
+
+    public void Please_Yaw(double pow){
+
+        AprilTagDetection desiredTag = null;
+        boolean targetFound = false;;
+        int sign=1;
+
+        while(!targetFound){
+
+            List<AprilTagDetection> currentDetections = apriltagProcesor.getDetections();
+            for (AprilTagDetection detection : currentDetections) {
+                if ((detection.metadata != null && (detection.id==5 || detection.id==2))){
+                    targetFound = true;
+                    desiredTag = detection;
+                    break;  // don't look any further.
+                }
+            }
+
+        }
+
+        if(desiredTag.ftcPose.yaw>0){
+
+            sign=-1;
+
+        }
+
+        Rotate(sign,pow,desiredTag.ftcPose.yaw);
+        sleep(500);
+
+    }
+
+    public void April_Please(double pow, int atagID){
+
+        AprilTagDetection desiredTag = null;
+        boolean targetFound = false;;
+        boolean ok=false;
+
+        double rangeError=10,headingError=10,yawError=10;
+        int signforward=1,signstrafe=1,signturn=1;
+
+        while(!targetFound){
+
+            List<AprilTagDetection> currentDetections = apriltagProcesor.getDetections();
+            for (AprilTagDetection detection : currentDetections) {
+                if ((detection.metadata != null) && (detection.id==atagID)){
+                    targetFound = true;
+                    desiredTag = detection;
+                    break;  // don't look any further.
+                }
+            }
+
+        }
+
+        rangeError=desiredTag.ftcPose.y-5;
+        headingError=desiredTag.ftcPose.yaw;
+        yawError=desiredTag.ftcPose.x;
+
+        if(rangeError>0){
+            signforward=-1;
+        }
+
+        if(headingError<0){
+
+            signturn=-1;
+
+        }
+
+        if(yawError>0){
+            signstrafe=-1;
+        }
+
+        Forward(signforward,pow,rangeError);
+        sleep(500);
+
+        lateral(signstrafe,pow,yawError);
+        sleep(500);
+
+        Rotate(signturn,pow,headingError);
+        sleep(500);
+
+    }
+
+    public void Go_To_April(double pow, int atagID){
+
+        AprilTagDetection desiredTag = null;
+        boolean targetFound = false;;
+        boolean ok=false;
+
+        double rangeError=10,headingError=10,yawError=10;
+        int signforward=1,signstrafe=1,signturn=1;
+
+        while(!targetFound){
+
+            List<AprilTagDetection> currentDetections = apriltagProcesor.getDetections();
+            for (AprilTagDetection detection : currentDetections) {
+                if ((detection.metadata != null) && (detection.id==atagID)){
+                    targetFound = true;
+                    desiredTag = detection;
+                    break;  // don't look any further.
+                }
+            }
+
+        }
+
+        rangeError=desiredTag.ftcPose.range-5;
+        headingError=desiredTag.ftcPose.bearing;
+        yawError=desiredTag.ftcPose.yaw;
+
+        if(rangeError>0){
+            signforward=-1;
+        }
+
+        if(headingError<0){
+
+            signturn=-1;
+
+        }
+
+        if(yawError>0){
+            signstrafe=-1;
+        }
+
+        Forward(signforward,pow,rangeError);
+        sleep(500);
+
+        lateral(signstrafe,pow,yawError);
+        sleep(500);
+
+        Rotate(signturn,pow,headingError);
+        sleep(500);
+
     }
 
     public void Move_To_April(int atagID){
@@ -711,7 +879,7 @@ public class Primitive_Movement extends LinearOpMode {
                 double strafe = Range.clip(-yawError * 1, -0.7, 0.7);
 
 
-                moveRobot(drive,turn,strafe);
+                moveRobot(drive,strafe,turn);
 
             }
 

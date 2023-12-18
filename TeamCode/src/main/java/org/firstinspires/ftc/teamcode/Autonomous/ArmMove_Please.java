@@ -27,9 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode.Autonomous;
-
-import android.util.Size;
+package org.firstinspires.ftc.teamcode.Implementations.DebugTools;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -40,11 +38,6 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.Implementations.Camera.BluePropThreshold;
-import org.firstinspires.ftc.teamcode.Implementations.Camera.RedPropThreshold;
-import org.firstinspires.ftc.vision.VisionPortal;
 
 /*
  * This OpMode illustrates the concept of driving a path based on encoder counts.
@@ -72,42 +65,12 @@ import org.firstinspires.ftc.vision.VisionPortal;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Experimentare Culori", group = "Robot")
+@Autonomous(name="Arm Move Please", group = "Robot")
 
-public class Camera_Experiment extends LinearOpMode {
-
-    private RedPropThreshold redProp;
-
-    private BluePropThreshold blueProp;
-    private VisionPortal visionPortal;
+public class ArmMove_Please extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-
-        redProp=new RedPropThreshold();
-        blueProp=new BluePropThreshold();
-
-        visionPortal = new VisionPortal.Builder()
-                .addProcessors(redProp,blueProp)
-                .setCamera(hardwareMap.get(WebcamName.class,"Camera2"))
-                .setCameraResolution(new Size(640,480))
-                .build();
-
-        while(visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING){
-
-        }
-
-
-
-        waitForStart();
-
-        while(opModeIsActive() && !isStopRequested()){
-            telemetry.addLine("Position red Prop: "+redProp.getPropPosition());
-            telemetry.addLine("--------");
-            telemetry.addLine("Left side: " +redProp.PrintLeft());
-            telemetry.addLine("Center side: "+redProp.PrintCenter());
-            telemetry.update();
-        }
 
     }
 }

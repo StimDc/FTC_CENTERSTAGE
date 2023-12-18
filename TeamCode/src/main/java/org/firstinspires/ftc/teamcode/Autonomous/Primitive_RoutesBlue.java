@@ -87,6 +87,7 @@ public class Primitive_RoutesBlue extends LinearOpMode {
     public void BLUE_BACKSTAGE(String parking, int waittimer){
 
         move.InitCamera();
+        move.CamFront_Open_Blue();
 
         while(move.Red_Prop_Pos()=="nope") {
             switch (move.Red_Prop_Pos()) {
@@ -114,6 +115,7 @@ public class Primitive_RoutesBlue extends LinearOpMode {
     public void BLUE_FRONTSTAGE(String parking, int waittimer){
 
         move.InitCamera();
+        move.CamFront_Open_Blue();
 
         while(move.Red_Prop_Pos()=="nope") {
             switch (move.Red_Prop_Pos()) {

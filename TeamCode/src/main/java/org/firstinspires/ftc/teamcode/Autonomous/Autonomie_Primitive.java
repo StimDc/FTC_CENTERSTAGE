@@ -100,9 +100,19 @@ public class Autonomie_Primitive extends LinearOpMode {
             ex.printStackTrace();
         }
 
+        routeRed=new Primitive_RoutesRed();
+
+        telemetry.addLine(alliance+" "+startpoint+" "+parking);
+        telemetry.update();
+
+        waitForStart();
+
+        routeRed.RED_BACKSTAGE(parking,wait);
+
+
         if(alliance=="RED" && startpoint=="FRONT_STAGE"){
 
-            routeRed.RED_FRONTSTAGE(parking,wait);
+           // routeRed.RED_FRONTSTAGE(parking,wait);
 
         }else if(alliance=="RED" && startpoint=="BACK_STAGE"){
 

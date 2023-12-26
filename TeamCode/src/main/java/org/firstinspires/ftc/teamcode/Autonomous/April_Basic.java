@@ -29,21 +29,22 @@
 
 package org.firstinspires.ftc.teamcode.Autonomous;
 
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Implementations.Camera.BluePropThreshold;
 import org.firstinspires.ftc.teamcode.Implementations.Camera.RedPropThreshold;
 import org.firstinspires.ftc.teamcode.Implementations.Robot.Wheels;
@@ -79,9 +80,9 @@ import java.util.List;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Move to April", group = "Robot")
+@Autonomous(name="April Basic", group = "Robot")
 
-public class Move_To_April extends LinearOpMode {
+public class April_Basic extends LinearOpMode {
 
     private WebcamName webcam1, webcam2;
 
@@ -98,92 +99,61 @@ public class Move_To_April extends LinearOpMode {
     private static final double PI = 3.14159265d;
     private static final double GO_TICKS_PER_REV = 537.7d;
     private Wheels wheels;
+    public static double distx,disty,rot, straffingerror=1, lateralerror=1.1904761d, roterror=0.825d;
+
     private static final double  WHEEL_CIRCUMFERENCE =  PI * 3.7795275d;
     public static double POWER;
 
     public static double rangeErrorGAIN=0.02, headingErrorGAIN=0.01,yawErrorGAIN=0.015;
 
-    public static double MAXrange=0.7,MAXheading=0.7,MAXyaw=0.7;
+    public static double MAXrange=0.3,MAXheading=0.2,MAXyaw=0.2;
+
+
+    private IMU imu;
+    private double HEADING;
+
     @Override
     public void runOpMode() {
 
         Init_Cameras();
         InitMotors();
-
+        InitIMU();
 
         waitForStart();
 
+        AprilTagDetection desiredTag = null;
+        boolean targetFound = false;
+        ;
+        boolean ok = false;
+        int oldtarget=-1;
 
-            AprilTagDetection desiredTag = null;
-            boolean targetFound = false;
-            boolean ok = false;
-            int oldtarget=-1;
-            boolean okRange = false;
-            double rangeError = 0, headingError = 0, yawError = 0;
+        double xpos = 0, ypos= 0, yawpos = 0;
 
-            while (!ok && opModeIsActive() && !isStopRequested()) {
-                targetFound=false;
+        while(targetFound==false){
 
-                List<AprilTagDetection> currentDetections = atag.getDetections();
-                for (AprilTagDetection detection : currentDetections) {
-                    if ((detection.metadata != null) && (detection.id == 6)) {
-                        targetFound = true;
-                        desiredTag = detection;
-                        break;  // don't look any further.
-                    }
+            List<AprilTagDetection> currentDetections = atag.getDetections();
+            for (AprilTagDetection detection : currentDetections) {
+                if ((detection.metadata != null) && (detection.id == 5)) {
+                    targetFound = true;
+                    desiredTag = detection;
+                    xpos=desiredTag.ftcPose.x;
+                    ypos=desiredTag.ftcPose.y;
+                    yawpos=desiredTag.ftcPose.yaw;
+                    break;  // don't look any further.
                 }
-
-                if (targetFound) {
-
-
-                    //rangeError = (desiredTag.ftcPose.range - 1);
-
-                    if((desiredTag.ftcPose.bearing>-2.5 && desiredTag.ftcPose.bearing<2.5)|| okRange==true){
-                        headingError=0;
-                    }else{
-
-                        headingError = desiredTag.ftcPose.bearing;
-
-
-                    }
-                    if((desiredTag.ftcPose.yaw>-2.5 && desiredTag.ftcPose.yaw<2.5)|| okRange==true){
-
-                        yawError=0;
-
-                    }else{
-
-                        yawError = desiredTag.ftcPose.yaw; //1.7795
-
-                    }
-                    okRange =(headingError == yawError && headingError==0);
-                    rangeError = (okRange)? (desiredTag.ftcPose.range-1) : 0;
-
-                    // Use the speed and turn "gains" to calculate how we want the robot to move.
-                    double drive = Range.clip(rangeError * rangeErrorGAIN, -MAXrange,MAXrange );
-                    double turn = Range.clip(headingError * headingErrorGAIN, -MAXheading, MAXheading);
-                    double strafe = Range.clip(-yawError * yawErrorGAIN, -MAXyaw, MAXyaw);
-
-
-                    //moveRobot(-drive, -strafe, turn);
-
-                    moveRobot(-drive, -strafe, turn);
-
-
-                }else{
-
-                    moveRobot(0,0,0);
-
-                }
-
-                if (rangeError < 8.66 && okRange) {
-
-                    ok = true;
-                    moveRobot(0,0,0);
-
-                }
-
-
             }
+
+        }
+
+        Rotate(11,0.7,yawpos);
+        sleep(3000);
+
+
+        Forward(-1,0.7,ypos);
+        sleep(3000);
+
+
+        lateral(-1,0.7,xpos);
 
     }
 
@@ -245,27 +215,165 @@ public class Move_To_April extends LinearOpMode {
         wheels.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
     }
+    public void InitIMU(){
 
-    public void moveRobot(double x, double y, double yaw) {
-        // Calculate wheel powers.
-        double frontLeftPower    =  x -y -yaw;
-        double frontRightPower   =  x +y +yaw;
-        double backLeftPower     =  x +y -yaw;
-        double backRightPower    =  x -y +yaw;
+        imu = hardwareMap.get(IMU.class, "imu");
+        // Adjust the orientation parameters to match your robot
+        IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
+                RevHubOrientationOnRobot.LogoFacingDirection.UP,
+                RevHubOrientationOnRobot.UsbFacingDirection.LEFT));
+        // Without this, the REV Hub's orientation is assumed to be logo up / USB forward
+        imu.initialize(parameters);
 
-        // Normalize wheel powers to be less than 1.0
-        double max = Math.max(Math.abs(frontLeftPower), Math.abs(frontRightPower));
-        max = Math.max(max, Math.abs(backLeftPower));
-        max = Math.max(max, Math.abs(backRightPower));
+        imu.resetYaw();
 
-        if (max > 1.0) {
-            frontLeftPower /= max;
-            frontRightPower /= max;
-            backLeftPower /= max;
-            backRightPower /= max;
+        HEADING=imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+
+    }
+
+
+    public void Forward(int sign,double pow, double dist){
+
+        if(sign>1){
+            sign=1;
+        }
+        if(sign<-1){
+            sign=-1;
         }
 
-        wheels.setPower(frontLeftPower,frontRightPower,backLeftPower,backRightPower);
+        dist=(int)(Inch_To_Ticks(Cm_To_Inch(dist)));
+
+        wheels.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        wheels.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        wheels.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        double x=dist-(int)Inch_To_Ticks(Cm_To_Inch(10*pow/0.6));
+
+        while(Math.abs(wheels.frontLeft.getCurrentPosition())<Math.abs(x)&&
+                Math.abs(wheels.frontRight.getCurrentPosition())<Math.abs(x) &&
+                Math.abs(wheels.backRight.getCurrentPosition())<Math.abs(x) &&
+                Math.abs(wheels.backLeft.getCurrentPosition())<Math.abs(x)){
+
+            wheels.setPower(sign*pow);
+
+        }
+
+        while(Math.abs(wheels.frontLeft.getCurrentPosition())<Math.abs(dist)&&
+                Math.abs(wheels.frontRight.getCurrentPosition())<Math.abs(dist) &&
+                Math.abs(wheels.backRight.getCurrentPosition())<Math.abs(dist) &&
+                Math.abs(wheels.backLeft.getCurrentPosition())<Math.abs(dist)){
+
+            if(pow>0.01){
+                pow=pow-0.4;
+            }
+            if(pow<0.01){
+                pow=0.01;
+            }
+
+            wheels.setPower(sign*pow);
+
+        }
+
+        wheels.setPower(0);
+        wheels.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        sleep(1000);
+
+        if(imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS)<HEADING){
+            Rotate(-1,POWER,-imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS)+ HEADING);
+        }else if(imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS)>HEADING){
+            Rotate(1,POWER,imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS)-HEADING);
+        }
+
+        HEADING=imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+
+    }
+
+    public void lateral (int sign,double pow, double dist){
+
+        if(sign>1){
+            sign=1;
+        }
+        if(sign<-1){
+            sign=-1;
+        }
+
+        dist=dist*lateralerror;
+
+        int ticks=(int)((Inch_To_Ticks(Cm_To_Inch(dist))*(1/Math.sin(45) ) )*35/42);
+
+        wheels.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        wheels.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        wheels.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        wheels.setTargetPosition(ticks*sign,-ticks*sign, -ticks*sign, ticks*sign);
+        wheels.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        wheels.setPower(pow);
+
+        wheels.waitMotors();
+
+        wheels.setPower(0);
+
+        wheels.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        sleep(1000);
+
+        if(imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS)<HEADING){
+            Rotate(-1,POWER,-imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS)+ HEADING);
+        }else if(imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS)>HEADING){
+            Rotate(1,POWER,imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS)-HEADING);
+        }
+
+        HEADING=imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+    }
+
+    public void Rotate(int sign, double pow, double deg){
+
+        if(sign>1){
+            sign=1;
+        }
+        if(sign<-1){
+            sign=-1;
+        }
+
+        deg=deg*roterror;
+
+        double botHeading=Math.abs(imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS))-Math.abs(HEADING);
+        deg=Math.toRadians(deg);
+
+        wheels.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+
+        while(Math.abs(botHeading)<Math.abs(deg)){
+
+            wheels.setPower(pow*sign, -pow*sign, pow*sign,-pow*sign);
+
+            botHeading = Math.abs(imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS))-Math.abs(HEADING);
+
+            telemetry.addLine("Heading"+ imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES));
+            telemetry.update();
+        }
+
+        wheels.setPower(0);
+        wheels.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        HEADING=imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+
+        telemetry.addLine("Heading"+ imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES));
+        telemetry.update();
+
+    }
+
+    public double Cm_To_Inch (double cm){
+
+        return cm*0.393700787d;
+
+    }
+
+    public double Inch_To_Cm(double inch){
+        return inch/0.393700787d;
+    }
+
+    public int Inch_To_Ticks(double inch){
+        return (int)((inch/WHEEL_CIRCUMFERENCE)*GO_TICKS_PER_REV);
     }
 
 }

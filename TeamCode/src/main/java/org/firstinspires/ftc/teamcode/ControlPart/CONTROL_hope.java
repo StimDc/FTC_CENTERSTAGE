@@ -53,7 +53,7 @@ public class CONTROL_hope extends OpMode {
 
     static final double AVIONSTART=0, AVIONRELEASE=0.5d;
 
-    private DcMotorEx  elevator1, elevator2;
+
     private DcMotorEx viper,hang;
 
     private DcMotor frontLeft,frontRight, backLeft, backRight;
@@ -63,11 +63,10 @@ public class CONTROL_hope extends OpMode {
     private  final double GO_TICKS_117=1425.1d;
 
  ///PID ARM
-
+    private DcMotorEx  elevator1, elevator2;
     private PIDController controller;
 
-    public static double p=0.03, i=0, d=0.0006
-            ;
+    public static double p=0.03, i=0, d=0.0006;
     public static double f=0.04;
 
     public static int target=0;
@@ -336,6 +335,8 @@ public class CONTROL_hope extends OpMode {
         if(gamepad2.right_trigger>0 && val>0){
             val-=gamepad2.right_trigger*1.25;
         }
+
+        target=(int) val;
 
         if(target==0 && elepos>=-5 && elepos<=5){
             elevator1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);

@@ -156,6 +156,7 @@ public class BLUE_BACKSTAGE extends LinearOpMode {
 
         boolean once=true;
 
+
         waitForStart();
 
         claw.setPosition(Claw.INTERMEDIARY);

@@ -504,6 +504,10 @@ public class RED_FRONTSTAGE extends LinearOpMode {
                 elevator1.setPower(power);
                 elevator2.setPower(power);
                 sleep(250);
+
+                telemetry.addLine("Pos: "+elevator1.getCurrentPosition());
+                telemetry.addLine("Target: "+ target);
+                telemetry.update();
             }
 
         }else if(elevator1.getCurrentPosition()>desiredTarget){
@@ -519,6 +523,10 @@ public class RED_FRONTSTAGE extends LinearOpMode {
                 elevator1.setPower(power);
                 elevator2.setPower(power);
                 sleep(250);
+
+                telemetry.addLine("Pos: "+elevator1.getCurrentPosition());
+                telemetry.addLine("Target: "+ target);
+                telemetry.update();
             }
 
         }

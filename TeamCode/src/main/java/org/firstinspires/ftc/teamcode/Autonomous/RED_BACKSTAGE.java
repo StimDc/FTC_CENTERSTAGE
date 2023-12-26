@@ -153,24 +153,14 @@ public class RED_BACKSTAGE extends LinearOpMode {
 
         Open_FrontCam();
 
+
+
         String propPosition=redProp.getPropPosition();
 
         boolean once=true;
 
         waitForStart();
 
-        claw.setPosition(Claw.INTERMEDIARY);
-
-        sleep(1500);
-
-        joint.setPosition(Joint.DOWN);
-
-        sleep(1500);
-
-        claw.setPosition(Claw.CLOSED);
-        sleep(1500);
-
-        lateral(1,0.6,90);
 
         /*
 
@@ -179,7 +169,7 @@ public class RED_BACKSTAGE extends LinearOpMode {
             telemetry.addLine("Nope :( "+propPosition);
             propPosition=redProp.getPropPosition();
 
-            if(propPosition.equals("left000")){
+            if(propPosition.equals("left")){
 
                 telemetry.addLine(propPosition);
                 telemetry.update();
@@ -195,7 +185,7 @@ public class RED_BACKSTAGE extends LinearOpMode {
                 
                 Backstage_CenterProp_Red(PARKING,0);
 
-            }else if(propPosition.equals("right00")){
+            }else if(propPosition.equals("right")){
 
                 telemetry.addLine(propPosition);
                 telemetry.update();

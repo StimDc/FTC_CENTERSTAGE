@@ -27,8 +27,11 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode.Implementations.DebugTools;
+package org.firstinspires.ftc.teamcode.Autonomous;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -38,6 +41,8 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.teamcode.Implementations.Constants.Claw;
 
 /*
  * This OpMode illustrates the concept of driving a path based on encoder counts.
@@ -64,13 +69,46 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
+@Config
+@Autonomous(name="Moving Claw", group = "Robot")
 
-@Autonomous(name="Arm Move Please", group = "Robot")
+public class MovingClaw extends LinearOpMode {
 
-public class ArmMove_Please extends LinearOpMode {
-
+    Servo claw;
     @Override
     public void runOpMode() {
+
+        claw=hardwareMap.get(Servo.class,"claw");
+        telemetry=new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+
+
+        waitForStart();
+
+        claw.setPosition(Claw.CLOSED);
+        sleep(1000);
+        while(opModeIsActive() && !isStopRequested()){
+            /*
+            if(claw.getPosition()>= Claw.OPEN-0.002 || claw.getPosition()<=Claw.OPEN+0.002){
+                claw.setPosition(Claw.CLOSED );
+                sleep(5000);
+            }else if(claw.getPosition()>=Claw.CLOSED-0.002 || claw.getPosition()<=Claw.CLOSED+0.002){
+                claw.setPosition(Claw.OPEN);
+                sleep(5000);
+            }
+
+             */
+
+            if(Math.abs(claw.getPosition()-Claw.OPEN) <0.002){
+                claw.setPosition(Claw.CLOSED);
+            }else if(Math.abs(claw.getPosition()-Claw.CLOSED) <0.002){
+                claw.setPosition(Claw.OPEN);
+            }
+            sleep(1500);
+
+            telemetry.addLine("Pos: "+ claw.getPosition());
+            telemetry.update();
+
+        }
 
     }
 }

@@ -64,13 +64,13 @@ public class ChoiceMenu extends LinearOpMode {
 
         String[] alliances= {"BLUE", "RED"};
         ItemLogic("alliance", alliances);
-
+        sleep(500);
         String[] positions= {"FRONT_STAGE","BACK_STAGE"};
         ItemLogic("position",positions);
-
+        sleep(500);
         String[] parkings = {"LEFT", "RIGHT"};
         ItemLogic("parking", parkings);
-
+        sleep(500);
         int timer =0;
         boolean timerChange = false;
         sleep(1000);

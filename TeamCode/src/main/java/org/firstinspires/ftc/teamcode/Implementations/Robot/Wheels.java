@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.Implementations.Annotations.ImplementedBy;
+import org.firstinspires.ftc.teamcode.Implementations.Math.MathFunc;
 
 public class Wheels {
 
@@ -67,6 +68,13 @@ public class Wheels {
         while(this.frontRight.isBusy() && this.frontLeft.isBusy() && this.backRight.isBusy() && this.backLeft.isBusy()){
 
         }
+    }
+
+    public boolean isDistNotReached(double dist){
+        return Math.abs(this.frontLeft.getCurrentPosition())<Math.abs(dist)&&
+                Math.abs(this.frontRight.getCurrentPosition())<Math.abs(dist) &&
+                Math.abs(this.backRight.getCurrentPosition())<Math.abs(dist) &&
+                Math.abs(this.backLeft.getCurrentPosition())<Math.abs(dist);
     }
 
 }

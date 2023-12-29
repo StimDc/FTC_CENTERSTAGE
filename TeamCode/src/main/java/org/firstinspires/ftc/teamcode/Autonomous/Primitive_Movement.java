@@ -29,15 +29,12 @@
 
 package org.firstinspires.ftc.teamcode.Autonomous;
 
-import android.util.Size;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.controller.PIDController;
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -60,32 +57,6 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import java.util.List;
-
-/*
- * This OpMode illustrates the concept of driving a path based on encoder counts.
- * The code is structured as a LinearOpMode
- *
- * The code REQUIRES that you DO have encoders on the wheels,
- *   otherwise you would use: RobotAutoDriveByTime;
- *
- *  This code ALSO requires that the drive Motors have been configured such that a positive
- *  power command moves them forward, and causes the encoders to count UP.
- *
- *   The desired path in this example is:
- *   - Drive forward for 48 inches
- *   - Spin right for 12 Inches
- *   - Drive Backward for 24 inches
- *   - Stop and close the claw.
- *
- *  The code is written using a method called: encoderDrive(speed, leftInches, rightInches, timeoutS)
- *  that performs the actual movement.
- *  This method assumes that each movement is relative to the last stopping place.
- *  There are other ways to perform encoder based moves, but this method is probably the simplest.
- *  This code uses the RUN_TO_POSITION mode to enable the Motor controllers to generate the run profile
- *
- * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
- * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
- */
 
 ///192.168. 43.1:8080/dash PENTRU DASHBOARD
 
@@ -215,16 +186,6 @@ public class Primitive_Movement extends LinearOpMode {
 
     }
 
-    private void telemetryCameraSwitching(){
-        if(visionPortal.getActiveCamera().equals(webcam1)){
-            telemetry.addData("ActiveCamera","Webcam 1");
-            telemetry.addData("Press RightBumper", "to switch to Webcam 2");
-        }
-        else{
-            telemetry.addData("ActiveCamera", "Webcam2");
-            telemetry.addData("Press LeftBumper", "to switch to Webcam 1");
-        }
-    }
 
     private void telemetryAprilTag(){
         List<AprilTagDetection> currentDetections = apriltagProcesor.getDetections();
@@ -328,31 +289,6 @@ public class Primitive_Movement extends LinearOpMode {
     public String Red_Prop_Pos(){
 
         return redProp.getPropPosition();
-
-    }
-
-
-    public void InitMotors(){
-        wheels = new Wheels(hardwareMap);
-        wheels.setDirection();
-        wheels.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        wheels.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-    }
-
-    public void InitIMU(){
-
-        imu = hardwareMap.get(IMU.class, "imu");
-        // Adjust the orientation parameters to match your robot
-        IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
-                RevHubOrientationOnRobot.LogoFacingDirection.UP,
-                RevHubOrientationOnRobot.UsbFacingDirection.LEFT));
-        // Without this, the REV Hub's orientation is assumed to be logo up / USB forward
-        imu.initialize(parameters);
-
-        imu.resetYaw();
-
-        HEADING=imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
 
     }
 

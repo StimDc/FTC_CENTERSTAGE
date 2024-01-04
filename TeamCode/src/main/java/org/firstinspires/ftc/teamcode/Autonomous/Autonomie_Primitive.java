@@ -79,7 +79,7 @@ public class Autonomie_Primitive extends LinearOpMode {
 
         waitForStart();
 
-        routeRed.RED_BACKSTAGE(parking,wait);
+        //routeRed.RED_BACKSTAGE(parking,wait);
 
 
         if(alliance=="RED" && startpoint=="FRONT_STAGE"){
@@ -88,15 +88,15 @@ public class Autonomie_Primitive extends LinearOpMode {
 
         }else if(alliance=="RED" && startpoint=="BACK_STAGE"){
 
-            routeRed.RED_BACKSTAGE(parking,wait);
+            //routeRed.RED_BACKSTAGE(parking,wait);
 
         }else if(alliance=="BLUE" && startpoint=="FRONT_STAGE"){
 
-           routeBlue.BLUE_FRONTSTAGE(parking,wait);
+           //routeBlue.BLUE_FRONTSTAGE(parking,wait);
 
         }else if(alliance=="BLUE" && startpoint=="BACK_STAGE"){
 
-           routeBlue.BLUE_BACKSTAGE(parking,wait);
+           //routeBlue.BLUE_BACKSTAGE(parking,wait);
 
         }
     }

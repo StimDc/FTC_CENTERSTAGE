@@ -29,36 +29,27 @@
 
 package org.firstinspires.ftc.teamcode.Autonomous;
 
-import com.acmerobotics.dashboard.FtcDashboard;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Servo;
+;
+import org.firstinspires.ftc.teamcode.Implementations.Robot.Robot;
 
-import org.firstinspires.ftc.teamcode.Implementations.Constants.Claw;
-import org.firstinspires.ftc.teamcode.Implementations.Constants.Joint;
 
-@Autonomous(name="Primitive Routes Blue", group = "Robot")
-@Disabled
-public class Primitive_RoutesBlue extends LinearOpMode {
+public class Primitive_RoutesBlue {
 
     private int apriltagid,idTarget=-1;
 
     private Servo joint, claw;
 
-    Joint jointPos;
-    Claw clawPos;
-
     Primitive_Movement move;
 
-    FtcDashboard dashboard;
+    private Robot robot;
 
-    @Override
-    public void runOpMode() {
 
-    }
 
     public void BLUE_BACKSTAGE(String parking, int waittimer){
+
 
         move.InitCamera();
         move.CamFront_Open_Blue();

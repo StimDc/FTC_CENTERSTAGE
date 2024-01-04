@@ -80,4 +80,117 @@ public class Arm {
             }
         }
     }
+    /*
+    private PIDController controller;
+
+        public static double p=0, i=0, d=0;
+        public static double f=0;
+        //public static int target=0;
+
+
+        private static final double MOTOR_CPR = 288.0;
+        private static final double GEAR_RATIO = 125.0 / 45.0;
+        private static final double ARM_TICKS_PER_DEGREE = MOTOR_CPR * GEAR_RATIO / 360.0;
+       // private static final double MAX_ARM_HOLDING_POWER = <some calibrated value here>;
+        private static final double ZERO_OFFSET = 70.0-3.85;
+        private DcMotorEx elevator1, elevator2;
+        public static double targetPosInDegrees=70.0-3.85;
+        private double powerLimit;
+
+        private  Servo joint;
+
+        private boolean once=false;
+
+        public void init()
+        {
+            controller=new PIDController(p,i,d);
+            telemetry=new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+
+            elevator1= hardwareMap.get(DcMotorEx.class,"e1");
+            elevator2= hardwareMap.get(DcMotorEx.class,"e2");
+
+
+            elevator1.setDirection(DcMotorSimple.Direction.REVERSE);
+            elevator2.setDirection(DcMotorSimple.Direction.REVERSE);
+
+            elevator1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            elevator2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+            elevator1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            elevator2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+            joint =hardwareMap.get(Servo.class,"joint");
+        }
+
+        public void loop(){
+
+            controller.setPID(p,i,d);
+
+            if(!once){
+                joint.setPosition(Joint.UP);
+                once=true;
+            }
+
+           // if(isOnTarget(1)) {
+
+                setPosition(targetPosInDegrees,0.7);
+
+           // }
+
+            armTask();
+
+            telemetry.addData("pos ",getPosition());
+            telemetry.addData("target ", targetPosInDegrees);
+            telemetry.update();
+
+        }
+
+        public void armTask()
+        {
+            double targetPosInTicks = (targetPosInDegrees - ZERO_OFFSET) * ARM_TICKS_PER_DEGREE;
+            double currPosInTicks = elevator1.getCurrentPosition();
+            double pidOutput = controller.calculate(currPosInTicks, targetPosInTicks);
+            // This ff is assuming arm at horizontal position is 90-degree.
+            double ff = f * Math.sin(Math.toRadians(ticksToRealWorldDegrees(currPosInTicks)));
+            double power = pidOutput + ff;
+            // Clip power to the range of -powerLimit to powerLimit.
+            power = power < -powerLimit ? -powerLimit : power > powerLimit ? powerLimit : power;
+            elevator1.setPower(power);
+            elevator2.setPower(power);
+        }
+
+        public boolean isOnTarget(double toleranceInDegrees)
+        {
+            double currPosInDegrees = getPosition();
+            return Math.abs(targetPosInDegrees - currPosInDegrees) <= toleranceInDegrees;
+        }
+
+        public void setPosition(double targetPosInDegrees, double powerLimit)
+        {
+            this.targetPosInDegrees = targetPosInDegrees;
+            this.powerLimit = Math.abs(powerLimit);
+        }
+
+
+        public double ticksToRealWorldDegrees(double ticks)
+        {
+            return ticks / ARM_TICKS_PER_DEGREE + ZERO_OFFSET;
+        }
+
+        public double getPosition()
+        {
+            return ticksToRealWorldDegrees(elevator1.getCurrentPosition());
+        }
+
+        //
+    // In your OpMode
+    //
+        static final double ARM_HOME_POS = 45.0;
+        static final double ARM_LOADING_POS = 50.0;
+        static final double ARM_SCORING_POS = 270.0;
+     //   Arm arm;
+      //  Elevator elevator;
+      //  DriveBase driveBase;
+        int state = 0;
+     */
 }

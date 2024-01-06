@@ -53,12 +53,18 @@ public class Movement {
             wheels.setPower(sign*pow);
         }
         while(wheels.isDistNotReached(dist)){
-            if(pow>0.01){
-                pow=pow-0.4;
+
+            if(dist>10){
+
+                if(pow>0.01){
+                    pow=pow-0.01;
+                }
+                if(pow<0.01){
+                    pow=0.01;
+                }
+
             }
-            if(pow<0.01){
-                pow=0.01;
-            }
+
 
             wheels.setPower(sign*pow);
         }
@@ -133,14 +139,17 @@ public class Movement {
         boolean ok = false;
         int oldtarget=-1;
 
-        double rangeError = 0, headingError = 0, yawError = 0;
+        boolean okHeading=false,okYaw=false;
+
+        double rangeError = 100, headingError = 0, yawError = 0;
 
         while(!ok){
         //while (!ok && opModeIsActive() && !isStopRequested()) {
 
+            targetFound=false;
             List<AprilTagDetection> currentDetections = atag.getDetections();
             for (AprilTagDetection detection : currentDetections) {
-                if ((detection.metadata != null) && (detection.id == 1)) {
+                if ((detection.metadata != null) && (detection.id == idtag)) {
                     targetFound = true;
                     desiredTag = detection;
                     break;  // don't look any further.
@@ -149,9 +158,20 @@ public class Movement {
 
             if (targetFound) {
 
-                rangeError = (desiredTag.ftcPose.range - 1);
-                headingError = desiredTag.ftcPose.bearing;
-                yawError = desiredTag.ftcPose.yaw; //1.7795
+                    rangeError = desiredTag.ftcPose.range;
+
+
+                if(okHeading==true){
+                    headingError=0;
+                }else{
+                    headingError = desiredTag.ftcPose.bearing;
+                }
+
+                if(okYaw==true){
+                    yawError=0;
+                }else{
+                    yawError = desiredTag.ftcPose.yaw; //1.7795
+                }
 
                 // Use the speed and turn "gains" to calculate how we want the robot to move.
                 double drive = Range.clip(rangeError * RANGE_ERROR_GAIN, -MAX_RANGE,MAX_RANGE );
@@ -159,19 +179,165 @@ public class Movement {
                 double strafe = Range.clip(-yawError * YAW_ERROR_GAIN, -MAX_YAW, MAX_YAW);
 
 
+                if(yawError>-2 && yawError<2){
+                    okYaw=true;
+                }
+                if(headingError>-1 && headingError<1){
+                    okHeading=true;
+                }
                 //moveRobot(-drive, -strafe, turn);
 
-                robot.move.generalMovement(-drive, -strafe, turn);
+                if(okHeading==true && okYaw==true){
+                    robot.move.generalMovement(-drive, 0, 0);
+                }else{
+                    robot.move.generalMovement(0, -strafe, turn);
+
+                }
+            //    robot.move.generalMovement(-drive, -strafe, turn);
 
             }else{
                 robot.move.generalMovement(0,0,0);
             }
-            if (rangeError < 7) {
+            if (rangeError < 25) {
 
                 ok = true;
                 robot.move.generalMovement(0,0,0);
             }
         }
+
+        headingError=100;
+        while(headingError>-1 && headingError<1){
+            //while (!ok && opModeIsActive() && !isStopRequested()) {
+
+            targetFound=false;
+            List<AprilTagDetection> currentDetections = atag.getDetections();
+            for (AprilTagDetection detection : currentDetections) {
+                if ((detection.metadata != null) && (detection.id == idtag)) {
+                    targetFound = true;
+                    desiredTag = detection;
+                    break;  // don't look any further.
+                }
+            }
+
+            if (targetFound) {
+
+                headingError = desiredTag.ftcPose.bearing;
+
+                // Use the speed and turn "gains" to calculate how we want the robot to move.
+                double turn = Range.clip(headingError * HEADING_ERROR_GAIN, -MAX_HEADING, MAX_HEADING);
+
+                //moveRobot(-drive, -strafe, turn);
+
+                   robot.move.generalMovement(0, 0, turn);
+
+            }else{
+                robot.move.generalMovement(0,0,0);
+            }
+        }
+
     }
-    sleep(SLEEP);
+
+    public void Move_to_AprilAllAxes(int idtag, Robot robot, AprilTagProcessor atag){
+
+        AprilTagDetection desiredTag = null;
+        boolean targetFound = false;
+        boolean ok = false;
+        int oldtarget=-1;
+
+        boolean okHeading=false,okYaw=false,okRange=false;
+
+        double rangeError = 100, headingError = 0, yawError = 0;
+
+        while(!ok){
+            //while (!ok && opModeIsActive() && !isStopRequested()) {
+
+            targetFound=false;
+            List<AprilTagDetection> currentDetections = atag.getDetections();
+            for (AprilTagDetection detection : currentDetections) {
+                if ((detection.metadata != null) && (detection.id == idtag)) {
+                    targetFound = true;
+                    desiredTag = detection;
+                    break;  // don't look any further.
+                }
+            }
+
+            if (targetFound) {
+
+                rangeError = desiredTag.ftcPose.range-8.5;
+
+
+
+                headingError = desiredTag.ftcPose.bearing-5;
+
+
+                yawError = desiredTag.ftcPose.yaw; //1.7795
+
+               /* if(okRange==true){
+                    rangeError=0;
+                }
+
+                if(okRange==true && okHeading==true){
+
+                    headingError=0;
+
+                }
+                if(okRange==true && okYaw==true){
+
+                    yawError=0;
+
+                }
+
+                */
+
+                // Use the speed and turn "gains" to calculate how we want the robot to move.
+                double drive = Range.clip(rangeError * RANGE_ERROR_GAIN, -MAX_RANGE,MAX_RANGE );
+                double turn = Range.clip(headingError * HEADING_ERROR_GAIN, -MAX_HEADING, MAX_HEADING);
+                double strafe = Range.clip(-yawError * YAW_ERROR_GAIN, -MAX_YAW, MAX_YAW);
+
+
+                    robot.move.generalMovement(-drive, -strafe, turn);
+
+            }else{
+                robot.move.generalMovement(0,0,0);
+            }
+            if (rangeError>-2 && rangeError < 2) {
+
+              //  okRange=true;
+                ok=true;
+                robot.move.generalMovement(0,0,0);
+
+            }
+            /*
+            else{
+                okRange=false;
+            }
+
+            if(headingError>-1 && headingError<1){
+                okHeading=true;
+            }else{
+                okHeading=false;
+            }
+
+            if(yawError>-1 && yawError<1){
+                okYaw=true;
+            }else{
+                okYaw=false;
+            }
+
+            if(okYaw==true && okHeading==true && okRange==true){
+
+                ok=true;
+                robot.move.generalMovement(0,0,0);
+
+
+            }
+
+             */
+
+        }
+
+
+
+    }
+
 }

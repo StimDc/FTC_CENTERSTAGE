@@ -90,8 +90,8 @@ public class Arm {
         private static final double GEAR_RATIO = 125.0 / 45.0;
         private static final double ARM_TICKS_PER_DEGREE = MOTOR_CPR * GEAR_RATIO / 360.0;
        // private static final double MAX_ARM_HOLDING_POWER = <some calibrated value here>;
-        private static final double ZERO_OFFSET = 70.0-3.85;
-        public static double targetPosInDegrees=70.0-3.85;
+        public  final double ZERO_OFFSET = 70.0-3.85;
+        public  double targetPosInDegrees=70.0-3.85;
         private double powerLimit;
 
 

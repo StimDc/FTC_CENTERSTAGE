@@ -32,16 +32,33 @@ package org.firstinspires.ftc.teamcode.Experimental;
 import static org.firstinspires.ftc.teamcode.Implementations.Constants.Direction.BACKWARDS;
 import static org.firstinspires.ftc.teamcode.Implementations.Constants.Direction.FORWARD;
 
+
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.teamcode.Implementations.Constants.Claw;
 import org.firstinspires.ftc.teamcode.Implementations.Robot.Robot;
 
 @Autonomous(name="testare", group = "Robot")
-
 public class TestareFunctiiNoi extends LinearOpMode {
 
     Robot robot;
+
+
+    @Override
+    public void runOpMode() throws InterruptedException {
+
+    }
+
+
+    @Config
+@Autonomous(name="Moving Claw", group = "Robot")
+
+public class MovingClaw extends LinearOpMode {
+
 
     @Override
     public void runOpMode() {
@@ -49,8 +66,38 @@ public class TestareFunctiiNoi extends LinearOpMode {
         robot.move.forward( FORWARD,0.6,30); //TODO: REFACUT ROTATIILE
         //sleep(300);
         robot.move.forward(BACKWARDS,0.6,30);
+        telemetry=new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+
+
+        waitForStart();
+
+        robot.claw.setPosition(Claw.CLOSED);
+        sleep(1000);
+        while(opModeIsActive() && !isStopRequested()){
+            /*
+            if(claw.getPosition()>= Claw.OPEN-0.002 || claw.getPosition()<=Claw.OPEN+0.002){
+                claw.setPosition(Claw.CLOSED );
+                sleep(5000);
+            }else if(claw.getPosition()>=Claw.CLOSED-0.002 || claw.getPosition()<=Claw.CLOSED+0.002){
+                claw.setPosition(Claw.OPEN);
+                sleep(5000);
+            }
+
+             */
+
+            if(Math.abs(robot.claw.getPosition()-Claw.OPEN) <0.002){
+                robot.claw.setPosition(Claw.CLOSED);
+            }else if(Math.abs(robot.claw.getPosition()-Claw.CLOSED) <0.002){
+                robot.claw.setPosition(Claw.OPEN);
+            }
+            sleep(1500);
+
+            telemetry.addLine("Pos: "+ robot.claw.getPosition());
+            telemetry.update();
+
+        }
 
     }
 
 
-}
+}}

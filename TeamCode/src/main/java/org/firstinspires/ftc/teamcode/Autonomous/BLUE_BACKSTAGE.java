@@ -77,6 +77,7 @@ public class BLUE_BACKSTAGE extends LinearOpMode {
 
         boolean once = true;
 
+
         waitForStart();
 
         robot.claw.setPosition(Claw.INTERMEDIARY);

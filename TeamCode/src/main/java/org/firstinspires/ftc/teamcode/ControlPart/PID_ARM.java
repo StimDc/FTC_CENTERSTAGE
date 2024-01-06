@@ -28,10 +28,10 @@ public class PID_ARM extends OpMode {
 
     private PIDController controller;
 
-    public static double p=0.03, i=0, d=0.00001;
-    public static double f=0.05;
+    public static double p=0, i=0, d=0;
+    public static double f=0.04;
 
-    public static int target=3;
+    public static int target=0;
 
     public double val=0;
 

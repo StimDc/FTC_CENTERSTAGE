@@ -11,6 +11,7 @@ import static org.firstinspires.ftc.teamcode.Implementations.Constants.Universal
 import static org.firstinspires.ftc.teamcode.Implementations.Constants.UniversalConsts.SLEEP;
 import static org.firstinspires.ftc.teamcode.Implementations.Constants.UniversalConsts.YAW_ERROR_GAIN;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
@@ -25,10 +26,13 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import java.util.List;
 
+@Config
 public class Movement {
    public  Wheels wheels;
    public IMU imu;
    public Telemetry telemetry;
+
+   public static double heading =0,range =0,yaw = 0;
    public double HEADING;
     public void init(HardwareMap hardwareMap, Wheels wheels, IMU imu,Telemetry telemetry){
         this.wheels = wheels;
@@ -263,7 +267,7 @@ public class Movement {
 
             if (targetFound) {
 
-                rangeError = desiredTag.ftcPose.range-8.75;
+                rangeError = desiredTag.ftcPose.range-12.75;
 
 
 
@@ -300,7 +304,7 @@ public class Movement {
             }else{
                 robot.move.generalMovement(0,0,0);
             }
-            if (rangeError>-2 && rangeError < 2) {
+            if (rangeError>-range && rangeError < range && Math.abs(headingError) <heading &&Math.abs(yawError) <yaw)  {
 
               //  okRange=true;
                 ok=true;

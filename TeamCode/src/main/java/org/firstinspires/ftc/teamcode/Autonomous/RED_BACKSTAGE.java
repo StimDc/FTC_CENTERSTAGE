@@ -43,7 +43,7 @@ import org.firstinspires.ftc.teamcode.Implementations.Constants.Claw;
 import org.firstinspires.ftc.teamcode.Implementations.Constants.Joint;
 import org.firstinspires.ftc.teamcode.Implementations.Robot.Robot;
 
-@Autonomous(name="RED FRONSTAGE", group = "Red Routes")
+@Autonomous(name="RED BACKSTAGE", group = "Red Routes")
 
 public class RED_BACKSTAGE extends  LinearOpMode{
 
@@ -269,38 +269,32 @@ public class RED_BACKSTAGE extends  LinearOpMode{
        robot.camera.openBackCam();
 
         robot.claw.setPosition(Claw.INTERMEDIARY);
-        sleep(1000);
+        sleep(750);
         robot.joint.setPosition(Joint.DOWN);
-        sleep(1000);
+        sleep(900);
         robot.claw.setPosition(Claw.CLOSED);
 
 
 
         robot.move.lateral(RIGHT,0.4,8);
-        sleep(250);
+        sleep(175);
 
         robot.move.forward(FORWARD,0.6,57);
-        sleep(250);
+        sleep(175);
         robot.claw.setPosition(Claw.INTERMEDIARY);
         sleep(500);
         robot.move.forward(BACKWARDS,0.5,5.5);
-        sleep(250);
+        sleep(175);
         robot.claw.setPosition(Claw.CLOSED);
-        sleep(1000);
+        sleep(500);
         robot.joint.setPosition(Joint.UP);
-        sleep(1000);
 
         robot.move.rotate(-1,0.6,90);
-        sleep(1000);
+        sleep(250);
 
         robot.move.Move_to_AprilAllAxes(tagID,robot,robot.camera.atag);
 
-
-
-        robot.joint.setPosition(Joint.UP);
-        robot.claw.setPosition(Claw.CLOSED);
-
-        sleep(1500);
+        sleep(500);
 
         int stateArm=0;
 
@@ -318,13 +312,13 @@ public class RED_BACKSTAGE extends  LinearOpMode{
                     break;
 
                 case 1:
-                    robot.arm.setPosition(225,1);
+                    robot.arm.setPosition(235,6);
                     TargetPosInDegrees=230;
                     stateArm=2;
                     break;
 
                 case 2:
-                    if(robot.arm.isOnTarget(1)) {
+                    if(robot.arm.isOnTarget(6)) {
                         stateArm=3;
                     }
                     break;
@@ -397,11 +391,10 @@ public class RED_BACKSTAGE extends  LinearOpMode{
 
 
         }
-        sleep(1000);
 
         robot.move.lateral(RIGHT,0.6,58);
 
-        sleep(1500);
+        sleep(250);
 
         robot.move.forward(BACKWARDS,0.6,25);
 

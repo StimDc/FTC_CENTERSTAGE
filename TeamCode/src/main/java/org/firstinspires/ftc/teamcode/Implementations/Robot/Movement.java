@@ -263,7 +263,7 @@ public class Movement {
 
             if (targetFound) {
 
-                rangeError = desiredTag.ftcPose.range-8.5;
+                rangeError = desiredTag.ftcPose.range-8.75;
 
 
 

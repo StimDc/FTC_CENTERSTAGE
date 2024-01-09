@@ -18,9 +18,9 @@ public class Robot{
     public Arm arm;
     IMU imu;
 
-    public Robot(HardwareMap hardwareMap, Telemetry telemetry){
+    public Robot(HardwareMap hardwareMap, Telemetry telemetry,int startPosition){ // startPosition 1 redFrontstage,-1 redbackstage, 2 bluefrontstage, -2 bluebackstage
         this.arm = new Arm(hardwareMap,telemetry);
-        this.camera = new Camera(hardwareMap);
+        this.camera = new Camera(hardwareMap,startPosition);
         //this.hardwareMap = hardwareMap;
         this.InitIMU(hardwareMap);
         this.wheels = new Wheels(hardwareMap);

@@ -47,8 +47,8 @@ import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.teamcode.Implementations.Camera.BluePropThreshold;
-import org.firstinspires.ftc.teamcode.Implementations.Camera.RedPropThreshold;
+import org.firstinspires.ftc.teamcode.Implementations.Camera.BluePropThreshold_Backstage;
+import org.firstinspires.ftc.teamcode.Implementations.Camera.RedPropThreshold_Backstage;
 import org.firstinspires.ftc.teamcode.Implementations.Constants.Claw;
 import org.firstinspires.ftc.teamcode.Implementations.Constants.Joint;
 import org.firstinspires.ftc.teamcode.Implementations.Robot.Wheels;
@@ -65,8 +65,8 @@ import java.util.List;
 
 public class Primitive_Movement extends LinearOpMode {
 
-    private RedPropThreshold redProp;
-    private BluePropThreshold blueProp;
+    private RedPropThreshold_Backstage redProp;
+    private BluePropThreshold_Backstage blueProp;
     private VisionPortal camBack,camFront,visionPortal;
     private AprilTagProcessor apriltagProcesor;
     private int apriltagid,idTarget;
@@ -116,7 +116,7 @@ public class Primitive_Movement extends LinearOpMode {
 
     public void InitCamera(){
 
-        redProp=new RedPropThreshold();
+        redProp=new RedPropThreshold_Backstage();
 
         apriltagProcesor = new AprilTagProcessor.Builder()
                 .setDrawAxes(true)

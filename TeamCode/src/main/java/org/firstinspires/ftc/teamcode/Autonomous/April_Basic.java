@@ -45,8 +45,8 @@ import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.teamcode.Implementations.Camera.BluePropThreshold;
-import org.firstinspires.ftc.teamcode.Implementations.Camera.RedPropThreshold;
+//import org.firstinspires.ftc.teamcode.Implementations.Camera.BluePropThreshold;
+//import org.firstinspires.ftc.teamcode.Implementations.Camera.RedPropThreshold_Backstage;
 import org.firstinspires.ftc.teamcode.Implementations.Robot.Wheels;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
@@ -86,9 +86,9 @@ public class April_Basic extends LinearOpMode {
 
     private WebcamName webcam1, webcam2;
 
-    private RedPropThreshold redProp;
+   // private RedPropThreshold_Backstage redProp;
 
-    private BluePropThreshold blueProp;
+   // private BluePropThreshold blueProp;
 
     private AprilTagProcessor atag;
 
@@ -161,8 +161,8 @@ public class April_Basic extends LinearOpMode {
 
         atag= new AprilTagProcessor.Builder().build();
 
-        redProp=new RedPropThreshold();
-        blueProp=new BluePropThreshold();
+     //   redProp=new RedPropThreshold_Backstage();
+     //   blueProp=new BluePropThreshold();
 
         webcam1 = hardwareMap.get(WebcamName.class, "Camera1");
         webcam2 = hardwareMap.get(WebcamName.class, "Camera2");
@@ -171,15 +171,15 @@ public class April_Basic extends LinearOpMode {
 
         visionPortal = new VisionPortal.Builder()
                 .setCamera(switchableCamera)
-                .addProcessors(atag,redProp,blueProp)
+              //  .addProcessors(atag,redProp,blueProp)
                 .build();
 
         while(visionPortal.getCameraState()!= VisionPortal.CameraState.STREAMING){
 
         }
 
-        visionPortal.setProcessorEnabled(redProp,false);
-        visionPortal.setProcessorEnabled(blueProp,false);
+       // visionPortal.setProcessorEnabled(redProp,false);
+       // visionPortal.setProcessorEnabled(blueProp,false);
 
     }
 
@@ -190,8 +190,8 @@ public class April_Basic extends LinearOpMode {
         }
 
         visionPortal.setProcessorEnabled(atag,true);
-        visionPortal.setProcessorEnabled(redProp,false);
-        visionPortal.setProcessorEnabled(blueProp,false);
+      //  visionPortal.setProcessorEnabled(redProp,false);
+      //  visionPortal.setProcessorEnabled(blueProp,false);
 
     }
 
@@ -202,8 +202,8 @@ public class April_Basic extends LinearOpMode {
         }
 
         visionPortal.setProcessorEnabled(atag,false);
-        visionPortal.setProcessorEnabled(redProp,true);
-        visionPortal.setProcessorEnabled(blueProp,true);
+      //  visionPortal.setProcessorEnabled(redProp,true);
+      //  visionPortal.setProcessorEnabled(blueProp,true);
 
     }
 

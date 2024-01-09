@@ -5,21 +5,13 @@ import static android.os.SystemClock.sleep;
 
 import android.util.Size;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Gamepad;
-import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.robotcore.external.hardware.camera.Camera;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.Implementations.Camera.RedPropThreshold;
-import org.firstinspires.ftc.teamcode.Implementations.DebugTools.CatchingBugs;
+import org.firstinspires.ftc.teamcode.Implementations.Camera.RedPropThreshold_Backstage;
 import org.firstinspires.ftc.teamcode.Implementations.Annotations.Experimental;
-import org.firstinspires.ftc.teamcode.Implementations.Annotations.ImplementedBy;
+import org.firstinspires.ftc.teamcode.Implementations.Robot.Robot;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
@@ -27,38 +19,16 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 public class CameraView extends OpMode {
 
-    private RedPropThreshold redProp;
-    private VisionPortal visionPortal1,visionPortal2;
-    private AprilTagProcessor apriltagProcesor;
+    private Robot robot;
 
     private boolean PressX=false, PressO=false,once=true;
+
+    private boolean baclCam=false;
 
     @Override
     public void init() {
 
-
-        visionPortal1 = new VisionPortal.Builder()
-                .addProcessor(apriltagProcesor)
-                .setCamera(hardwareMap.get(WebcamName.class,"Camera1"))
-                .setCameraResolution(new Size(640,480))
-                .build();
-
-        while(visionPortal1.getCameraState() != VisionPortal.CameraState.STREAMING){
-
-        }
-
-        visionPortal1.stopStreaming();
-
-
-        visionPortal2=new VisionPortal.Builder()
-                .addProcessor(redProp)
-                .setCamera(hardwareMap.get(WebcamName.class,"Camera2"))
-                .setCameraResolution(new Size(640,480))
-                .build();
-
-        while(visionPortal2.getCameraState() != VisionPortal.CameraState.STREAMING){
-
-        }
+        robot = new Robot(hardwareMap,telemetry,-1);
 
     }
 
@@ -68,8 +38,9 @@ public class CameraView extends OpMode {
     public void loop() {
 
         if(gamepad1.a){
-            if(!PressX && visionPortal1.getCameraState()== VisionPortal.CameraState.STREAMING){
-                Cam_Front();
+            if(!PressX){
+                robot.camera.openFrontCam();
+                baclCam=false;
             }
             PressX=true;
 
@@ -79,8 +50,9 @@ public class CameraView extends OpMode {
 
         if(gamepad1.b){
 
-            if(!PressO && visionPortal2.getCameraState()== VisionPortal.CameraState.STREAMING){
-                Cam_Back();
+            if(!PressO){
+                robot.camera.openBackCam();
+                baclCam=true;
             }
             PressO=true;
 
@@ -88,37 +60,14 @@ public class CameraView extends OpMode {
             PressO=false;
         }
 
-        telemetry.addLine("Front Camera: X");
-        telemetry.addLine("Back Camera: O");
+        telemetry.addLine("Front Camera: A");
+        telemetry.addLine("Back Camera: B");
+        telemetry.addLine("---------------");
+        if(baclCam==true){
+            telemetry.addLine("Prop position:"+robot.camera.getPositionProp());
+
+        }
         telemetry.update();
-
-    }
-
-    public void Cam_Front(){
-
-        visionPortal1.stopStreaming();
-        while(visionPortal1.getCameraState() != VisionPortal.CameraState.STOPPING_STREAM){
-
-        }
-        sleep(500);
-        visionPortal2.resumeStreaming();
-        while(visionPortal2.getCameraState() != VisionPortal.CameraState.STREAMING){
-
-        }
-
-    }
-
-    public void Cam_Back(){
-
-        visionPortal2.stopStreaming();
-        while(visionPortal2.getCameraState() != VisionPortal.CameraState.STOPPING_STREAM){
-
-        }
-        sleep(500);
-        visionPortal1.resumeStreaming();
-        while(visionPortal1.getCameraState() != VisionPortal.CameraState.STREAMING){
-
-        }
 
     }
 

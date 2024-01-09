@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.ControlPart;
 
 import static java.lang.Math.abs;
-import static android.os.SystemClock.sleep;
 
 import android.util.Size;
 
@@ -9,24 +8,18 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.controller.PIDController;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.Implementations.Camera.RedPropThreshold;
 import org.firstinspires.ftc.teamcode.Implementations.Constants.Claw;
 import org.firstinspires.ftc.teamcode.Implementations.Constants.Joint;
-import org.firstinspires.ftc.teamcode.Implementations.DebugTools.CatchingBugs;
 import org.firstinspires.ftc.teamcode.Implementations.Annotations.Experimental;
-import org.firstinspires.ftc.teamcode.Implementations.Annotations.ImplementedBy;
 import org.firstinspires.ftc.teamcode.Implementations.Robot.Wheels;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;

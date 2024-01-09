@@ -30,20 +30,13 @@
 package org.firstinspires.ftc.teamcode.Autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.Implementations.Camera.BluePropThreshold;
-import org.firstinspires.ftc.teamcode.Implementations.Camera.RedPropThreshold;
+import org.firstinspires.ftc.teamcode.Implementations.Camera.BluePropThreshold_Backstage;
+import org.firstinspires.ftc.teamcode.Implementations.Camera.RedPropThreshold_Frontstage;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
@@ -79,9 +72,9 @@ public class Camera_Switch extends LinearOpMode {
 
     private WebcamName webcam1, webcam2;
 
-    private RedPropThreshold redProp;
+    private RedPropThreshold_Frontstage redProp;
 
-    private BluePropThreshold blueProp;
+    private BluePropThreshold_Backstage blueProp;
 
     private AprilTagProcessor atag;
 
@@ -113,8 +106,8 @@ public class Camera_Switch extends LinearOpMode {
 
         atag= new AprilTagProcessor.Builder().build();
 
-        redProp=new RedPropThreshold();
-        blueProp=new BluePropThreshold();
+        redProp=new RedPropThreshold_Frontstage();
+        blueProp=new BluePropThreshold_Backstage();
 
         webcam1 = hardwareMap.get(WebcamName.class, "Camera1");
         webcam2 = hardwareMap.get(WebcamName.class, "Camera2");

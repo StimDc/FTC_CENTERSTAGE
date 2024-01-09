@@ -38,8 +38,10 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.Implementations.Camera.BluePropThreshold;
-import org.firstinspires.ftc.teamcode.Implementations.Camera.RedPropThreshold;
+import org.firstinspires.ftc.teamcode.Implementations.Camera.BluePropThreshold_Backstage;
+import org.firstinspires.ftc.teamcode.Implementations.Camera.BluePropThreshold_Frontstage;
+import org.firstinspires.ftc.teamcode.Implementations.Camera.RedPropThreshold_Backstage;
+import org.firstinspires.ftc.teamcode.Implementations.Camera.RedPropThreshold_Backstage;
 import org.firstinspires.ftc.teamcode.Implementations.Constants.Claw;
 import org.firstinspires.ftc.teamcode.Implementations.Constants.Joint;
 import org.firstinspires.ftc.teamcode.Implementations.Robot.Robot;
@@ -50,8 +52,8 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import java.util.List;
 
 public class Primitive_RoutesRed {
-    private RedPropThreshold redProp;
-    private BluePropThreshold blueProp;
+    private RedPropThreshold_Backstage redProp;
+    private BluePropThreshold_Frontstage blueProp;
 
     private AprilTagProcessor apriltagProcesor;
     private int apriltagid,idTarget;
@@ -419,7 +421,7 @@ public class Primitive_RoutesRed {
 
     public void FUCKINGCAMERAFRONT_Red(){
 
-        redProp=new RedPropThreshold();
+        redProp=new RedPropThreshold_Backstage();
 
        /* vision = new VisionPortal.Builder()
                 .setCamera(hardwareMap.get(WebcamName.class,"Camera2"))

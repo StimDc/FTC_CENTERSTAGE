@@ -44,8 +44,8 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.Implementations.Camera.BluePropThreshold;
-import org.firstinspires.ftc.teamcode.Implementations.Camera.RedPropThreshold;
+import org.firstinspires.ftc.teamcode.Implementations.Camera.BluePropThreshold_Backstage;
+import org.firstinspires.ftc.teamcode.Implementations.Camera.RedPropThreshold_Frontstage;
 import org.firstinspires.ftc.teamcode.Implementations.Robot.Wheels;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
@@ -85,9 +85,9 @@ public class Move_To_April extends LinearOpMode {
 
     private WebcamName webcam1, webcam2;
 
-    private RedPropThreshold redProp;
+    private RedPropThreshold_Frontstage redProp;
 
-    private BluePropThreshold blueProp;
+    private BluePropThreshold_Backstage blueProp;
 
     private AprilTagProcessor atag;
 
@@ -191,8 +191,8 @@ public class Move_To_April extends LinearOpMode {
 
         atag= new AprilTagProcessor.Builder().build();
 
-        redProp=new RedPropThreshold();
-        blueProp=new BluePropThreshold();
+        redProp=new RedPropThreshold_Frontstage();
+        blueProp=new BluePropThreshold_Backstage();
 
         webcam1 = hardwareMap.get(WebcamName.class, "Camera1");
         webcam2 = hardwareMap.get(WebcamName.class, "Camera2");

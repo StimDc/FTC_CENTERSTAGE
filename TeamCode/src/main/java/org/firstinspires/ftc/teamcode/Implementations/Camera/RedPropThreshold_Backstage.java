@@ -11,25 +11,27 @@ import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
-public class BluePropThreshold implements VisionProcessor {
+public class RedPropThreshold_Backstage implements VisionProcessor {
 
 
     private double left,center;
 
     Mat testMat= new Mat();
+    Mat highMat=new Mat();
+    Mat lowMat=new Mat();
     Mat finalMat=new Mat();
 
-    double blueThreshold=0.009d;//0.049d
+    double redThreshold=0.03d;//0.049d
 
-    String outStr="nope";
+    String outStr="center";
 
 
     static final Rect LEFT_RECTANGLE=new Rect (
-            new Point(0,200),
-            new Point(320,480)
+            new Point(0,250),
+            new Point(270,480)
     );
     static final Rect CENTER_RECTANGLE=new Rect(
-            new Point(321,200),
+            new Point(271,250),
             new Point(640,480)
     );
 
@@ -60,15 +62,21 @@ public class BluePropThreshold implements VisionProcessor {
     public Object processFrame(Mat frame, long captureTimeNanos) {
         Imgproc.cvtColor(frame,testMat,Imgproc.COLOR_RGB2HSV);
 
-        Scalar HSVRedLower=new Scalar(105,100,20);
-        Scalar HSVRedUpper=new Scalar(135,255,255);
+        Scalar lowHSVRedLower=new Scalar(0,100,20);
+        Scalar lowHSVRedUpper=new Scalar(15,255,255);
 
+        Scalar highHSVRedLower=new Scalar(172,100,20);
+        Scalar highHSVRedUpper=new Scalar(180,255,255);
 
-        Core.inRange(testMat,HSVRedLower,HSVRedUpper,finalMat);
+        Core.inRange(testMat,lowHSVRedLower,lowHSVRedUpper,lowMat);
+        Core.inRange(testMat,highHSVRedLower,highHSVRedUpper,highMat);
 
         testMat.release();
 
+        Core.bitwise_or(lowMat,highMat,finalMat);
 
+        lowMat.release();
+        highMat.release();
 
         ///METODA 1: adunam toti pixelii din fiecare regiune, suma o impartim la numarul de pixeli total si apoi comparam rezultatul final cu redThreshold
 
@@ -88,27 +96,23 @@ public class BluePropThreshold implements VisionProcessor {
 
         double maxim=Math.max(averageLeftBox,averageCenterBox);
 
-/*
 
-        if(averageLeftBox==maxim){
+        if(averageLeftBox>redThreshold && averageLeftBox>averageCenterBox){
             outStr="left";
-        }else if(averageCenterBox==maxim){
+        }else if(averageCenterBox>redThreshold && averageCenterBox>averageLeftBox){
             outStr="center";
+        }else{
+
+            outStr="right";
+
         }
-        else if(averageRightBox==maxim){
+        /*else if(averageRightBox==maxim){
             outStr="right";
         }
+
+
 
          */
-
-        if(averageLeftBox>blueThreshold){
-            outStr="left";
-        }else if(averageCenterBox>blueThreshold){
-            outStr="center";
-        }
-        else{
-            outStr="right";
-        }
 
         return null;
     }

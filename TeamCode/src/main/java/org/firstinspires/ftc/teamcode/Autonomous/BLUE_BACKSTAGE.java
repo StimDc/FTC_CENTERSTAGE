@@ -29,100 +29,97 @@
 
 package org.firstinspires.ftc.teamcode.Autonomous;
 
-import com.acmerobotics.dashboard.FtcDashboard;
+import static org.firstinspires.ftc.teamcode.Implementations.Constants.Direction.BACKWARDS;
+import static org.firstinspires.ftc.teamcode.Implementations.Constants.Direction.FORWARD;
+import static org.firstinspires.ftc.teamcode.Implementations.Constants.Direction.LEFT;
+import static org.firstinspires.ftc.teamcode.Implementations.Constants.Direction.RIGHT;
+
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.Implementations.Camera.BluePropThreshold;
+
+import org.firstinspires.ftc.teamcode.Implementations.Camera.BluePropThreshold_Backstage;
+import org.firstinspires.ftc.teamcode.Implementations.Camera.RedPropThreshold_Backstage;
+import org.firstinspires.ftc.teamcode.Implementations.Camera.RedPropThreshold_Backstage;
 import org.firstinspires.ftc.teamcode.Implementations.Constants.Claw;
 import org.firstinspires.ftc.teamcode.Implementations.Constants.Joint;
-import org.firstinspires.ftc.teamcode.Implementations.Constants.PIDConstantsArm;
-import org.firstinspires.ftc.teamcode.Implementations.Robot.CameraFunc;
 import org.firstinspires.ftc.teamcode.Implementations.Robot.Robot;
-import org.firstinspires.ftc.vision.VisionPortal;
-import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
-@Autonomous(name="BLUE BACKSTAGE", group = "Red Routes")
+@Autonomous(name="BLUE BACKSTAGE", group = "Blue Routes")
 
-public class BLUE_BACKSTAGE extends LinearOpMode {
+public class BLUE_BACKSTAGE extends  LinearOpMode{
 
-    private int PARKING = -1; //-1 for left parking and 1 for right
-    private WebcamName backCam, frontCam;
-    private BluePropThreshold blueProp;
-    private AprilTagProcessor atag;
-    private VisionPortal vision;
-
+    private int PARKING=1; //-1 for left parking and 1 for right
+  //  private BluePropThreshold_Backstage blueProp;
     private PIDController controller;
 
+    public static double p=0.04, i=0, d=0.00001;//d=0.00001
+    public static double f=0.002;
 
-    public static int target = 3;
-    private final double ticks_in_degrees = 288 / (360.0 * 0.36); /// gear ratio: 45/125=0.36
+    public static double target;
+
+    private final double ticks_in_degrees=288*(125/45.0)/360; /// gear ratio: 45/125=0.36
 
     private DcMotorEx elevator1, elevator2;
-    Robot robot;
+    private  Robot robot;
+
+    private int tagID;
+
+    private   final double ZERO_OFFSET = 70.0-3.85;
+    private   double TargetPosInDegrees=70.0-3.85;
+
+
 
     @Override
-    public void runOpMode() {
+    public void runOpMode () {
 
-        robot = new Robot(hardwareMap,telemetry);
+       // blueProp=new BluePropThreshold_Backstage();
+        robot = new Robot(hardwareMap,telemetry,-2);
+        robot.camera.openFrontCam();
+        target=robot.arm.ZERO_OFFSET;
 
 
-        //BasicMovements.init(hardwareMap);
-        //BasicMovements.wheels.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        CameraFunc.openCamera(frontCam,"front",vision,atag,blueProp);
 
-        String propPosition = blueProp.getPropPosition();
+        String propPosition=robot.camera.getPositionProp();
 
-        boolean once = true;
-
+        boolean once=true;
 
         waitForStart();
 
-        robot.claw.setPosition(Claw.INTERMEDIARY);
-
-        sleep(1500);
-
-        robot.joint.setPosition(Joint.DOWN);
-
-        sleep(1500);
-
-        robot.claw.setPosition(Claw.CLOSED);
-
-        sleep(1500);
-
-        //BasicMovements.lateral(-1, 0.6, 95);
-
-        /*
         while ((propPosition.equals("nope") || once) && opModeIsActive() && !isStopRequested()){
 
             telemetry.addLine("Nope :( "+propPosition);
-            propPosition=blueProp.getPropPosition();
+            propPosition=robot.camera.getPositionProp();
+            //propPosition="center";
 
             if(propPosition.equals("left")){
 
                 telemetry.addLine(propPosition);
                 telemetry.update();
-                tagID=4;
+                tagID=1;
+                once=false;
 
-                Backstage_LeftProp_Blue(PARKING,0);
+                Backstage_LeftProp_Red(PARKING,0);
 
             }else if(propPosition.equals("center")){
 
                 telemetry.addLine(propPosition);
                 telemetry.update();
-                tagID=5;
+                tagID=2;
+                once=false;
 
-                Backstage_CenterProp_Blue(PARKING,0);
+                Backstage_CenterProp_Red(PARKING,0);
 
             }else if(propPosition.equals("right")){
 
                 telemetry.addLine(propPosition);
                 telemetry.update();
-                tagID=6;
+                tagID=3;
+                once=false;
 
-                Backstage_RightProp_Blue(PARKING,0);
+                Backstage_RightProp_Red(PARKING,0);
 
             }
 
@@ -130,295 +127,419 @@ public class BLUE_BACKSTAGE extends LinearOpMode {
 
         }
 
-         */
-    }
 
-    public void Backstage_LeftProp_Blue(int parking, int timer) {
-
-        CameraFunc.openCamera(backCam,"back",vision,atag,blueProp);
-
-        waitForStart();
-
-        robot.claw.setPosition(Claw.INTERMEDIARY);
-        sleep(1000);
-
-        robot.joint.setPosition(Joint.DOWN);
-        sleep(1000);
-
-        robot.claw.setPosition(Claw.CLOSED);
-        sleep(1000);
-
-        robot.move.forward(1,0.7,64);
-        sleep(1000);
-
-
-        robot.move.rotate(-1, 0.5, 90);
-        sleep(1000);
-
-        robot.claw.setPosition(Claw.INTERMEDIARY);
-        sleep(1000);
-
-        robot.joint.setPosition(Joint.UP);
-        sleep(1000);
-
-        //BasicMovements.lateral(-1, 0.7, 61);
-        sleep(1000);
-
-        //BasicMovements.forward(1, 0.7, 45);
-
-
-        /*
-        Forward(1,0.5,7);
-        sleep(500);
-
-        claw.setPosition(Claw.INTERMEDIARY);
-        sleep(500);
-
-        Forward(-1,0.4,3);
-        sleep(500);
-
-        claw.setPosition(Claw.CLOSED);
-        sleep(100);
-
-        joint.setPosition(Joint.UP);
-
-        //ove_to_April(tagID);
-
-        moveArm(200);
-        sleep(500);
-
-        claw.setPosition(Claw.OPEN);
-        sleep(500);
-
-        moveArm(0);
-
-        if(parking=="LEFT"){
-
-            lateral(-1,0,0);
-
-        }else if(parking=="RIGHT"){
-
-            lateral(1,0,0);
-
-        }
-
-
-         */
-
-        // lateral(parking,0.6,20);//DOAR PARCARE
 
 
     }
 
-    public void Backstage_CenterProp_Blue(int parking, int timer) {
+    public void Backstage_LeftProp_Red(int parking,int timer){
 
-        CameraFunc.openCamera(backCam,"back",vision,atag,blueProp);
-
-
-        waitForStart();
+        robot.camera.openBackCam();
 
         robot.claw.setPosition(Claw.INTERMEDIARY);
-        sleep(1000);
+        sleep(750);
         robot.joint.setPosition(Joint.DOWN);
-        sleep(1000);
-
+        sleep(900);
         robot.claw.setPosition(Claw.CLOSED);
-        sleep(1000);
 
 
-        sleep(1000);
-        //BasicMovements.forward(1, 0.7, 66);
-        sleep(1000);
 
+        robot.move.lateral(LEFT,0.4,21.5);
+        sleep(175);
 
+        robot.move.forward(FORWARD,0.6,36.5);
+        sleep(175);
         robot.claw.setPosition(Claw.INTERMEDIARY);
-        sleep(1000);
-
+        sleep(250);
+        robot.move.forward(BACKWARDS,0.5,5.5);
+        sleep(175);
+        robot.claw.setPosition(Claw.CLOSED);
+        sleep(250);
         robot.joint.setPosition(Joint.UP);
 
-        // Forward(-1,0.5,4);
-        //sleep(1000);
+        robot.move.rotate(1,0.6,90);
+        sleep(250);
 
-        // claw.setPosition(clawPos.CLOSED);
-        // sleep(1000);
+        robot.move.Move_to_AprilAllAxes(tagID,robot,robot.camera.atag);
 
-        //BasicMovements.forward(-1, 0.7, 65);
-        sleep(1000);
+        sleep(250);
 
-        //BasicMovements.lateral(-1, 0.5, 45);
-        sleep(1000);
+        int stateArm=0;
 
-        // claw.setPosition(Claw.INTERMEDIARY);
-        // sleep(1000);
+        boolean armtarget=false,OKtarget=false;
 
-        //joint.setPosition(Joint.UP);
+        while(!armtarget){
 
-/*
-        Rotate(1,0,90);
-        sleep(500);
+            switch (stateArm){
 
-        Move_To_April(tagID);
-        sleep(500);
+                case 0:
 
-        moveArm(200);
+                    robot.arm.setPosition(ZERO_OFFSET,1);
+                    TargetPosInDegrees=ZERO_OFFSET;
+                    stateArm=1;
+                    break;
 
-        sleep(500);
+                case 1:
+                    robot.arm.setPosition(240,6);
+                    TargetPosInDegrees=230;
+                    stateArm=2;
+                    break;
 
-        setPosition(clawPos.OPEN);
+                case 2:
+                    if(robot.arm.isOnTarget(6)) {
+                        stateArm=3;
+                    }
+                    break;
 
-        moveArm(0);
+                case 3:
 
-        sleep(500);
+                    robot.claw.setPosition(Claw.OPEN);
+                    stateArm=4;
+                    break;
 
+                case 4:
 
-        if(parking=="LEFT"){
 
-            lateral(-1,0,0);
+                    if(Math.abs(robot.claw.getPosition()-Claw.OPEN) <0.03){
 
-        }else if(parking=="RIGHT"){
+                        stateArm=5;
+                    }
+                    break;
 
-            lateral(1,0,0);
 
-        }
+                case 5:
+                    robot.arm.setPosition(ZERO_OFFSET,1);
+                    TargetPosInDegrees=ZERO_OFFSET;
+                    stateArm=6;
+                    break;
 
-       */
+                case 6:
+                    if(robot.arm.isOnTarget(5)) {
+                        if(Math.abs(TargetPosInDegrees-ZERO_OFFSET)<5){
 
-        //BasicMovements.lateral(parking, 0.5, 20);//PARCAM SI ATAT
+                            OKtarget=true;
 
+                        }
+                        stateArm=7;
+                    }
+                    break;
 
-    }
+                case 7:
 
-    public void Backstage_RightProp_Blue(int parking, double timer) {
+                    armtarget=true;
+                    telemetry.addLine("DONE :D");
+                    // telemetry.update();
 
-        CameraFunc.openCamera(backCam,"back",vision,atag,blueProp);
-
-        waitForStart();
-
-
-        robot.claw.setPosition(Claw.INTERMEDIARY);
-        sleep(1000);
-
-        robot.joint.setPosition(Joint.DOWN);
-        sleep(1000);
-
-        robot.claw.setPosition(Claw.CLOSED);
-        sleep(1000);
-
-        //BasicMovements.forward(1, 0.7, 64);
-        sleep(1000);
-
-
-        robot.move.rotate(1, 0.5, 90);
-        sleep(1000);
-
-        robot.claw.setPosition(Claw.INTERMEDIARY);
-        sleep(1000);
-
-        robot.joint.setPosition(Joint.UP);
-        sleep(1000);
-
-        //BasicMovements.lateral(1, 0.7, 61);
-        sleep(1000);
-
-        //BasicMovements.forward(-1, 0.7, 45);
-
-        /*
-        Open_BackCam();
-
-        waitForStart();
-
-        joint.setPosition(Joint.UP);
-        sleep(500);
-
-        claw.setPosition(Claw.CLOSED);
-        sleep(500);
-
-        Forward(1,0.7,61);
-        sleep(500);
-
-        Rotate(1,0.5,90);
-        sleep(500);
-
-        joint.setPosition(Joint.DOWN);
-
-        Forward(-1,0.6,25);
-        sleep(500);
-
-        claw.setPosition(Claw.INTERMEDIARY);
-        sleep(500);
-
-        Forward(-1,0.4,3.5);
-        sleep(500);
-
-        claw.setPosition(Claw.CLOSED);
-        sleep(100);
-
-        joint.setPosition(Joint.UP);
-
-         */
-
-        /*
-        Move_to_April(tagID);
-
-        moveArm(200);
-        sleep(500);
-
-        claw.setPosition(Claw.OPEN);
-        sleep(500);
-
-        moveArm(0);
-        sleep(500);
-
-        if(parking=="LEFT"){
-
-            lateral(-1,0,0);
-
-        }else if(parking=="RIGHT"){
-
-            lateral(1,0,0);
-
-        }
-
-         */
-
-        //BasicMovements.lateral(parking, 0.6, 30);
-
-
-    }
-
-
-    public void moveArm(int desiredTarget) {//TODO: RESCRIS
-
-        if (elevator1.getCurrentPosition() < desiredTarget) {
-
-            for (target = elevator1.getCurrentPosition(); target <= desiredTarget; target++) {
-                controller.setPID(PIDConstantsArm.p, PIDConstantsArm.i, PIDConstantsArm.d);
-                int elepos = elevator1.getCurrentPosition();
-                double pid = controller.calculate(elepos, target);
-                double ff = Math.cos(Math.toRadians(target / ticks_in_degrees));
-
-                double power = pid + ff;
-
-                elevator1.setPower(power);
-                elevator2.setPower(power);
-                sleep(250);
             }
 
-        } else if (elevator1.getCurrentPosition() > desiredTarget) {
+            if(Math.abs(TargetPosInDegrees-ZERO_OFFSET)<5 && OKtarget==true){
 
-            for (target = elevator1.getCurrentPosition(); target >= 0; target--) {
-                controller.setPID(PIDConstantsArm.p, PIDConstantsArm.i, PIDConstantsArm.d);
-                int elepos = elevator1.getCurrentPosition();
-                double pid = controller.calculate(elepos, target);
-                double ff = Math.cos(Math.toRadians(target / ticks_in_degrees));
+                robot.arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-                double power = pid + ff;
+                robot.arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-                elevator1.setPower(power);
-                elevator2.setPower(power);
-                sleep(250);
+                robot.arm.setPower(0);
+
             }
+
+            if(Math.abs(TargetPosInDegrees-ZERO_OFFSET)>=3){
+                OKtarget=false;
+
+            }
+
+            if(OKtarget==false){
+                robot.arm.armTask();
+
+            }
+            // telemetry.addLine("Ceva: "+ceva);
+            telemetry.addLine("Pos: "+robot.arm.getPosition());
+            telemetry.addLine("Target: "+TargetPosInDegrees);
+            telemetry.addLine("State: "+stateArm);
+            telemetry.update();
+
+
         }
+
+        robot.move.lateral(LEFT,0.6,69);
+
+        sleep(250);
+
+        robot.move.forward(BACKWARDS,0.6,25);
     }
 
+    public void Backstage_CenterProp_Red(int parking,int timer){
+
+        robot.camera.openBackCam();
+
+        robot.claw.setPosition(Claw.INTERMEDIARY);
+        sleep(750);
+        robot.joint.setPosition(Joint.DOWN);
+        sleep(900);
+        robot.claw.setPosition(Claw.CLOSED);
+
+
+
+        robot.move.lateral(LEFT,0.4,8);
+        sleep(175);
+
+        robot.move.forward(FORWARD,0.6,57);
+        sleep(175);
+        robot.claw.setPosition(Claw.INTERMEDIARY);
+        sleep(500);
+        robot.move.forward(BACKWARDS,0.5,5.5);
+        sleep(175);
+        robot.claw.setPosition(Claw.CLOSED);
+        sleep(500);
+        robot.joint.setPosition(Joint.UP);
+
+        robot.move.rotate(1,0.6,90);
+        sleep(250);
+
+        //   robot.move.forward(BACKWARDS,0.6,30);
+
+        robot.move.Move_to_AprilAllAxes(tagID,robot,robot.camera.atag);
+
+        sleep(250);
+
+        int stateArm=0;
+
+        boolean armtarget=false,OKtarget=false;
+
+        while(!armtarget){
+
+            switch (stateArm){
+
+                case 0:
+
+                    robot.arm.setPosition(ZERO_OFFSET,1);
+                    TargetPosInDegrees=ZERO_OFFSET;
+                    stateArm=1;
+                    break;
+
+                case 1:
+                    robot.arm.setPosition(240,6);
+                    TargetPosInDegrees=230;
+                    stateArm=2;
+                    break;
+
+                case 2:
+                    if(robot.arm.isOnTarget(6)) {
+                        stateArm=3;
+                    }
+                    break;
+
+                case 3:
+
+                    robot.claw.setPosition(Claw.OPEN);
+                    stateArm=4;
+                    break;
+
+                case 4:
+
+
+                    if(Math.abs(robot.claw.getPosition()-Claw.OPEN) <0.03){
+
+                        stateArm=5;
+                    }
+                    break;
+
+
+                case 5:
+                    robot.arm.setPosition(ZERO_OFFSET,1);
+                    TargetPosInDegrees=ZERO_OFFSET;
+                    stateArm=6;
+                    break;
+
+                case 6:
+                    if(robot.arm.isOnTarget(5)) {
+                        if(Math.abs(TargetPosInDegrees-ZERO_OFFSET)<5){
+
+                            OKtarget=true;
+
+                        }
+                        stateArm=7;
+                    }
+                    break;
+
+                case 7:
+
+                    armtarget=true;
+                    telemetry.addLine("DONE :D");
+                    // telemetry.update();
+
+            }
+
+            if(Math.abs(TargetPosInDegrees-ZERO_OFFSET)<5 && OKtarget==true){
+
+                robot.arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+                robot.arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+                robot.arm.setPower(0);
+
+            }
+
+            if(Math.abs(TargetPosInDegrees-ZERO_OFFSET)>=3){
+                OKtarget=false;
+
+            }
+
+            if(OKtarget==false){
+                robot.arm.armTask();
+
+            }
+            // telemetry.addLine("Ceva: "+ceva);
+            telemetry.addLine("Pos: "+robot.arm.getPosition());
+            telemetry.addLine("Target: "+TargetPosInDegrees);
+            telemetry.addLine("State: "+stateArm);
+            telemetry.update();
+
+
+        }
+
+        robot.move.lateral(LEFT,0.6,58);
+
+        sleep(250);
+
+        robot.move.forward(BACKWARDS,0.6,25);
+
+    }
+    public void Backstage_RightProp_Red(int parking, double timer){
+
+        robot.camera.openBackCam();
+
+        robot.claw.setPosition(Claw.INTERMEDIARY);
+        sleep(750);
+        robot.joint.setPosition(Joint.DOWN);
+        sleep(900);
+        robot.claw.setPosition(Claw.CLOSED);
+
+
+
+        robot.move.lateral(LEFT,0.4,8);
+        sleep(175);
+
+        robot.move.forward(FORWARD,0.6,57);
+        sleep(175);
+        robot.claw.setPosition(Claw.INTERMEDIARY);
+        sleep(500);
+        robot.move.forward(BACKWARDS,0.5,5.5);
+        sleep(175);
+        robot.claw.setPosition(Claw.CLOSED);
+        sleep(500);
+        robot.joint.setPosition(Joint.UP);
+
+        robot.move.rotate(1,0.6,90);
+        sleep(250);
+
+        //   robot.move.forward(BACKWARDS,0.6,30);
+
+        robot.move.Move_to_AprilAllAxes(tagID,robot,robot.camera.atag);
+
+        sleep(250);
+
+        int stateArm=0;
+
+        boolean armtarget=false,OKtarget=false;
+
+        while(!armtarget){
+
+            switch (stateArm){
+
+                case 0:
+
+                    robot.arm.setPosition(ZERO_OFFSET,1);
+                    TargetPosInDegrees=ZERO_OFFSET;
+                    stateArm=1;
+                    break;
+
+                case 1:
+                    robot.arm.setPosition(240,6);
+                    TargetPosInDegrees=230;
+                    stateArm=2;
+                    break;
+
+                case 2:
+                    if(robot.arm.isOnTarget(6)) {
+                        stateArm=3;
+                    }
+                    break;
+
+                case 3:
+
+                    robot.claw.setPosition(Claw.OPEN);
+                    stateArm=4;
+                    break;
+
+                case 4:
+
+
+                    if(Math.abs(robot.claw.getPosition()-Claw.OPEN) <0.03){
+
+                        stateArm=5;
+                    }
+                    break;
+
+
+                case 5:
+                    robot.arm.setPosition(ZERO_OFFSET,1);
+                    TargetPosInDegrees=ZERO_OFFSET;
+                    stateArm=6;
+                    break;
+
+                case 6:
+                    if(robot.arm.isOnTarget(5)) {
+                        if(Math.abs(TargetPosInDegrees-ZERO_OFFSET)<5){
+
+                            OKtarget=true;
+
+                        }
+                        stateArm=7;
+                    }
+                    break;
+
+                case 7:
+
+                    armtarget=true;
+                    telemetry.addLine("DONE :D");
+                    // telemetry.update();
+
+            }
+
+            if(Math.abs(TargetPosInDegrees-ZERO_OFFSET)<5 && OKtarget==true){
+
+                robot.arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+                robot.arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+                robot.arm.setPower(0);
+
+            }
+
+            if(Math.abs(TargetPosInDegrees-ZERO_OFFSET)>=3){
+                OKtarget=false;
+
+            }
+
+            if(OKtarget==false){
+                robot.arm.armTask();
+
+            }
+            // telemetry.addLine("Ceva: "+ceva);
+            telemetry.addLine("Pos: "+robot.arm.getPosition());
+            telemetry.addLine("Target: "+TargetPosInDegrees);
+            telemetry.addLine("State: "+stateArm);
+            telemetry.update();
+
+
+        }
+
+        robot.move.lateral(LEFT,0.6,40);
+
+        sleep(250);
+
+        robot.move.forward(BACKWARDS,0.6,25);
+    }
 }
+
+//759 lines and 40 warnings 331 lines and 27 warnings

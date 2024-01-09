@@ -5,19 +5,40 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.Implementations.Camera.BluePropThreshold;
+import org.firstinspires.ftc.teamcode.Implementations.Camera.BluePropThreshold_Backstage;
+import org.firstinspires.ftc.teamcode.Implementations.Camera.BluePropThreshold_Frontstage;
+import org.firstinspires.ftc.teamcode.Implementations.Camera.Choising_Color;
+import org.firstinspires.ftc.teamcode.Implementations.Camera.RedPropThreshold_Backstage;
+import org.firstinspires.ftc.teamcode.Implementations.Camera.RedPropThreshold_Frontstage;
 import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.VisionProcessor;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 public class Camera {
     public AprilTagProcessor atag;
-    public BluePropThreshold blueProp;
+ /*   public BluePropThreshold_Backstage bluePropBackstage;
+    public BluePropThreshold_Frontstage bluePropFrontstage;
+    public RedPropThreshold_Backstage redPropThresholdBackstage;
+    public RedPropThreshold_Frontstage redPropThresholdFrontstage;
+
+
+  */
+public Choising_Color color;
 
     public WebcamName backCam, frontCam;
     public VisionPortal vision;
-    public Camera(HardwareMap hardwareMap){ //TODO: make the difference between blueprop and redprop
+
+    public VisionProcessor colorProcessor;
+
+    public Camera(HardwareMap hardwareMap, int startPosition){ //1 redFrontstage,-1 redbackstage, 2 bluefrontstage, -2 bluebackstage
+        //TODO: make the difference between bluePropBackstage and redprop
         atag = new AprilTagProcessor.Builder().build();
-        blueProp = new BluePropThreshold();
+       // bluePropBackstage = new BluePropThreshold_Backstage();
+
+        color=new Choising_Color();
+
+        color.getStartPosition(startPosition);
+
 
         backCam = hardwareMap.get(WebcamName.class, "Camera1");
         frontCam = hardwareMap.get(WebcamName.class, "Camera2");
@@ -26,13 +47,16 @@ public class Camera {
 
         vision = new VisionPortal.Builder()
                 .setCamera(switchableCamera)
-                .addProcessors(atag,blueProp)
+               // .addProcessors(atag,bluePropBackstage)
+                .addProcessors(atag,color.getColor())
                 .build();
 
         while(vision.getCameraState() != VisionPortal.CameraState.STREAMING){
 
         }
-        vision.setProcessorEnabled(blueProp,false);
+        //vision.setProcessorEnabled(bluePropBackstage,false);
+        vision.setProcessorEnabled(color.getColor(),false);
+
     }
 
     public void openBackCam(){
@@ -41,7 +65,9 @@ public class Camera {
         }
 
         vision.setProcessorEnabled(atag,true);
-        vision.setProcessorEnabled(blueProp,false);
+        //vision.setProcessorEnabled(bluePropBackstage,false);
+        vision.setProcessorEnabled(color.getColor(),false);
+
 
         while(vision.getCameraState()!=VisionPortal.CameraState.STREAMING){
 
@@ -53,9 +79,19 @@ public class Camera {
         }
 
         vision.setProcessorEnabled(atag,false);
-        vision.setProcessorEnabled(blueProp,true);
+       // vision.setProcessorEnabled(bluePropBackstage,true);
+        vision.setProcessorEnabled(color.getColor(),true);
+
+
         while(vision.getCameraState()!=VisionPortal.CameraState.STREAMING){
 
         }
     }
+
+    public String getPositionProp(){
+
+        return color.getProp();
+
+    }
+
 }

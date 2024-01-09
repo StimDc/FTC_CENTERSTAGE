@@ -24,6 +24,8 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import java.util.List;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 public class Movement {
     public Wheels wheels;
@@ -264,7 +266,7 @@ public class Movement {
 
             if (targetFound) {
 
-                rangeError = desiredTag.ftcPose.range - 8.75;
+                rangeError = desiredTag.ftcPose.range - 11;// pentru red center backdrop: 10 sau 10.5 pentru red right backdrop: 9
 
 
                 headingError = desiredTag.ftcPose.bearing - 5;
@@ -367,7 +369,7 @@ public class Movement {
 
             if (targetFound) {
 
-                rangeError = desiredTag.ftcPose.range - 8.75;
+                rangeError = desiredTag.ftcPose.range - 10;
 
 
                 headingError = desiredTag.ftcPose.bearing - 5;
@@ -410,6 +412,14 @@ public class Movement {
                 robot.move.generalMovement(0, 0, 0);
 
             }
+
+            if(STATE){
+
+                robot.move.generalMovement(0, 0, 0);
+
+
+            }
+
             /*
             else{
                 okRange=false;

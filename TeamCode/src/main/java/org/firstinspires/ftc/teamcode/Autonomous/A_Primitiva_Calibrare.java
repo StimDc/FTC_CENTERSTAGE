@@ -46,7 +46,7 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.teamcode.Implementations.Camera.RedPropThreshold;
+import org.firstinspires.ftc.teamcode.Implementations.Camera.RedPropThreshold_Backstage;
 import org.firstinspires.ftc.teamcode.Implementations.Constants.Joint;
 import org.firstinspires.ftc.teamcode.Implementations.Robot.Wheels;
 import org.firstinspires.ftc.vision.VisionPortal;
@@ -63,7 +63,7 @@ import java.util.List;
 
 public class A_Primitiva_Calibrare extends LinearOpMode {
 
-    private RedPropThreshold redProp;
+    private RedPropThreshold_Backstage redProp;
     private VisionPortal visionPortal;
     private AprilTagProcessor apriltagProcesor;
     private int apriltagid;
@@ -178,7 +178,7 @@ public class A_Primitiva_Calibrare extends LinearOpMode {
 
     public void InitCamera(){
 
-        redProp=new RedPropThreshold();
+        redProp=new RedPropThreshold_Backstage();
 
         apriltagProcesor = new AprilTagProcessor.Builder()
                 .setDrawAxes(true)

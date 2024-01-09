@@ -38,7 +38,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import org.firstinspires.ftc.teamcode.Implementations.Camera.RedPropThreshold;
+import org.firstinspires.ftc.teamcode.Implementations.Camera.RedPropThreshold_Backstage;
 import org.firstinspires.ftc.teamcode.Implementations.Constants.Claw;
 import org.firstinspires.ftc.teamcode.Implementations.Constants.Joint;
 import org.firstinspires.ftc.teamcode.Implementations.Robot.Robot;
@@ -48,7 +48,7 @@ import org.firstinspires.ftc.teamcode.Implementations.Robot.Robot;
 public class RED_BACKSTAGE2 extends  LinearOpMode{
 
     private int PARKING=1; //-1 for left parking and 1 for right
-    private RedPropThreshold redProp;
+  //  private RedPropThreshold_Backstage redProp;
     private PIDController controller;
 
     public static double p=0.04, i=0, d=0.00001;//d=0.00001
@@ -71,14 +71,14 @@ public class RED_BACKSTAGE2 extends  LinearOpMode{
     @Override
     public void runOpMode () {
 
-        redProp=new RedPropThreshold();
-        robot = new Robot(hardwareMap,telemetry);
+       // redProp=new RedPropThreshold_Backstage();
+        robot = new Robot(hardwareMap,telemetry,-1);
         robot.camera.openFrontCam();
         target=robot.arm.ZERO_OFFSET;
 
 
 
-        String propPosition=redProp.getPropPosition();
+        String propPosition=robot.camera.getPositionProp();
 
         boolean once=true;
 
@@ -87,8 +87,8 @@ public class RED_BACKSTAGE2 extends  LinearOpMode{
         while ((propPosition.equals("nope") || once) && opModeIsActive() && !isStopRequested()){
 
             telemetry.addLine("Nope :( "+propPosition);
-            //propPosition=redProp.getPropPosition();
-            propPosition="center";
+            propPosition=robot.camera.getPositionProp();
+            //propPosition="center";
 
             if(propPosition.equals("left")){
 
@@ -297,7 +297,7 @@ public class RED_BACKSTAGE2 extends  LinearOpMode{
 
         boolean armtarget=false,OKtarget=false;
 
-        while(!armtarget){
+        while(!armtarget && opModeIsActive() && !isStopRequested()){
 
             switch (stateArm){
 
@@ -309,14 +309,14 @@ public class RED_BACKSTAGE2 extends  LinearOpMode{
                     break;
 
                 case 1:
-                    robot.arm.setPosition(235,6);
+                    robot.arm.setPosition(240,6);
                     TargetPosInDegrees=230;
                     stateArm=2;
                     break;
 
                 case 2:
-                    if(robot.arm.isOnTarget(6)) {
-                        stateArm=3;
+                    if(robot.arm.isOnTarget(6) && robot.move.getArmState()) {
+                        stateArm=4;
                     }
                     break;
 
@@ -352,8 +352,8 @@ public class RED_BACKSTAGE2 extends  LinearOpMode{
                     break;
 
                 case 7:
-                    if(robot.arm.isOnTarget(1)) {
-                        if(Math.abs(TargetPosInDegrees-ZERO_OFFSET)<3){
+                    if(robot.arm.isOnTarget(5)) {
+                        if(Math.abs(TargetPosInDegrees-ZERO_OFFSET)<5){
 
                             OKtarget=true;
 
@@ -373,7 +373,7 @@ public class RED_BACKSTAGE2 extends  LinearOpMode{
             robot.move.Move_to_AprilAllAxes_StateMachine(tagID,robot,robot.camera.atag);
 
 
-            if(Math.abs(TargetPosInDegrees-ZERO_OFFSET)<3 && OKtarget==true){
+            if(Math.abs(TargetPosInDegrees-ZERO_OFFSET)<5 && OKtarget==true){
 
                 robot.arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 

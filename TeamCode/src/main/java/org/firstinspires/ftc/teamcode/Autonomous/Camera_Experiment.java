@@ -32,34 +32,28 @@ package org.firstinspires.ftc.teamcode.Autonomous;
 import android.util.Size;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.Implementations.Camera.BluePropThreshold;
-import org.firstinspires.ftc.teamcode.Implementations.Camera.RedPropThreshold;
+import org.firstinspires.ftc.teamcode.Implementations.Camera.BluePropThreshold_Backstage;
+import org.firstinspires.ftc.teamcode.Implementations.Camera.RedPropThreshold_Backstage;
+import org.firstinspires.ftc.teamcode.Implementations.Camera.RedPropThreshold_Frontstage;
 import org.firstinspires.ftc.vision.VisionPortal;
 
 @Autonomous(name="Experimentare Culori", group = "Robot")
 
 public class Camera_Experiment extends LinearOpMode {
 
-    private RedPropThreshold redProp;
+    private RedPropThreshold_Backstage redProp;
 
-    private BluePropThreshold blueProp;
+    private BluePropThreshold_Backstage blueProp;
     private VisionPortal visionPortal;
 
     @Override
     public void runOpMode() {
 
-        redProp=new RedPropThreshold();
-        blueProp=new BluePropThreshold();
+        redProp=new RedPropThreshold_Backstage();
+        blueProp=new BluePropThreshold_Backstage();
 
         visionPortal = new VisionPortal.Builder()
                 .addProcessors(redProp,blueProp)
@@ -71,15 +65,22 @@ public class Camera_Experiment extends LinearOpMode {
 
         }
 
-
-
         waitForStart();
 
         while(opModeIsActive() && !isStopRequested()){
-            telemetry.addLine("Position red Prop: "+redProp.getPropPosition());
+            telemetry.addLine("Position RED Prop: "+redProp.getPropPosition());
+            telemetry.addLine("**********");
+            telemetry.addLine("LeftRED side: " +redProp.PrintLeft());
+            telemetry.addLine("CenterRED side: "+redProp.PrintCenter());
             telemetry.addLine("--------");
-            telemetry.addLine("Left side: " +redProp.PrintLeft());
-            telemetry.addLine("Center side: "+redProp.PrintCenter());
+            telemetry.addLine("--------");
+            telemetry.addLine("--------");
+
+            telemetry.addLine("Position BLUE Prop: "+blueProp.getPropPosition());
+            telemetry.addLine("**********");
+            telemetry.addLine("LeftBLUE side: " +blueProp.PrintLeft());
+            telemetry.addLine("CenterBLUE side: "+blueProp.PrintCenter());
+
             telemetry.update();
         }
 

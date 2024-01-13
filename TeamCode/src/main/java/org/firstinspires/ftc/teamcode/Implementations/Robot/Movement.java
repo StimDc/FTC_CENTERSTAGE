@@ -253,6 +253,8 @@ public class Movement {
 
         double rangeError = 100, headingError = 0, yawError = 0;
 
+        int error=0;
+
         while (!ok) {
             //while (!ok && opModeIsActive() && !isStopRequested()) {
 
@@ -326,8 +328,15 @@ public class Movement {
 
                  */
 
+                error++;
+
                 robot.move.generalMovement(0, 0, 0);
             }
+
+            if(error>15){
+                ok=true;
+            }
+
             if (rangeError > -2 && rangeError < 2 && headingError>-5 && headingError<5) {
 
                 //  okRange=true;

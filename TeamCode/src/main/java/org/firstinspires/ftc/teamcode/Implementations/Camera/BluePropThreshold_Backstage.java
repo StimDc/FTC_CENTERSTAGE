@@ -26,10 +26,10 @@ public class BluePropThreshold_Backstage implements VisionProcessor {
 
     static final Rect LEFT_RECTANGLE=new Rect (
             new Point(0,200),
-            new Point(320,480)
+            new Point(300,480)
     );
     static final Rect CENTER_RECTANGLE=new Rect(
-            new Point(321,200),
+            new Point(301,200),
             new Point(640,480)
     );
 

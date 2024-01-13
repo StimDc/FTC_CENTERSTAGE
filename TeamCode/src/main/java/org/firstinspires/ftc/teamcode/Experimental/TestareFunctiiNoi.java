@@ -65,7 +65,7 @@ public class MovingClaw extends LinearOpMode {
     @Override
     public void runOpMode() {
         try {
-            robot = new Robot(hardwareMap,telemetry,1);
+            robot = new Robot(hardwareMap,telemetry);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

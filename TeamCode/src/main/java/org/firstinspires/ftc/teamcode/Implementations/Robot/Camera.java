@@ -7,25 +7,14 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.Implementations.Camera.BluePropThreshold_Backstage;
 import org.firstinspires.ftc.teamcode.Implementations.Camera.BluePropThreshold_Frontstage;
-import org.firstinspires.ftc.teamcode.Implementations.Camera.Choising_Color;
 import org.firstinspires.ftc.teamcode.Implementations.Camera.RedPropThreshold_Backstage;
 import org.firstinspires.ftc.teamcode.Implementations.Camera.RedPropThreshold_Frontstage;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.VisionProcessor;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
-import java.util.Dictionary;
-
 public class Camera {
     public AprilTagProcessor atag;
- /*   public BluePropThreshold_Backstage bluePropBackstage;
-    public BluePropThreshold_Frontstage bluePropFrontstage;
-    public RedPropThreshold_Backstage redPropThresholdBackstage;
-    public RedPropThreshold_Frontstage redPropThresholdFrontstage;
-
-
-  */
-public Choising_Color color;
 
     public BluePropThreshold_Backstage bluePropBackstage;
     public BluePropThreshold_Frontstage bluePropFrontstage;
@@ -33,51 +22,12 @@ public Choising_Color color;
     public RedPropThreshold_Frontstage redPropThresholdFrontstage;
 
     public VisionProcessor processor;
-    public String positionProp;
-
-
-
     public WebcamName backCam, frontCam;
     public VisionPortal vision;
 
-    int STARTPOSITION;
-
-    public VisionProcessor colorProcessor;
     public Robot robot;
 
-
-    /*
-    public void getColor() {
-
-
-        if (STARTPOSITION == -2) {
-
-            bluePropBackstage = new BluePropThreshold_Backstage();
-
-        } else if (STARTPOSITION == -1) {
-
-            redPropThresholdBackstage = new RedPropThreshold_Backstage();
-
-
-        } else if (STARTPOSITION == 1) {
-
-            redPropThresholdFrontstage = new RedPropThreshold_Frontstage();
-
-        } else if (STARTPOSITION == 2) {
-
-            bluePropFrontstage = new BluePropThreshold_Frontstage();
-        }else{
-
-        }
-    }
-
-    */
-
-
-
-    public Camera(HardwareMap hardwareMap, int startPosition,Robot robot){ //1 redFrontstage,-1 redbackstage, 2 bluefrontstage, -2 bluebackstage
-        //TODO: make the difference between bluePropBackstage and redprop
-
+    public Camera(HardwareMap hardwareMap,Robot robot){
         if(robot.parameter.get("alliance").equals("RED") &&
                 robot.parameter.get("position").equals("BACK_STAGE")){
             this.redPropThresholdBackstage=new RedPropThreshold_Backstage();
@@ -104,16 +54,6 @@ public Choising_Color color;
 
         this.atag = new AprilTagProcessor.Builder().build();
         this.robot = robot;
-       // bluePropBackstage = new BluePropThreshold_Backstage();
-
-       //  color=new Choising_Color();
-
-      //  color.getStartPosition(startPosition);
-
-        //STARTPOSITION= startPosition;
-
-        //getColor();
-
 
         backCam = hardwareMap.get(WebcamName.class, "Camera1");
         frontCam = hardwareMap.get(WebcamName.class, "Camera2");
@@ -164,17 +104,6 @@ public Choising_Color color;
 
         }
     }
-/*
-    public String getPositionProp(){
-
-
-
-    }
-    
- */
-
-
-
     public void getProcessor(){
         if(robot.parameter.get("alliance").equals("RED") &&
                 robot.parameter.get("position").equals("BACK_STAGE")){
@@ -196,7 +125,7 @@ public Choising_Color color;
         }
     }
 
-    public String GetPropPositionr(){
+    public String GetPropPosition(){
         if(robot.parameter.get("alliance").equals("RED") &&
                 robot.parameter.get("position").equals("BACK_STAGE")){
            return this.redPropThresholdBackstage.getPropPosition();
@@ -212,7 +141,7 @@ public Choising_Color color;
             return this.bluePropFrontstage.getPropPosition();
         }
         else{
-            return this.bluePropFrontstage.getPropPosition();
+            return this.bluePropBackstage.getPropPosition();
 
         }
     }

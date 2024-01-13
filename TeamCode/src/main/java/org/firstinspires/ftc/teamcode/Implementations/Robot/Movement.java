@@ -24,8 +24,6 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import java.util.List;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 public class Movement {
     public Wheels wheels;
@@ -77,7 +75,6 @@ public class Movement {
     }
 
     public void lateral(int sign, double pow, double dist) {
-        //sign = MathFunc.valueToOne(sign);
         dist = dist * LATERAL_ERROR;
 
         int ticks = (int) ((MathFunc.inchToTicks(MathFunc.cmToInch(dist)) * (1 / Math.sin(45))) * 35 / 42);
@@ -112,7 +109,6 @@ public class Movement {
     }
 
     public void rotate(int sign, double pow, double deg) {
-        //sign = MathFunc.valueToOne(sign);
         deg *= ROTATE_ERROR;
         double botHeading = Math.abs(this.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS)) - Math.abs(HEADING);
         deg = Math.toRadians(deg);
@@ -132,112 +128,6 @@ public class Movement {
         telemetry.addLine("Heading" + this.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES));
         telemetry.update();
         sleep(SLEEP);
-    }
-
-
-    public void Move_to_April(int idtag, Robot robot, AprilTagProcessor atag) {
-
-        AprilTagDetection desiredTag = null;
-        boolean targetFound = false;
-        boolean ok = false;
-        int oldtarget = -1;
-
-        boolean okHeading = false, okYaw = false;
-
-        double rangeError = 100, headingError = 0, yawError = 0;
-
-        while (!ok) {
-            //while (!ok && opModeIsActive() && !isStopRequested()) {
-
-            targetFound = false;
-            List<AprilTagDetection> currentDetections = atag.getDetections();
-            for (AprilTagDetection detection : currentDetections) {
-                if ((detection.metadata != null) && (detection.id == idtag)) {
-                    targetFound = true;
-                    desiredTag = detection;
-                    break;  // don't look any further.
-                }
-            }
-
-            if (targetFound) {
-
-                rangeError = desiredTag.ftcPose.range;
-
-
-                if (okHeading == true) {
-                    headingError = 0;
-                } else {
-                    headingError = desiredTag.ftcPose.bearing;
-                }
-
-                if (okYaw == true) {
-                    yawError = 0;
-                } else {
-                    yawError = desiredTag.ftcPose.yaw; //1.7795
-                }
-
-                // Use the speed and turn "gains" to calculate how we want the robot to move.
-                double drive = Range.clip(rangeError * RANGE_ERROR_GAIN, -MAX_RANGE, MAX_RANGE);
-                double turn = Range.clip(headingError * HEADING_ERROR_GAIN, -MAX_HEADING, MAX_HEADING);
-                double strafe = Range.clip(-yawError * YAW_ERROR_GAIN, -MAX_YAW, MAX_YAW);
-
-
-                if (yawError > -2 && yawError < 2) {
-                    okYaw = true;
-                }
-                if (headingError > -1 && headingError < 1) {
-                    okHeading = true;
-                }
-                //moveRobot(-drive, -strafe, turn);
-
-                if (okHeading == true && okYaw == true) {
-                    robot.move.generalMovement(-drive, 0, 0);
-                } else {
-                    robot.move.generalMovement(0, -strafe, turn);
-
-                }
-                //    robot.move.generalMovement(-drive, -strafe, turn);
-
-            } else {
-                robot.move.generalMovement(0, 0, 0);
-            }
-            if (rangeError < 25) {
-
-                ok = true;
-                robot.move.generalMovement(0, 0, 0);
-            }
-        }
-
-        headingError = 100;
-        while (headingError > -1 && headingError < 1) {
-            //while (!ok && opModeIsActive() && !isStopRequested()) {
-
-            targetFound = false;
-            List<AprilTagDetection> currentDetections = atag.getDetections();
-            for (AprilTagDetection detection : currentDetections) {
-                if ((detection.metadata != null) && (detection.id == idtag)) {
-                    targetFound = true;
-                    desiredTag = detection;
-                    break;  // don't look any further.
-                }
-            }
-
-            if (targetFound) {
-
-                headingError = desiredTag.ftcPose.bearing;
-
-                // Use the speed and turn "gains" to calculate how we want the robot to move.
-                double turn = Range.clip(headingError * HEADING_ERROR_GAIN, -MAX_HEADING, MAX_HEADING);
-
-                //moveRobot(-drive, -strafe, turn);
-
-                robot.move.generalMovement(0, 0, turn);
-
-            } else {
-                robot.move.generalMovement(0, 0, 0);
-            }
-        }
-
     }
 
     public void Move_to_AprilAllAxes(int idtag, Robot robot, AprilTagProcessor atag) {

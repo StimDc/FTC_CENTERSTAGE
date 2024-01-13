@@ -32,17 +32,10 @@ package org.firstinspires.ftc.teamcode.Autonomous;
 import static org.firstinspires.ftc.teamcode.Implementations.Constants.Direction.BACKWARDS;
 import static org.firstinspires.ftc.teamcode.Implementations.Constants.Direction.FORWARD;
 import static org.firstinspires.ftc.teamcode.Implementations.Constants.Direction.LEFT;
-import static org.firstinspires.ftc.teamcode.Implementations.Constants.Direction.RIGHT;
 
-import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-
-import org.firstinspires.ftc.teamcode.Implementations.Camera.BluePropThreshold_Backstage;
-import org.firstinspires.ftc.teamcode.Implementations.Camera.RedPropThreshold_Backstage;
-import org.firstinspires.ftc.teamcode.Implementations.Camera.RedPropThreshold_Backstage;
 import org.firstinspires.ftc.teamcode.Implementations.Constants.Claw;
 import org.firstinspires.ftc.teamcode.Implementations.Constants.Joint;
 import org.firstinspires.ftc.teamcode.Implementations.Robot.Robot;
@@ -54,32 +47,17 @@ import java.io.IOException;
 public class BLUE_BACKSTAGE extends  LinearOpMode{
 
     private int PARKING=1; //-1 for left parking and 1 for right
-  //  private BluePropThreshold_Backstage blueProp;
-    private PIDController controller;
 
-    public static double p=0.04, i=0, d=0.00001;//d=0.00001
-    public static double f=0.002;
-
-    public static double target;
-
-    private final double ticks_in_degrees=288*(125/45.0)/360; /// gear ratio: 45/125=0.36
-
-    private DcMotorEx elevator1, elevator2;
+    private static double target;
     private  Robot robot;
-
     private int tagID;
 
     private   final double ZERO_OFFSET = 70.0-3.85;
     private   double TargetPosInDegrees=70.0-3.85;
-
-
-
     @Override
     public void runOpMode () {
-
-       // blueProp=new BluePropThreshold_Backstage();
         try {
-            robot = new Robot(hardwareMap,telemetry,-2);
+            robot = new Robot(hardwareMap,telemetry);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -88,10 +66,7 @@ public class BLUE_BACKSTAGE extends  LinearOpMode{
 
 
 
-       // String propPosition=robot.camera.GetPropPositionr();
-
-       String propPosition="nope";
-
+       String propPosition=robot.camera.GetPropPosition();
 
         boolean once=true;
 
@@ -100,45 +75,30 @@ public class BLUE_BACKSTAGE extends  LinearOpMode{
         while ((propPosition.equals("nope") || once) && opModeIsActive() && !isStopRequested()){
 
             telemetry.addLine("Nope :( "+propPosition);
-            //propPosition=robot.camera.getPositionProp();
-            propPosition="center";
+            propPosition=robot.camera.GetPropPosition();
 
+            telemetry.addLine(propPosition);
             if(propPosition.equals("left")){
-
-                telemetry.addLine(propPosition);
-                telemetry.update();
                 tagID=1;
                 once=false;
 
                 Backstage_LeftProp_Red(PARKING,0);
 
             }else if(propPosition.equals("center")){
-
-                telemetry.addLine(propPosition);
-                telemetry.update();
                 tagID=2;
                 once=false;
 
                 Backstage_CenterProp_Red(PARKING,0);
 
             }else if(propPosition.equals("right")){
-
-                telemetry.addLine(propPosition);
-                telemetry.update();
                 tagID=3;
                 once=false;
 
                 Backstage_RightProp_Red(PARKING,0);
 
             }
-
             telemetry.update();
-
         }
-
-
-
-
     }
 
     public void Backstage_LeftProp_Red(int parking,int timer){
@@ -237,11 +197,11 @@ public class BLUE_BACKSTAGE extends  LinearOpMode{
 
                     armtarget=true;
                     telemetry.addLine("DONE :D");
-                    // telemetry.update();
+
 
             }
 
-            if(Math.abs(TargetPosInDegrees-ZERO_OFFSET)<5 && OKtarget==true){
+            if(Math.abs(TargetPosInDegrees-ZERO_OFFSET)<5 && OKtarget){
 
                 robot.arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
@@ -256,7 +216,7 @@ public class BLUE_BACKSTAGE extends  LinearOpMode{
 
             }
 
-            if(OKtarget==false){
+            if(!OKtarget){
                 robot.arm.armTask();
 
             }
@@ -378,7 +338,7 @@ public class BLUE_BACKSTAGE extends  LinearOpMode{
 
             }
 
-            if(Math.abs(TargetPosInDegrees-ZERO_OFFSET)<5 && OKtarget==true){
+            if(Math.abs(TargetPosInDegrees-ZERO_OFFSET)<5 && OKtarget){
 
                 robot.arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
@@ -393,11 +353,10 @@ public class BLUE_BACKSTAGE extends  LinearOpMode{
 
             }
 
-            if(OKtarget==false){
+            if(!OKtarget){
                 robot.arm.armTask();
 
             }
-            // telemetry.addLine("Ceva: "+ceva);
             telemetry.addLine("Pos: "+robot.arm.getPosition());
             telemetry.addLine("Target: "+TargetPosInDegrees);
             telemetry.addLine("State: "+stateArm);
@@ -457,41 +416,29 @@ public class BLUE_BACKSTAGE extends  LinearOpMode{
         int stateArm=0;
 
         boolean armtarget=false,OKtarget=false;
-
         while(!armtarget){
-
             switch (stateArm){
-
                 case 0:
-
                     robot.arm.setPosition(ZERO_OFFSET,1);
                     TargetPosInDegrees=ZERO_OFFSET;
                     stateArm=1;
                     break;
-
                 case 1:
                     robot.arm.setPosition(240,6);
                     TargetPosInDegrees=230;
                     stateArm=2;
                     break;
-
                 case 2:
                     if(robot.arm.isOnTarget(6)) {
                         stateArm=3;
                     }
                     break;
-
                 case 3:
-
                     robot.claw.setPosition(Claw.OPEN);
                     stateArm=4;
                     break;
-
                 case 4:
-
-
                     if(Math.abs(robot.claw.getPosition()-Claw.OPEN) <0.03){
-
                         stateArm=5;
                     }
                     break;
@@ -518,11 +465,11 @@ public class BLUE_BACKSTAGE extends  LinearOpMode{
 
                     armtarget=true;
                     telemetry.addLine("DONE :D");
-                    // telemetry.update();
+
 
             }
 
-            if(Math.abs(TargetPosInDegrees-ZERO_OFFSET)<5 && OKtarget==true){
+            if(Math.abs(TargetPosInDegrees-ZERO_OFFSET)<5 && OKtarget){
 
                 robot.arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
@@ -537,17 +484,14 @@ public class BLUE_BACKSTAGE extends  LinearOpMode{
 
             }
 
-            if(OKtarget==false){
+            if(!OKtarget){
                 robot.arm.armTask();
 
             }
-            // telemetry.addLine("Ceva: "+ceva);
             telemetry.addLine("Pos: "+robot.arm.getPosition());
             telemetry.addLine("Target: "+TargetPosInDegrees);
             telemetry.addLine("State: "+stateArm);
             telemetry.update();
-
-
         }
 
         robot.move.lateral(LEFT,0.6,40);
@@ -557,5 +501,3 @@ public class BLUE_BACKSTAGE extends  LinearOpMode{
         robot.move.forward(BACKWARDS,0.6,25);
     }
 }
-
-//759 lines and 40 warnings 331 lines and 27 warnings

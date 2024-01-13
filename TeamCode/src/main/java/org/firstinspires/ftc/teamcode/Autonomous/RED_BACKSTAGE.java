@@ -31,7 +31,6 @@ package org.firstinspires.ftc.teamcode.Autonomous;
 
 import static org.firstinspires.ftc.teamcode.Implementations.Constants.Direction.BACKWARDS;
 import static org.firstinspires.ftc.teamcode.Implementations.Constants.Direction.FORWARD;
-import static org.firstinspires.ftc.teamcode.Implementations.Constants.Direction.LEFT;
 import static org.firstinspires.ftc.teamcode.Implementations.Constants.Direction.RIGHT;
 
 import com.arcrobotics.ftclib.controller.PIDController;
@@ -40,8 +39,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
-import org.firstinspires.ftc.teamcode.Implementations.Camera.RedPropThreshold_Backstage;
-import org.firstinspires.ftc.teamcode.Implementations.Camera.RedPropThreshold_Frontstage;
 import org.firstinspires.ftc.teamcode.Implementations.Constants.Claw;
 import org.firstinspires.ftc.teamcode.Implementations.Constants.Joint;
 import org.firstinspires.ftc.teamcode.Implementations.Robot.Robot;
@@ -53,17 +50,8 @@ import java.io.IOException;
 public class RED_BACKSTAGE extends  LinearOpMode{
 
     private int PARKING=1; //-1 for left parking and 1 for right
-  //  private RedPropThreshold_Backstage redProp;
-    private PIDController controller;
-
-    public static double p=0.04, i=0, d=0.00001;//d=0.00001
-    public static double f=0.002;
 
     public static double target;
-
-    private final double ticks_in_degrees=288*(125/45.0)/360; /// gear ratio: 45/125=0.36
-
-    private DcMotorEx elevator1, elevator2;
     private  Robot robot;
 
     private int tagID;
@@ -75,10 +63,8 @@ public class RED_BACKSTAGE extends  LinearOpMode{
 
     @Override
     public void runOpMode () {
-
-      //  redProp=new RedPropThreshold_Backstage();
         try {
-            robot = new Robot(hardwareMap,telemetry,-1);
+            robot = new Robot(hardwareMap,telemetry);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -87,63 +73,43 @@ public class RED_BACKSTAGE extends  LinearOpMode{
 
 
 
-        String propPosition=robot.camera.GetPropPositionr();
+        String propPosition=robot.camera.GetPropPosition();
 
         telemetry.addLine("Prop: "+propPosition);
         telemetry.update();
-
-      //  String propPosition="nope";
-
 
         boolean once=true;
 
         waitForStart();
 
-
         while ((propPosition.equals("nope") || once) && opModeIsActive() && !isStopRequested()){
 
             telemetry.addLine("Nope :( "+propPosition);
-            propPosition=robot.camera.GetPropPositionr();
-           // propPosition="left";
+            propPosition=robot.camera.GetPropPosition();
+            telemetry.addLine(propPosition);
+            switch (propPosition) {
+                case "left":
+                    tagID = 4;
+                    once = false;
 
-            if(propPosition.equals("left")){
+                    Backstage_LeftProp_Red(PARKING, 0);
 
-                telemetry.addLine(propPosition);
-                telemetry.update();
-                tagID=4;
-                once=false;
+                    break;
+                case "center":
+                    tagID = 5;
+                    once = false;
 
-                Backstage_LeftProp_Red(PARKING,0);
+                    Backstage_CenterProp_Red(PARKING, 0);
 
-            }else if(propPosition.equals("center")){
-
-                telemetry.addLine(propPosition);
-                telemetry.update();
-                tagID=5;
-                once=false;
-
-                Backstage_CenterProp_Red(PARKING,0);
-
-            }else if(propPosition.equals("right")){
-
-                telemetry.addLine(propPosition);
-                telemetry.update();
-                tagID=6;
-                once=false;
-
-                Backstage_RightProp_Red(PARKING,0);
-
+                    break;
+                case "right":
+                    tagID = 6;
+                    once = false;
+                    Backstage_RightProp_Red(PARKING, 0);
+                    break;
             }
-
             telemetry.update();
-
         }
-
-
-
-
-
-
     }
 
     public void Backstage_LeftProp_Red(int parking,int timer){
@@ -155,8 +121,6 @@ public class RED_BACKSTAGE extends  LinearOpMode{
         robot.joint.setPosition(Joint.DOWN);
         sleep(900);
         robot.claw.setPosition(Claw.CLOSED);
-
-
 
         robot.move.forward(FORWARD,0.6,39);
         sleep(175);
@@ -255,7 +219,7 @@ public class RED_BACKSTAGE extends  LinearOpMode{
 
             }
 
-            if(Math.abs(TargetPosInDegrees-ZERO_OFFSET)<5 && OKtarget==true){
+            if(Math.abs(TargetPosInDegrees-ZERO_OFFSET)<5 && OKtarget){
 
                 robot.arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
@@ -270,26 +234,18 @@ public class RED_BACKSTAGE extends  LinearOpMode{
 
             }
 
-            if(OKtarget==false){
+            if(!OKtarget){
                 robot.arm.armTask();
 
             }
-            // telemetry.addLine("Ceva: "+ceva);
             telemetry.addLine("Pos: "+robot.arm.getPosition());
             telemetry.addLine("Target: "+TargetPosInDegrees);
             telemetry.addLine("State: "+stateArm);
             telemetry.update();
-
-
         }
-
         robot.move.lateral(RIGHT,0.6,40);
-
         sleep(250);
-
         robot.move.forward(BACKWARDS,0.6,25);
-
-
     }
 
     public void Backstage_CenterProp_Red(int parking,int timer){
@@ -319,8 +275,6 @@ public class RED_BACKSTAGE extends  LinearOpMode{
 
         robot.move.rotate(-1,0.6,90);
         sleep(250);
-
-     //   robot.move.forward(BACKWARDS,0.6,30);
 
         robot.move.Move_to_AprilAllAxes(tagID,robot,robot.camera.atag);
 
@@ -390,42 +344,26 @@ public class RED_BACKSTAGE extends  LinearOpMode{
 
                     armtarget=true;
                     telemetry.addLine("DONE :D");
-                    // telemetry.update();
-
             }
 
-            if(Math.abs(TargetPosInDegrees-ZERO_OFFSET)<5 && OKtarget==true){
-
+            if(Math.abs(TargetPosInDegrees-ZERO_OFFSET)<5 && OKtarget){
                 robot.arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
                 robot.arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
                 robot.arm.setPower(0);
-
             }
-
             if(Math.abs(TargetPosInDegrees-ZERO_OFFSET)>=3){
                 OKtarget=false;
-
             }
-
-            if(OKtarget==false){
+            if(!OKtarget){
                 robot.arm.armTask();
-
             }
-            // telemetry.addLine("Ceva: "+ceva);
             telemetry.addLine("Pos: "+robot.arm.getPosition());
             telemetry.addLine("Target: "+TargetPosInDegrees);
             telemetry.addLine("State: "+stateArm);
             telemetry.update();
-
-
         }
-
         robot.move.lateral(RIGHT,0.6,58);
-
         sleep(250);
-
         robot.move.forward(BACKWARDS,0.6,25);
 
     }
@@ -525,44 +463,27 @@ public class RED_BACKSTAGE extends  LinearOpMode{
 
                     armtarget=true;
                     telemetry.addLine("DONE :D");
-                    // telemetry.update();
 
             }
 
-            if(Math.abs(TargetPosInDegrees-ZERO_OFFSET)<5 && OKtarget==true){
-
+            if(Math.abs(TargetPosInDegrees-ZERO_OFFSET)<5 && OKtarget){
                 robot.arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
                 robot.arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
                 robot.arm.setPower(0);
-
             }
-
             if(Math.abs(TargetPosInDegrees-ZERO_OFFSET)>=3){
                 OKtarget=false;
-
             }
-
-            if(OKtarget==false){
+            if(!OKtarget){
                 robot.arm.armTask();
-
             }
-            // telemetry.addLine("Ceva: "+ceva);
             telemetry.addLine("Pos: "+robot.arm.getPosition());
             telemetry.addLine("Target: "+TargetPosInDegrees);
             telemetry.addLine("State: "+stateArm);
             telemetry.update();
-
-
         }
-
         robot.move.lateral(RIGHT,0.6,69);
-
         sleep(250);
-
         robot.move.forward(BACKWARDS,0.6,25);
     }
 }
-
-//759 lines and 40 warnings 331 lines and 27 warnings

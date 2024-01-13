@@ -64,10 +64,9 @@ public class Wheels {
         this.backRight.setTargetPosition(backRightTarget);
     }
 
+    @SuppressWarnings("StatemenentWithEmptyBody")
     public void waitMotors(){
-        while(this.frontRight.isBusy() && this.frontLeft.isBusy() && this.backRight.isBusy() && this.backLeft.isBusy()){
-
-        }
+        while(this.frontRight.isBusy() && this.frontLeft.isBusy() && this.backRight.isBusy() && this.backLeft.isBusy());
     }
 
     public boolean isDistNotReached(double dist){

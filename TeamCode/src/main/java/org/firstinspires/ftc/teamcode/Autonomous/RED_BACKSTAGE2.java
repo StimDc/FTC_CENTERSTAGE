@@ -32,13 +32,9 @@ package org.firstinspires.ftc.teamcode.Autonomous;
 import static org.firstinspires.ftc.teamcode.Implementations.Constants.Direction.BACKWARDS;
 import static org.firstinspires.ftc.teamcode.Implementations.Constants.Direction.FORWARD;
 import static org.firstinspires.ftc.teamcode.Implementations.Constants.Direction.RIGHT;
-
-import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import org.firstinspires.ftc.teamcode.Implementations.Camera.RedPropThreshold_Backstage;
 import org.firstinspires.ftc.teamcode.Implementations.Constants.Claw;
 import org.firstinspires.ftc.teamcode.Implementations.Constants.Joint;
 import org.firstinspires.ftc.teamcode.Implementations.Robot.Robot;
@@ -50,41 +46,22 @@ import java.io.IOException;
 public class RED_BACKSTAGE2 extends  LinearOpMode{
 
     private int PARKING=1; //-1 for left parking and 1 for right
-  //  private RedPropThreshold_Backstage redProp;
-    private PIDController controller;
-
-    public static double p=0.04, i=0, d=0.00001;//d=0.00001
-    public static double f=0.002;
 
     public static double target;
-
-    private final double ticks_in_degrees=288*(125/45.0)/360; /// gear ratio: 45/125=0.36
-
-    private DcMotorEx elevator1, elevator2;
     private  Robot robot;
-
     private int tagID;
-
     private   final double ZERO_OFFSET = 70.0-3.85;
     private   double TargetPosInDegrees=70.0-3.85;
-
-
-
     @Override
     public void runOpMode () {
-
-       // redProp=new RedPropThreshold_Backstage();
         try {
-            robot = new Robot(hardwareMap,telemetry,-1);
+            robot = new Robot(hardwareMap,telemetry);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
         robot.camera.openFrontCam();
         target=robot.arm.ZERO_OFFSET;
 
-
-
-       //String propPosition=robot.camera.GetPropPositionr();
         String propPosition="nope";
 
 
@@ -93,47 +70,26 @@ public class RED_BACKSTAGE2 extends  LinearOpMode{
         waitForStart();
 
         while ((propPosition.equals("nope") || once) && opModeIsActive() && !isStopRequested()){
-
             telemetry.addLine("Nope :( "+propPosition);
-          //  propPosition=robot.camera.getPositionProp();
-            //propPosition="center";
-
-            if(propPosition.equals("left")){
-
-                telemetry.addLine(propPosition);
-                telemetry.update();
-                tagID=4;
-                once=false;
-
-                Backstage_LeftProp_Red(PARKING,0);
-
-            }else if(propPosition.equals("center")){
-
-                telemetry.addLine(propPosition);
-                telemetry.update();
-                tagID=5;
-                once=false;
-
-                Backstage_CenterProp_Red(PARKING,0);
-
-            }else if(propPosition.equals("right")){
-
-                telemetry.addLine(propPosition);
-                telemetry.update();
-                tagID=6;
-                once=false;
-
-                Backstage_RightProp_Red(PARKING,0);
-
+            switch (propPosition) {
+                case "left":
+                    tagID = 4;
+                    once = false;
+                    Backstage_LeftProp_Red(PARKING, 0);
+                    break;
+                case "center":
+                    tagID = 5;
+                    once = false;
+                    Backstage_CenterProp_Red(PARKING, 0);
+                    break;
+                case "right":
+                    tagID = 6;
+                    once = false;
+                    Backstage_RightProp_Red(PARKING, 0);
+                    break;
             }
-
             telemetry.update();
-
         }
-
-
-
-
     }
 
     public void Backstage_LeftProp_Red(int parking,int timer){
@@ -231,18 +187,12 @@ public class RED_BACKSTAGE2 extends  LinearOpMode{
 
                     armtarget=true;
                     telemetry.addLine("DONE :D");
-                    // telemetry.update();
-
             }
 
-            if(Math.abs(robot.arm.targetPosInDegrees-ZERO_OFFSET)<3 && OKtarget==true){
+            if(Math.abs(robot.arm.targetPosInDegrees-ZERO_OFFSET)<3 && OKtarget){
 
-                elevator1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                elevator2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-                elevator1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                elevator2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
+                robot.arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                robot.arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 robot.arm.setPower(0);
 
             }
@@ -252,12 +202,12 @@ public class RED_BACKSTAGE2 extends  LinearOpMode{
 
             }
 
-            if(OKtarget==false){
+            if(!OKtarget){
                 robot.arm.armTask();
 
             }
             // telemetry.addLine("Ceva: "+ceva);
-            telemetry.addLine("Pos: "+elevator1.getCurrentPosition());
+            telemetry.addLine("Pos: "+robot.arm.elevator1.getCurrentPosition());
             telemetry.addLine("Target: "+target);
             telemetry.addLine("State: "+stateArm);
             telemetry.update();
@@ -396,11 +346,10 @@ public class RED_BACKSTAGE2 extends  LinearOpMode{
 
             }
 
-            if(OKtarget==false){
+            if(!OKtarget){
                 robot.arm.armTask();
 
             }
-            // telemetry.addLine("Ceva: "+ceva);
             telemetry.addLine("Pos: "+robot.arm.getPosition());
             telemetry.addLine("Target: "+TargetPosInDegrees);
             telemetry.addLine("State: "+stateArm);
@@ -541,14 +490,9 @@ public class RED_BACKSTAGE2 extends  LinearOpMode{
 
             }
 
-            if(Math.abs(robot.arm.targetPosInDegrees-robot.arm.ZERO_OFFSET)<3 && OKtarget==true){
-
-                elevator1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                elevator2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-                elevator1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                elevator2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
+            if(Math.abs(robot.arm.targetPosInDegrees-robot.arm.ZERO_OFFSET)<3 && OKtarget){
+                robot.arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                robot.arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 robot.arm.setPower(0);
 
             }
@@ -558,12 +502,12 @@ public class RED_BACKSTAGE2 extends  LinearOpMode{
 
             }
 
-            if(OKtarget==false){
+            if(!OKtarget){
                 robot.arm.armTask();
 
             }
             // telemetry.addLine("Ceva: "+ceva);
-            telemetry.addLine("Pos: "+elevator1.getCurrentPosition());
+            telemetry.addLine("Pos: "+robot.arm.elevator1.getCurrentPosition());
             telemetry.addLine("Target: "+target);
             telemetry.addLine("State: "+stateArm);
             telemetry.update();
@@ -575,5 +519,3 @@ public class RED_BACKSTAGE2 extends  LinearOpMode{
         robot.move.lateral(RIGHT,0.6,30);
     }
 }
-
-//759 lines and 40 warnings 331 lines and 27 warnings

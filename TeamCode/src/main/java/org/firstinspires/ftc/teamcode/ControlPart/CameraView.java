@@ -32,7 +32,7 @@ public class CameraView extends OpMode {
     public void init() {
 
         try {
-            robot = new Robot(hardwareMap,telemetry,-1);
+            robot = new Robot(hardwareMap,telemetry);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

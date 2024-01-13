@@ -45,6 +45,8 @@ import org.firstinspires.ftc.teamcode.Implementations.Constants.Claw;
 import org.firstinspires.ftc.teamcode.Implementations.Constants.Joint;
 import org.firstinspires.ftc.teamcode.Implementations.Robot.Robot;
 
+import java.io.IOException;
+
 @Autonomous(name="RED FRONTSTAGE", group = "Red Routes")
 
 public class RED_FRONTSTAGE extends  LinearOpMode{
@@ -74,13 +76,20 @@ public class RED_FRONTSTAGE extends  LinearOpMode{
     public void runOpMode () {
 
     //    redProp=new RedPropThreshold_Frontstage();
-        robot = new Robot(hardwareMap,telemetry,1);
+        try {
+            robot = new Robot(hardwareMap,telemetry,1);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         robot.camera.openFrontCam();
         target=robot.arm.ZERO_OFFSET;
 
 
 
-        String propPosition=robot.camera.getPositionProp();
+        //String propPosition=robot.camera.GetPropPositionr();
+
+        String propPosition="nope";
+
 
         boolean once=true;
 
@@ -89,8 +98,8 @@ public class RED_FRONTSTAGE extends  LinearOpMode{
         while ((propPosition.equals("nope") || once) && opModeIsActive() && !isStopRequested()){
 
             telemetry.addLine("Nope :( "+propPosition);
-            propPosition=robot.camera.getPositionProp();
-           // propPosition="center";
+           // propPosition=robot.camera.getPositionProp();
+            propPosition="center";
 
             if(propPosition.equals("left")){
 

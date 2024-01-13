@@ -22,26 +22,26 @@ public class Choising_Color{
     public VisionProcessor getColor() {
 
 
-        if (startPosition == -2) {
+        if (this.startPosition == -2) {
 
-            bluePropBackstage = new BluePropThreshold_Backstage();
-            return bluePropBackstage;
+            this.bluePropBackstage = new BluePropThreshold_Backstage();
+            return this.bluePropBackstage;
 
-        } else if (startPosition == -1) {
+        } else if (this.startPosition == -1) {
 
-            redPropThresholdBackstage = new RedPropThreshold_Backstage();
-            return redPropThresholdBackstage;
+            this.redPropThresholdBackstage = new RedPropThreshold_Backstage();
+            return this.redPropThresholdBackstage;
 
 
-        } else if (startPosition == 1) {
+        } else if (this.startPosition == 1) {
 
-            redPropThresholdFrontstage = new RedPropThreshold_Frontstage();
-            return redPropThresholdFrontstage;
+            this.redPropThresholdFrontstage = new RedPropThreshold_Frontstage();
+            return this.redPropThresholdFrontstage;
 
-        } else if (startPosition == 2) {
+        } else if (this.startPosition == 2) {
 
-            bluePropFrontstage = new BluePropThreshold_Frontstage();
-            return bluePropFrontstage;
+            this.bluePropFrontstage = new BluePropThreshold_Frontstage();
+            return this.bluePropFrontstage;
         }else{
             return null;
         }
@@ -49,22 +49,22 @@ public class Choising_Color{
 
     public String getProp(){
 
-        if (startPosition == -2) {
+        if (this.startPosition == -2) {
 
-            return bluePropBackstage.getPropPosition();
+            return this.bluePropBackstage.getPropPosition();
 
-        } else if (startPosition == -1) {
+        } else if (this.startPosition == -1) {
 
-            return redPropThresholdBackstage.getPropPosition();
+            return this.redPropThresholdBackstage.getPropPosition();
 
 
-        } else if (startPosition == 1) {
+        } else if (this.startPosition == 1) {
 
-            return redPropThresholdFrontstage.getPropPosition();
+            return this.redPropThresholdFrontstage.getPropPosition();
 
-        } else if (startPosition == 2) {
+        } else if (this.startPosition == 2) {
 
-            return bluePropFrontstage.getPropPosition();
+            return this.bluePropFrontstage.getPropPosition();
         }else{
             return "nope";
         }

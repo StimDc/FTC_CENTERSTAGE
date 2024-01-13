@@ -247,6 +247,8 @@ public class Movement {
         boolean ok = false;
         int oldtarget = -1;
 
+        int help=0, ceva=1;
+
         boolean okHeading = false, okYaw = false, okRange = false;
 
         double rangeError = 100, headingError = 0, yawError = 0;
@@ -266,13 +268,13 @@ public class Movement {
 
             if (targetFound) {
 
-                rangeError = desiredTag.ftcPose.range - 11;// pentru red center backdrop: 10 sau 10.5 pentru red right backdrop: 9
+                rangeError = desiredTag.ftcPose.range - 9.5;// pentru red center backdrop: 10 sau 10.5 pentru red right backdrop: 9
 
 
-                headingError = desiredTag.ftcPose.bearing - 5;
+                headingError = desiredTag.ftcPose.bearing;//5
 
 
-                yawError = desiredTag.ftcPose.yaw; //1.7795
+                yawError = desiredTag.ftcPose.yaw+2.3; //1.7795
 
                /* if(okRange==true){
                     rangeError=0;
@@ -297,12 +299,160 @@ public class Movement {
                 double strafe = Range.clip(-yawError * YAW_ERROR_GAIN, -MAX_YAW, MAX_YAW);
 
 
+                help=0;
+
                 robot.move.generalMovement(-drive, -strafe, turn);
 
+
             } else {
+
+                /*
+                help=help+ceva;
+
+                if(help==100000){
+
+                    help=0;
+                    ceva=ceva*(-1);
+                    robot.move.generalMovement(0, 0, 100);
+
+
+                }else if(help==-100000){
+
+                    help=0;
+                    ceva=ceva*(-1);
+                    robot.move.generalMovement(0, 0, -100);
+
+                }
+
+                 */
+
                 robot.move.generalMovement(0, 0, 0);
             }
-            if (rangeError > -2 && rangeError < 2) {
+            if (rangeError > -2 && rangeError < 2 && headingError>-5 && headingError<5) {
+
+                //  okRange=true;
+                ok = true;
+                robot.move.generalMovement(0, 0, 0);
+
+            }
+            /*
+            else{
+                okRange=false;
+            }
+
+            if(headingError>-1 && headingError<1){
+                okHeading=true;
+            }else{
+                okHeading=false;
+            }
+
+            if(yawError>-1 && yawError<1){
+                okYaw=true;
+            }else{
+                okYaw=false;
+            }
+
+            if(okYaw==true && okHeading==true && okRange==true){
+
+                ok=true;
+                robot.move.generalMovement(0,0,0);
+
+
+            }
+
+             */
+
+            telemetry.addLine("Range Error "+ rangeError);
+            telemetry.addLine("Heading Error "+headingError);
+            telemetry.addLine("Yaw Error "+yawError);
+            telemetry.update();
+
+        }
+
+
+    }
+
+
+    public void CorrectingTurn(int idtag, Robot robot, AprilTagProcessor atag) {
+
+        AprilTagDetection desiredTag = null;
+        boolean targetFound = false;
+        boolean ok = false;
+        int oldtarget = -1;
+
+        int help=0, ceva=1;
+
+        boolean okHeading = false, okYaw = false, okRange = false;
+
+        double rangeError = 100, headingError = 0, yawError = 0;
+
+        while (!ok) {
+            //while (!ok && opModeIsActive() && !isStopRequested()) {
+
+            targetFound = false;
+            List<AprilTagDetection> currentDetections = atag.getDetections();
+            for (AprilTagDetection detection : currentDetections) {
+                if ((detection.metadata != null) && (detection.id == idtag)) {
+                    targetFound = true;
+                    desiredTag = detection;
+                    break;  // don't look any further.
+                }
+            }
+
+            if (targetFound) {
+
+                headingError = desiredTag.ftcPose.bearing;//5
+
+               /* if(okRange==true){
+                    rangeError=0;
+                }
+
+                if(okRange==true && okHeading==true){
+
+                    headingError=0;
+
+                }
+                if(okRange==true && okYaw==true){
+
+                    yawError=0;
+
+                }
+
+                */
+
+                // Use the speed and turn "gains" to calculate how we want the robot to move.
+                double turn = Range.clip(headingError * HEADING_ERROR_GAIN, -MAX_HEADING, MAX_HEADING);
+
+                help=0;
+
+                robot.move.generalMovement(0, 0, turn);
+
+
+            } else {
+
+                /*
+                help=help+ceva;
+
+                if(help==100000){
+
+                    help=0;
+                    ceva=ceva*(-1);
+                    robot.move.generalMovement(0, 0, 100);
+
+
+                }else if(help==-100000){
+
+                    help=0;
+                    ceva=ceva*(-1);
+                    robot.move.generalMovement(0, 0, -100);
+
+                }
+
+                 */
+
+                robot.move.generalMovement(0, 0, 0);
+            }
+            if (headingError > -5 && headingError < 5) {
 
                 //  okRange=true;
                 ok = true;
@@ -340,6 +490,8 @@ public class Movement {
 
 
     }
+
+
 
     boolean STATE=false;
 

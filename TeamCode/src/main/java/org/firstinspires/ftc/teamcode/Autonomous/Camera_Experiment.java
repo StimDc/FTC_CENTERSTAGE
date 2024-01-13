@@ -44,7 +44,7 @@ import org.firstinspires.ftc.vision.VisionPortal;
 
 public class Camera_Experiment extends LinearOpMode {
 
-    private RedPropThreshold_Backstage redProp;
+    private RedPropThreshold_Frontstage redProp;
 
     private BluePropThreshold_Backstage blueProp;
     private VisionPortal visionPortal;
@@ -52,7 +52,7 @@ public class Camera_Experiment extends LinearOpMode {
     @Override
     public void runOpMode() {
 
-        redProp=new RedPropThreshold_Backstage();
+        redProp=new RedPropThreshold_Frontstage();
         blueProp=new BluePropThreshold_Backstage();
 
         visionPortal = new VisionPortal.Builder()

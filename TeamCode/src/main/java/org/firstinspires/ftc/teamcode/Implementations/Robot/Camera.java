@@ -14,6 +14,8 @@ import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.VisionProcessor;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
+import java.util.Dictionary;
+
 public class Camera {
     public AprilTagProcessor atag;
  /*   public BluePropThreshold_Backstage bluePropBackstage;
@@ -25,19 +27,92 @@ public class Camera {
   */
 public Choising_Color color;
 
+    public BluePropThreshold_Backstage bluePropBackstage;
+    public BluePropThreshold_Frontstage bluePropFrontstage;
+    public RedPropThreshold_Backstage redPropThresholdBackstage;
+    public RedPropThreshold_Frontstage redPropThresholdFrontstage;
+
+    public VisionProcessor processor;
+    public String positionProp;
+
+
+
     public WebcamName backCam, frontCam;
     public VisionPortal vision;
 
-    public VisionProcessor colorProcessor;
+    int STARTPOSITION;
 
-    public Camera(HardwareMap hardwareMap, int startPosition){ //1 redFrontstage,-1 redbackstage, 2 bluefrontstage, -2 bluebackstage
+    public VisionProcessor colorProcessor;
+    public Robot robot;
+
+
+    /*
+    public void getColor() {
+
+
+        if (STARTPOSITION == -2) {
+
+            bluePropBackstage = new BluePropThreshold_Backstage();
+
+        } else if (STARTPOSITION == -1) {
+
+            redPropThresholdBackstage = new RedPropThreshold_Backstage();
+
+
+        } else if (STARTPOSITION == 1) {
+
+            redPropThresholdFrontstage = new RedPropThreshold_Frontstage();
+
+        } else if (STARTPOSITION == 2) {
+
+            bluePropFrontstage = new BluePropThreshold_Frontstage();
+        }else{
+
+        }
+    }
+
+    */
+
+
+
+    public Camera(HardwareMap hardwareMap, int startPosition,Robot robot){ //1 redFrontstage,-1 redbackstage, 2 bluefrontstage, -2 bluebackstage
         //TODO: make the difference between bluePropBackstage and redprop
-        atag = new AprilTagProcessor.Builder().build();
+
+        if(robot.parameter.get("alliance").equals("RED") &&
+                robot.parameter.get("position").equals("BACK_STAGE")){
+            this.redPropThresholdBackstage=new RedPropThreshold_Backstage();
+
+        }
+        else if(robot.parameter.get("alliance").equals("RED") &&
+                robot.parameter.get("position").equals("FRONT_STAGE")){
+            this.redPropThresholdFrontstage= new RedPropThreshold_Frontstage();
+        }
+
+        else if(robot.parameter.get("alliance").equals("BLUE") &&
+                robot.parameter.get("position").equals("FRONT_STAGE")){
+            this.bluePropFrontstage=new BluePropThreshold_Frontstage();
+        }
+        else{
+            this.bluePropBackstage= new BluePropThreshold_Backstage();
+
+        }
+
+
+
+
+
+
+        this.atag = new AprilTagProcessor.Builder().build();
+        this.robot = robot;
        // bluePropBackstage = new BluePropThreshold_Backstage();
 
-        color=new Choising_Color();
+       //  color=new Choising_Color();
 
-        color.getStartPosition(startPosition);
+      //  color.getStartPosition(startPosition);
+
+        //STARTPOSITION= startPosition;
+
+        //getColor();
 
 
         backCam = hardwareMap.get(WebcamName.class, "Camera1");
@@ -45,17 +120,19 @@ public Choising_Color color;
         CameraName switchableCamera = ClassFactory.getInstance()
                 .getCameraManager().nameForSwitchableCamera(backCam,frontCam);
 
+
+        this.getProcessor();
         vision = new VisionPortal.Builder()
                 .setCamera(switchableCamera)
-               // .addProcessors(atag,bluePropBackstage)
-                .addProcessors(atag,color.getColor())
+               //.addProcessors(atag,redPropThresholdBackstage)
+                .addProcessors(atag,processor)
                 .build();
 
         while(vision.getCameraState() != VisionPortal.CameraState.STREAMING){
 
         }
-        //vision.setProcessorEnabled(bluePropBackstage,false);
-        vision.setProcessorEnabled(color.getColor(),false);
+        //vision.setProcessorEnabled(redPropThresholdBackstage,false);
+       vision.setProcessorEnabled(processor,false);
 
     }
 
@@ -65,8 +142,8 @@ public Choising_Color color;
         }
 
         vision.setProcessorEnabled(atag,true);
-        //vision.setProcessorEnabled(bluePropBackstage,false);
-        vision.setProcessorEnabled(color.getColor(),false);
+        //vision.setProcessorEnabled(redPropThresholdBackstage,false);
+        vision.setProcessorEnabled(this.processor,false);
 
 
         while(vision.getCameraState()!=VisionPortal.CameraState.STREAMING){
@@ -79,19 +156,69 @@ public Choising_Color color;
         }
 
         vision.setProcessorEnabled(atag,false);
-       // vision.setProcessorEnabled(bluePropBackstage,true);
-        vision.setProcessorEnabled(color.getColor(),true);
+       //vision.setProcessorEnabled(redPropThresholdBackstage,true);
+        vision.setProcessorEnabled(this.processor,true);
 
 
         while(vision.getCameraState()!=VisionPortal.CameraState.STREAMING){
 
         }
     }
-
+/*
     public String getPositionProp(){
 
-        return color.getProp();
+
 
     }
+    
+ */
+
+
+
+    public void getProcessor(){
+        if(robot.parameter.get("alliance").equals("RED") &&
+                robot.parameter.get("position").equals("BACK_STAGE")){
+            this.processor = this.redPropThresholdBackstage;
+
+        }
+        else if(robot.parameter.get("alliance").equals("RED") &&
+                robot.parameter.get("position").equals("FRONT_STAGE")){
+            this.processor = this.redPropThresholdFrontstage;
+        }
+
+        else if(robot.parameter.get("alliance").equals("BLUE") &&
+                robot.parameter.get("position").equals("FRONT_STAGE")){
+            this.processor = this.bluePropFrontstage;
+        }
+        else{
+            this.processor = this.bluePropBackstage;
+
+        }
+    }
+
+    public String GetPropPositionr(){
+        if(robot.parameter.get("alliance").equals("RED") &&
+                robot.parameter.get("position").equals("BACK_STAGE")){
+           return this.redPropThresholdBackstage.getPropPosition();
+
+        }
+        else if(robot.parameter.get("alliance").equals("RED") &&
+                robot.parameter.get("position").equals("FRONT_STAGE")){
+            return this.redPropThresholdFrontstage.getPropPosition();
+        }
+
+        else if(robot.parameter.get("alliance").equals("BLUE") &&
+                robot.parameter.get("position").equals("FRONT_STAGE")){
+            return this.bluePropFrontstage.getPropPosition();
+        }
+        else{
+            return this.bluePropFrontstage.getPropPosition();
+
+        }
+    }
+
+
 
 }
+
+

@@ -31,6 +31,7 @@ package org.firstinspires.ftc.teamcode.Autonomous;
 
 import static org.firstinspires.ftc.teamcode.Implementations.Constants.Direction.BACKWARDS;
 import static org.firstinspires.ftc.teamcode.Implementations.Constants.Direction.FORWARD;
+import static org.firstinspires.ftc.teamcode.Implementations.Constants.Direction.LEFT;
 import static org.firstinspires.ftc.teamcode.Implementations.Constants.Direction.RIGHT;
 
 import com.arcrobotics.ftclib.controller.PIDController;
@@ -44,6 +45,8 @@ import org.firstinspires.ftc.teamcode.Implementations.Camera.RedPropThreshold_Fr
 import org.firstinspires.ftc.teamcode.Implementations.Constants.Claw;
 import org.firstinspires.ftc.teamcode.Implementations.Constants.Joint;
 import org.firstinspires.ftc.teamcode.Implementations.Robot.Robot;
+
+import java.io.IOException;
 
 @Autonomous(name="RED BACKSTAGE", group = "Red Routes")
 
@@ -74,23 +77,34 @@ public class RED_BACKSTAGE extends  LinearOpMode{
     public void runOpMode () {
 
       //  redProp=new RedPropThreshold_Backstage();
-        robot = new Robot(hardwareMap,telemetry,-1);
+        try {
+            robot = new Robot(hardwareMap,telemetry,-1);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         robot.camera.openFrontCam();
         target=robot.arm.ZERO_OFFSET;
 
 
 
-        String propPosition=robot.camera.getPositionProp();
+        String propPosition=robot.camera.GetPropPositionr();
+
+        telemetry.addLine("Prop: "+propPosition);
+        telemetry.update();
+
+      //  String propPosition="nope";
+
 
         boolean once=true;
 
         waitForStart();
 
+
         while ((propPosition.equals("nope") || once) && opModeIsActive() && !isStopRequested()){
 
             telemetry.addLine("Nope :( "+propPosition);
-            propPosition=robot.camera.getPositionProp();
-           // propPosition="center";
+            propPosition=robot.camera.GetPropPositionr();
+           // propPosition="left";
 
             if(propPosition.equals("left")){
 
@@ -128,6 +142,8 @@ public class RED_BACKSTAGE extends  LinearOpMode{
 
 
 
+
+
     }
 
     public void Backstage_LeftProp_Red(int parking,int timer){
@@ -142,23 +158,30 @@ public class RED_BACKSTAGE extends  LinearOpMode{
 
 
 
-        robot.move.lateral(RIGHT,0.4,8);
+        robot.move.forward(FORWARD,0.6,39);
         sleep(175);
 
-        robot.move.forward(FORWARD,0.6,57);
-        sleep(175);
-        robot.claw.setPosition(Claw.INTERMEDIARY);
-        sleep(500);
+        robot.move.rotate(-1,0.6,51.5);
+        sleep(1500);
+
+
+        robot.move.forward(FORWARD,0.5,12);
+        sleep(750);
+
+       robot.claw.setPosition(Claw.INTERMEDIARY);
+       sleep(750);
+
+
         robot.move.forward(BACKWARDS,0.5,5.5);
         sleep(175);
         robot.claw.setPosition(Claw.CLOSED);
         sleep(500);
         robot.joint.setPosition(Joint.UP);
 
-        robot.move.rotate(-1,0.6,90);
+        robot.move.rotate(-1,0.6,40);
         sleep(250);
 
-        //   robot.move.forward(BACKWARDS,0.6,30);
+
 
         robot.move.Move_to_AprilAllAxes(tagID,robot,robot.camera.atag);
 
@@ -265,6 +288,8 @@ public class RED_BACKSTAGE extends  LinearOpMode{
         sleep(250);
 
         robot.move.forward(BACKWARDS,0.6,25);
+
+
     }
 
     public void Backstage_CenterProp_Red(int parking,int timer){

@@ -1,5 +1,11 @@
 package org.firstinspires.ftc.teamcode.ControlPart;
 
+import static org.firstinspires.ftc.teamcode.Implementations.Constants.UniversalConsts.HEADING_ERROR_GAIN;
+import static org.firstinspires.ftc.teamcode.Implementations.Constants.UniversalConsts.MAX_HEADING;
+import static org.firstinspires.ftc.teamcode.Implementations.Constants.UniversalConsts.MAX_RANGE;
+import static org.firstinspires.ftc.teamcode.Implementations.Constants.UniversalConsts.MAX_YAW;
+import static org.firstinspires.ftc.teamcode.Implementations.Constants.UniversalConsts.RANGE_ERROR_GAIN;
+import static org.firstinspires.ftc.teamcode.Implementations.Constants.UniversalConsts.YAW_ERROR_GAIN;
 import static java.lang.Math.abs;
 
 import android.util.Size;
@@ -20,6 +26,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.Implementations.Constants.Claw;
 import org.firstinspires.ftc.teamcode.Implementations.Constants.Joint;
 import org.firstinspires.ftc.teamcode.Implementations.Annotations.Experimental;
+import org.firstinspires.ftc.teamcode.Implementations.Robot.Robot;
 import org.firstinspires.ftc.teamcode.Implementations.Robot.Wheels;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
@@ -28,9 +35,9 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import java.util.List;
 
 @Config
-@TeleOp(name = "Hope Control")
+@TeleOp(name = "Experiment Control")
 
-public class CONTROL_hope extends OpMode {
+public class Experiment_Control extends OpMode {
 
     private Servo joint, claw;
 
@@ -55,7 +62,7 @@ public class CONTROL_hope extends OpMode {
 
     private  final double GO_TICKS_117=1425.1d;
 
- ///PID ARM
+    ///PID ARM
     private DcMotorEx  elevator1, elevator2;
     private PIDController controller;
 
@@ -66,6 +73,8 @@ public class CONTROL_hope extends OpMode {
 
     public double val=0;
 
+    Servo hangLeft;
+
 
     private final double ticks_in_degrees=288/(360.0*0.36); /// gear ratio: 45/125=0.36
 
@@ -74,8 +83,7 @@ public class CONTROL_hope extends OpMode {
 
     private AprilTagDetection desiredTag;
 
-    Servo hangLeft,hangRight;
-
+    private boolean aprilk=false;
 
 
 
@@ -94,8 +102,6 @@ public class CONTROL_hope extends OpMode {
         claw=hardwareMap.get(Servo.class,"claw");
         joint=hardwareMap.get(Servo.class,"joint");
         hangLeft=hardwareMap.get(Servo.class,"hl");
-        hangRight=hardwareMap.get(Servo.class,"hr");
-
 
 
         elevator1=hardwareMap.get(DcMotorEx.class,"e1");
@@ -114,8 +120,12 @@ public class CONTROL_hope extends OpMode {
         viper.setDirection(DcMotorSimple.Direction.FORWARD);
         viper.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+        viper.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        viper.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+
         hang=hardwareMap.get(DcMotorEx.class,"s");
-        hang.setDirection(DcMotorSimple.Direction.REVERSE);
+        hang.setDirection(DcMotorSimple.Direction.FORWARD);
         hang.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
@@ -127,10 +137,7 @@ public class CONTROL_hope extends OpMode {
         if(!once){
             joint.setPosition(jointpos.UP);
             claw.setPosition(clawpos.INTERMEDIARY);//CLAWINTERMEDIARY
-            hangLeft.setPosition(0.35);
-            hangRight.setPosition(0.65);
-
-
+            hangLeft.setPosition(0.3);
             once=true;
         }
 
@@ -151,20 +158,6 @@ public class CONTROL_hope extends OpMode {
             PressJoint=false;
         }
 
-        if(gamepad2.dpad_up){
-
-            hangLeft.setPosition(0.7561111);
-            hangRight.setPosition(0.24399999);
-
-        }
-
-        if(gamepad2.dpad_down){
-
-            hangLeft.setPosition(0.35);
-            hangRight.setPosition(0.65);
-
-
-        }
 
         if(gamepad2.dpad_right){
             joint.setPosition(0.4);
@@ -174,6 +167,19 @@ public class CONTROL_hope extends OpMode {
         if(gamepad2.dpad_left){
             claw.setPosition(clawpos.OPEN);//CLAWOPEN
             OKClaw=false;
+        }
+
+        if(gamepad2.dpad_up){
+
+            hangLeft.setPosition(0.7561111);
+
+        }
+
+        if(gamepad2.dpad_down){
+
+            hangLeft.setPosition(0.3);
+
+
         }
 
         if(gamepad2.a){
@@ -195,56 +201,17 @@ public class CONTROL_hope extends OpMode {
         if(gamepad2.right_stick_y<0){
 
 
-                hang.setPower(-gamepad2.right_stick_y);
+            hang.setPower(-gamepad2.right_stick_y);
 
-                hang.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
 
         }else if(gamepad2.right_stick_y>0){
-
-            hang.setPower(-gamepad2.right_stick_y);
-
-            hang.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-
-        }
-
-        else {
-
-            hang.setPower(0);
-            hang.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        }
-
-         if(gamepad2.left_stick_y>0){
-
-                viper.setPower(-gamepad2.left_stick_y);
-                viper.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-
-        }else if (gamepad2.left_stick_y<0){
-
-             viper.setPower(-gamepad2.left_stick_y);
-             viper.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-
-         }
-
-         else{
-
-             viper.setPower(0);
-             viper.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-         }
-
-
-
-
-        /*
-        else if(gamepad2.right_stick_y>0){
 
             if(gamepad2.right_stick_y>0.25){
                 hang.setPower(0.25);
             }else{
                 hang.setPower(-gamepad2.right_stick_y);
-                
+
             }
 
         }else if(gamepad2.right_stick_y<0){
@@ -263,20 +230,13 @@ public class CONTROL_hope extends OpMode {
             viper.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
             viper.setPower(-0.3);
 
-        }
-
-         */
-
-       /*
-        else{
+        }else{
 
             hang.setPower(0);
             viper.setPower(0);
             viper.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         }
-
-        */
 
         double drive =0;
         double strafe=0;
@@ -289,60 +249,35 @@ public class CONTROL_hope extends OpMode {
        */
 
 
-        boolean targetFound = false;
-        desiredTag  = null;
-
-        // Step through the list of detected tags and look for a matching tag
-        List<AprilTagDetection> currentDetections = apriltagProcesor.getDetections();
-        for (AprilTagDetection detection : currentDetections) {
-            if (detection.metadata != null && (detection.id==5 || detection.id==2)){
-                targetFound = true;
-                desiredTag = detection;
-                break;  // don't look any further.
-            } else {
-                telemetry.addData("Unknown Target", "Tag ID %d is not in TagLibrary\n", detection.id);
-            }
-        }
+        aprilk=false;
 
         // If Left Bumper is being pressed, AND we have found the desired target, Drive to target Automatically .
-        if (gamepad1.y && targetFound) {
+        if (gamepad1.b) {
 
-            // Determine heading, range and Yaw (tag image rotation) error so we can use them to control the robot automatically.
-            double  rangeError      = (desiredTag.ftcPose.range - 5);
-            double  headingError    = desiredTag.ftcPose.bearing;
-            double  yawError        = desiredTag.ftcPose.yaw;
+            Move_to_AprilAxes();
 
-            // Use the speed and turn "gains" to calculate how we want the robot to move.
-            drive  = Range.clip(rangeError * 1, -0.7, 0.7);
-            turn   = Range.clip(headingError * 1.1, -0.7, 0.7) ;
-            strafe = Range.clip(-yawError * 1, -0.7, 0.7);
+            aprilk=true;
 
-            drive*=(-1);
-            turn*=(-1);
-            strafe*=(-1);
+
         }else if(gamepad1.a){
 
             drive=-gamepad1.left_stick_y/1.25;
 
         }else if(gamepad1.x){
 
-            strafe=-gamepad1.left_stick_x*1.1;// 1.25
+            strafe=-gamepad1.left_stick_x*1.1/1.25;
 
         }else {
 
             drive=-gamepad1.left_stick_y/1.25;
-            strafe=-gamepad1.left_stick_x*1.1/0.75;// /1.25
+            strafe=-gamepad1.left_stick_x*1.1/1.25;
             turn=-gamepad1.right_stick_x/2.5;
         }
 
-        if(gamepad1.x && targetFound){
-
-            double  headingError    = desiredTag.ftcPose.yaw;
-            turn   = Range.clip(headingError * 1, -0.7, 0.7) ;
-
+        if(aprilk==false){
+            moveRobot(drive,strafe,turn);
         }
 
-        moveRobot(drive,strafe,turn);
         moveElevator();
 
 
@@ -380,6 +315,9 @@ public class CONTROL_hope extends OpMode {
 
         double power = pid + ff;
 
+        power = power < -0.15 ? -0.15 : Math.min(power, 0.7);
+
+
         elevator1.setPower(power);
         elevator2.setPower(power);
 
@@ -387,17 +325,27 @@ public class CONTROL_hope extends OpMode {
         telemetry.addData("target ", target);
         telemetry.update();
 
-        if(gamepad2.left_trigger>0){
-            val+=gamepad2.left_trigger*0.75;
+        if(gamepad2.left_trigger>0 && elevator1.getCurrentPosition()>=val-2 && elevator1.getCurrentPosition()<=val+2 && val+20<=300){
+
+            val=elevator1.getCurrentPosition()+10;
+
+            // val+=gamepad2.left_trigger*5;
+           // val+=20;
+        }else if(gamepad2.right_trigger>0 && val-gamepad2.right_trigger>0){
+            val-=gamepad2.right_trigger*0.75;
         }
 
-        if(gamepad2.right_trigger>0 && val>0){
-            val-=gamepad2.right_trigger*1.25;
+        else if(gamepad2.left_trigger==0 && gamepad2.right_trigger==0){
+
+            val=elevator1.getCurrentPosition();
+
         }
+
+
 
         target=(int) val;
 
-        if(target==0 && elepos>=-5 && elepos<=5){
+        if(target<=0 && elepos>=-5 && elepos<=5){
             elevator1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             elevator2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
@@ -406,6 +354,8 @@ public class CONTROL_hope extends OpMode {
 
             elevator1.setPower(0);
             elevator2.setPower(0);
+
+            val=0;
         }
 
         target=(int) val;
@@ -459,6 +409,129 @@ public class CONTROL_hope extends OpMode {
 
     }
 
+    public void Move_to_AprilAxes() {
+
+        AprilTagDetection desiredTag = null;
+        boolean targetFound = false;
+        boolean ok = false;
+        int oldtarget = -1;
+
+        int help=0, ceva=1;
+
+        boolean okHeading = false, okYaw = false, okRange = false;
+
+        double rangeError = 100, headingError = 0, yawError = 0;
+
+
+            //while (!ok && opModeIsActive() && !isStopRequested()) {
+
+            targetFound = false;
+            List<AprilTagDetection> currentDetections = apriltagProcesor.getDetections();
+            for (AprilTagDetection detection : currentDetections) {
+                if ((detection.metadata != null) && (detection.id==5 || detection.id==2)) {
+                    targetFound = true;
+                    desiredTag = detection;
+                    break;  // don't look any further.
+                }
+            }
+
+            if (targetFound) {
+
+                rangeError = desiredTag.ftcPose.range - 7;// pentru red center backdrop: 10 sau 10.5 pentru red right backdrop: 9
+
+
+                headingError = desiredTag.ftcPose.bearing;//5
+
+
+                yawError = desiredTag.ftcPose.yaw+2.3; //1.7795
+
+               /* if(okRange==true){
+                    rangeError=0;
+                }
+
+                if(okRange==true && okHeading==true){
+
+                    headingError=0;
+
+                }
+                if(okRange==true && okYaw==true){
+
+                    yawError=0;
+
+                }
+
+                */
+
+                // Use the speed and turn "gains" to calculate how we want the robot to move.
+                double drive = Range.clip(rangeError * RANGE_ERROR_GAIN, -MAX_RANGE, MAX_RANGE);
+                double turn = Range.clip(headingError * HEADING_ERROR_GAIN, -MAX_HEADING, MAX_HEADING);
+                double strafe = Range.clip(-yawError * YAW_ERROR_GAIN, -MAX_YAW, MAX_YAW);
+
+
+                help=0;
+
+                moveRobot(-drive, -strafe, turn);
+
+
+            } else {
+
+                /*
+                help=help+ceva;
+
+                if(help==100000){
+
+                    help=0;
+                    ceva=ceva*(-1);
+                    robot.move.generalMovement(0, 0, 100);
+
+
+                }else if(help==-100000){
+
+                    help=0;
+                    ceva=ceva*(-1);
+                    robot.move.generalMovement(0, 0, -100);
+
+                }
+
+                 */
+
+                moveRobot(0, 0, 0);
+            }
+
+            /*
+            else{
+                okRange=false;
+            }
+
+            if(headingError>-1 && headingError<1){
+                okHeading=true;
+            }else{
+                okHeading=false;
+            }
+
+            if(yawError>-1 && yawError<1){
+                okYaw=true;
+            }else{
+                okYaw=false;
+            }
+
+            if(okYaw==true && okHeading==true && okRange==true){
+
+                ok=true;
+                robot.move.generalMovement(0,0,0);
+
+
+            }
+
+             */
+
+
+
+
     }
+
+
+
+}
 
 

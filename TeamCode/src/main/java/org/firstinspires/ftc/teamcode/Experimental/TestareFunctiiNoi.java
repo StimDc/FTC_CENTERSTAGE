@@ -42,6 +42,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.Implementations.Constants.Claw;
 import org.firstinspires.ftc.teamcode.Implementations.Robot.Robot;
 
+import java.io.IOException;
+
 @Autonomous(name="testare", group = "Robot")
 public class TestareFunctiiNoi extends LinearOpMode {
 
@@ -62,7 +64,11 @@ public class MovingClaw extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        robot = new Robot(hardwareMap,telemetry);
+        try {
+            robot = new Robot(hardwareMap,telemetry,1);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         robot.move.forward( FORWARD,0.6,30); //TODO: REFACUT ROTATIILE
         //sleep(300);
         robot.move.forward(BACKWARDS,0.6,30);

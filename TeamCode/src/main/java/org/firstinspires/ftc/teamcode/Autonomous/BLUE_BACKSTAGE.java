@@ -47,6 +47,8 @@ import org.firstinspires.ftc.teamcode.Implementations.Constants.Claw;
 import org.firstinspires.ftc.teamcode.Implementations.Constants.Joint;
 import org.firstinspires.ftc.teamcode.Implementations.Robot.Robot;
 
+import java.io.IOException;
+
 @Autonomous(name="BLUE BACKSTAGE", group = "Blue Routes")
 
 public class BLUE_BACKSTAGE extends  LinearOpMode{
@@ -76,13 +78,20 @@ public class BLUE_BACKSTAGE extends  LinearOpMode{
     public void runOpMode () {
 
        // blueProp=new BluePropThreshold_Backstage();
-        robot = new Robot(hardwareMap,telemetry,-2);
+        try {
+            robot = new Robot(hardwareMap,telemetry,-2);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         robot.camera.openFrontCam();
         target=robot.arm.ZERO_OFFSET;
 
 
 
-        String propPosition=robot.camera.getPositionProp();
+       // String propPosition=robot.camera.GetPropPositionr();
+
+       String propPosition="nope";
+
 
         boolean once=true;
 
@@ -91,8 +100,8 @@ public class BLUE_BACKSTAGE extends  LinearOpMode{
         while ((propPosition.equals("nope") || once) && opModeIsActive() && !isStopRequested()){
 
             telemetry.addLine("Nope :( "+propPosition);
-            propPosition=robot.camera.getPositionProp();
-            //propPosition="center";
+            //propPosition=robot.camera.getPositionProp();
+            propPosition="center";
 
             if(propPosition.equals("left")){
 
@@ -416,23 +425,30 @@ public class BLUE_BACKSTAGE extends  LinearOpMode{
 
 
 
-        robot.move.lateral(LEFT,0.4,8);
+        robot.move.forward(FORWARD,0.6,39);
         sleep(175);
 
-        robot.move.forward(FORWARD,0.6,57);
-        sleep(175);
+        robot.move.rotate(1,0.6,51.5);
+        sleep(1500);
+
+
+        robot.move.forward(FORWARD,0.5,12);
+        sleep(750);
+
         robot.claw.setPosition(Claw.INTERMEDIARY);
-        sleep(500);
+        sleep(750);
+
+
         robot.move.forward(BACKWARDS,0.5,5.5);
         sleep(175);
         robot.claw.setPosition(Claw.CLOSED);
         sleep(500);
         robot.joint.setPosition(Joint.UP);
 
-        robot.move.rotate(1,0.6,90);
+        robot.move.rotate(1,0.6,40);
         sleep(250);
 
-        //   robot.move.forward(BACKWARDS,0.6,30);
+
 
         robot.move.Move_to_AprilAllAxes(tagID,robot,robot.camera.atag);
 

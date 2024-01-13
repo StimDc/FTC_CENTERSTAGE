@@ -6,6 +6,10 @@ import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.Implementations.ChoiceMenu.ChoiceMenu;
+
+import java.io.IOException;
+import java.util.Dictionary;
 
 public class Robot{
     public Wheels wheels;
@@ -18,9 +22,12 @@ public class Robot{
     public Arm arm;
     IMU imu;
 
-    public Robot(HardwareMap hardwareMap, Telemetry telemetry,int startPosition){ // startPosition 1 redFrontstage,-1 redbackstage, 2 bluefrontstage, -2 bluebackstage
+    public Dictionary<String,String> parameter;
+
+    public Robot(HardwareMap hardwareMap, Telemetry telemetry,int startPosition) throws IOException { // startPosition 1 redFrontstage,-1 redbackstage, 2 bluefrontstage, -2 bluebackstage
+        this.parameter = ChoiceMenu.readFromFile();
         this.arm = new Arm(hardwareMap,telemetry);
-        this.camera = new Camera(hardwareMap,startPosition);
+        this.camera = new Camera(hardwareMap,startPosition,this);
         //this.hardwareMap = hardwareMap;
         this.InitIMU(hardwareMap);
         this.wheels = new Wheels(hardwareMap);

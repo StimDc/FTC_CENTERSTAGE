@@ -19,7 +19,7 @@ public class BluePropThreshold_Frontstage implements VisionProcessor {
     Mat testMat= new Mat();
     Mat finalMat=new Mat();
 
-    double blueThreshold=0.009d;//0.049d
+    double blueThreshold=0.04d;//0.049d
 
     String outStr="nope";
 

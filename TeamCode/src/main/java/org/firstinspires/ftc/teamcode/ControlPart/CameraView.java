@@ -15,7 +15,10 @@ import org.firstinspires.ftc.teamcode.Implementations.Robot.Robot;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
-@TeleOp(name = "Camera View")
+import java.io.IOException;
+
+@TeleOp(name = "Camera View"
+)
 
 public class CameraView extends OpMode {
 
@@ -28,7 +31,11 @@ public class CameraView extends OpMode {
     @Override
     public void init() {
 
-        robot = new Robot(hardwareMap,telemetry,-1);
+        try {
+            robot = new Robot(hardwareMap,telemetry,-1);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 
@@ -64,7 +71,7 @@ public class CameraView extends OpMode {
         telemetry.addLine("Back Camera: B");
         telemetry.addLine("---------------");
         if(baclCam==true){
-            telemetry.addLine("Prop position:"+robot.camera.getPositionProp());
+        //    telemetry.addLine("Prop position:"+robot.camera.getPositionProp());
 
         }
         telemetry.update();

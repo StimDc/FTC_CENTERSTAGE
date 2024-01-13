@@ -21,17 +21,17 @@ public class RedPropThreshold_Frontstage implements VisionProcessor {
     Mat lowMat=new Mat();
     Mat finalMat=new Mat();
 
-    double redThreshold=0.045d;//0.049d
+    double redThreshold=0.04d;//0.049d
 
-    String outStr="center";
+    String outStr="nope";
 
 
     static final Rect LEFT_RECTANGLE=new Rect (
              new Point(0,250),
-             new Point(320,480)
+             new Point(300,480)
             );
     static final Rect CENTER_RECTANGLE=new Rect(
-            new Point(321,250),
+            new Point(301,250),
             new Point(640,480)
     );
 

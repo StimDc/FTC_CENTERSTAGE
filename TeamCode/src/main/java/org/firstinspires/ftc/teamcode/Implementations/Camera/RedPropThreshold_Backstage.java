@@ -21,7 +21,7 @@ public class RedPropThreshold_Backstage implements VisionProcessor {
     Mat lowMat=new Mat();
     Mat finalMat=new Mat();
 
-    double redThreshold=0.03d;//0.049d
+    double redThreshold=0.04d;//0.049d
 
     String outStr="center";
 

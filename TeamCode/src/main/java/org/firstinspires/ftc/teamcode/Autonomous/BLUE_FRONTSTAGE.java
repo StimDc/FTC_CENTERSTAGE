@@ -31,6 +31,7 @@ package org.firstinspires.ftc.teamcode.Autonomous;
 
 import static org.firstinspires.ftc.teamcode.Implementations.Constants.Direction.BACKWARDS;
 import static org.firstinspires.ftc.teamcode.Implementations.Constants.Direction.FORWARD;
+import static org.firstinspires.ftc.teamcode.Implementations.Constants.Direction.LEFT;
 import static org.firstinspires.ftc.teamcode.Implementations.Constants.Direction.RIGHT;
 
 import com.arcrobotics.ftclib.controller.PIDController;
@@ -46,6 +47,8 @@ import org.firstinspires.ftc.teamcode.Implementations.Camera.RedPropThreshold_Fr
 import org.firstinspires.ftc.teamcode.Implementations.Constants.Claw;
 import org.firstinspires.ftc.teamcode.Implementations.Constants.Joint;
 import org.firstinspires.ftc.teamcode.Implementations.Robot.Robot;
+
+import java.io.IOException;
 
 @Autonomous(name="BLUE FRONTSTAGE", group = "Blue Routes")
 
@@ -76,13 +79,20 @@ public class BLUE_FRONTSTAGE extends  LinearOpMode{
     public void runOpMode () {
 
        // blueProp=new BluePropThreshold_Frontstage();
-        robot = new Robot(hardwareMap,telemetry,2);
+        try {
+            robot = new Robot(hardwareMap,telemetry,2);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         robot.camera.openFrontCam();
         target=robot.arm.ZERO_OFFSET;
 
 
 
-        String propPosition=robot.camera.getPositionProp();
+        //String propPosition=robot.camera.GetPropPositionr();
+
+        String propPosition="nope";
+
 
         boolean once=true;
 
@@ -91,8 +101,8 @@ public class BLUE_FRONTSTAGE extends  LinearOpMode{
         while ((propPosition.equals("nope") || once) && opModeIsActive() && !isStopRequested()){
 
             telemetry.addLine("Nope :( "+propPosition);
-            propPosition=robot.camera.getPositionProp();
-            //propPosition="center";
+           // propPosition=robot.camera.getPositionProp();
+            propPosition="center";
 
             if(propPosition.equals("left")){
 
@@ -280,7 +290,7 @@ public class BLUE_FRONTSTAGE extends  LinearOpMode{
 
 
 
-        robot.move.lateral(RIGHT,0.4,8);
+        robot.move.lateral(LEFT,0.4,8);
         sleep(175);
 
         robot.move.forward(FORWARD,0.6,57);

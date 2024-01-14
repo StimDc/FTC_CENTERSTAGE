@@ -4,9 +4,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.teamcode.Implementations.Annotations.ImplementedBy;
-import org.firstinspires.ftc.teamcode.Implementations.Math.MathFunc;
-
 public class Wheels {
 
 

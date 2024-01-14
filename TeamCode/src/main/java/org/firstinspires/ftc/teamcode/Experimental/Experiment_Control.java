@@ -6,8 +6,6 @@ import static org.firstinspires.ftc.teamcode.Implementations.Constants.Universal
 import static org.firstinspires.ftc.teamcode.Implementations.Constants.UniversalConsts.MAX_YAW;
 import static org.firstinspires.ftc.teamcode.Implementations.Constants.UniversalConsts.RANGE_ERROR_GAIN;
 import static org.firstinspires.ftc.teamcode.Implementations.Constants.UniversalConsts.YAW_ERROR_GAIN;
-import static java.lang.Math.abs;
-
 import android.util.Size;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -25,8 +23,6 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.Implementations.Constants.Claw;
 import org.firstinspires.ftc.teamcode.Implementations.Constants.Joint;
-import org.firstinspires.ftc.teamcode.Implementations.Annotations.Experimental;
-import org.firstinspires.ftc.teamcode.Implementations.Robot.Robot;
 import org.firstinspires.ftc.teamcode.Implementations.Robot.Wheels;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
@@ -56,7 +52,6 @@ public class Experiment_Control extends OpMode {
 
     private DcMotorEx viper,hang;
 
-    private DcMotor frontLeft,frontRight, backLeft, backRight;
 
     public Wheels wheels;
 
@@ -129,8 +124,6 @@ public class Experiment_Control extends OpMode {
         hang.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
-
-    @Experimental()
     @Override
     public void loop() {
 

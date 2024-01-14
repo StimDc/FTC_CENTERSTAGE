@@ -33,17 +33,17 @@ import static org.firstinspires.ftc.teamcode.Implementations.Constants.Direction
 import static org.firstinspires.ftc.teamcode.Implementations.Constants.Direction.FORWARD;
 import static org.firstinspires.ftc.teamcode.Implementations.Constants.Direction.RIGHT;
 
-import com.arcrobotics.ftclib.controller.PIDController;
+import com.outoftheboxrobotics.photoncore.Photon;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import org.firstinspires.ftc.teamcode.Implementations.Constants.Claw;
 import org.firstinspires.ftc.teamcode.Implementations.Constants.Joint;
 import org.firstinspires.ftc.teamcode.Implementations.Robot.Robot;
 
 import java.io.IOException;
 
+@Photon()
 @Autonomous(name="RED FRONTSTAGE", group = "Red Routes")
 
 public class RED_FRONTSTAGE extends  LinearOpMode{

@@ -1,19 +1,9 @@
 package org.firstinspires.ftc.teamcode.ControlPart;
 
-import static java.lang.Math.abs;
-import static android.os.SystemClock.sleep;
-
-import android.util.Size;
-
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.Implementations.Camera.RedPropThreshold_Backstage;
-import org.firstinspires.ftc.teamcode.Implementations.Annotations.Experimental;
 import org.firstinspires.ftc.teamcode.Implementations.Robot.Robot;
-import org.firstinspires.ftc.vision.VisionPortal;
-import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+
 
 import java.io.IOException;
 
@@ -39,8 +29,6 @@ public class CameraView extends OpMode {
 
     }
 
-
-    @Experimental()
     @Override
     public void loop() {
 
@@ -70,7 +58,7 @@ public class CameraView extends OpMode {
         telemetry.addLine("Front Camera: A");
         telemetry.addLine("Back Camera: B");
         telemetry.addLine("---------------");
-        if(baclCam==true){
+        if(baclCam){
         //    telemetry.addLine("Prop position:"+robot.camera.getPositionProp());
 
         }

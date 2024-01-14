@@ -45,11 +45,12 @@ public class Robot{
         this.claw = hardwareMap.get(Servo.class, "claw");
 
         this.lynxModules = hardwareMap.getAll(LynxModule.class);
-
+        /*
         for(LynxModule module : this.lynxModules){
             module.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
         }
 
+         */
         if(this.lynxModules.get(0).isParent() && LynxConstants.isEmbeddedSerialNumber(this.lynxModules.get(0).getSerialNumber())){
             this.controlHub = this.lynxModules.get(0);
             this.expansionHub = this.lynxModules.get(1);
@@ -65,6 +66,7 @@ public class Robot{
         this.controlHub.setConstant(Color.rgb(255,100,20));
 
 
+
     }
 
     public void InitIMU(HardwareMap hardwareMap){
@@ -78,6 +80,9 @@ public class Robot{
     }
 
 
-
+    public void clearBulkCache(){
+        this.controlHub.clearBulkCache();
+        this.expansionHub.clearBulkCache();
+    }
 
 }

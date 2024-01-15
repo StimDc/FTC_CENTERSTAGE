@@ -103,7 +103,7 @@ public class PID_ANGLE extends OpMode {
         telemetry.update();
     }
     public double PIDControl(double reference,double state){
-        double error = angleWrap(reference-state);
+        double error = angleWrapRadians(reference-state);
         telemetry.addData("Error: ",error);
         integralSum+=error*timer.seconds();
         double derivative = (error - lastError)/(timer.seconds());
@@ -111,7 +111,7 @@ public class PID_ANGLE extends OpMode {
         timer.reset();
         return(error * Kp) + (derivative * Kd) + (integralSum *Ki);
     }
-    public double angleWrap(double radians){
+    public double angleWrapRadians(double radians){
         while(radians>Math.PI){
             radians -=2*Math.PI;
 

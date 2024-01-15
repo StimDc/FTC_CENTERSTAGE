@@ -40,8 +40,7 @@ import java.util.Dictionary;
 @Autonomous(name="AUTONOMIE PEIMITIVE", group = "Robot")
 public class Autonomie_Primitive extends LinearOpMode {
     Dictionary<String,String> paramaters;
-    private Primitive_RoutesRed routeRed;
-    private Primitive_RoutesBlue routeBlue;
+
 
     private String alliance; // RED=1 && BLUE=2
     private String startpoint; // FRONTSTAGE=1 && BACKSTAGE=2
@@ -72,7 +71,6 @@ public class Autonomie_Primitive extends LinearOpMode {
             ex.printStackTrace();
         }
 
-        routeRed=new Primitive_RoutesRed();
 
         telemetry.addLine(alliance+" "+startpoint+" "+parking);
         telemetry.update();

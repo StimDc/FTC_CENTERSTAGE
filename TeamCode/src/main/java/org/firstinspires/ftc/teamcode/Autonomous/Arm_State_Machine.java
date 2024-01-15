@@ -196,11 +196,10 @@ public class Arm_State_Machine extends LinearOpMode {
                 case 7:
 
                     telemetry.addLine("DONE :D");
-                   // telemetry.update();
 
             }
 
-            if(target==0 && OKtarget==true){
+            if(target==0 && OKtarget){
 
                 elevator1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 elevator2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -218,7 +217,7 @@ public class Arm_State_Machine extends LinearOpMode {
 
             }
 
-            if(OKtarget==false){
+            if(!OKtarget){
                 ArmTask();
 
             }

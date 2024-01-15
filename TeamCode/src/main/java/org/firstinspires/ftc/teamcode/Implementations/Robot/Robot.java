@@ -45,6 +45,7 @@ public class Robot{
         this.claw = hardwareMap.get(Servo.class, "claw");
 
         this.lynxModules = hardwareMap.getAll(LynxModule.class);
+        //TODO: de implementat optimizarile
         /*
         for(LynxModule module : this.lynxModules){
             module.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
@@ -62,10 +63,9 @@ public class Robot{
             this.expansionHub = this.lynxModules.get(0);
         }
 
+        // Semnalizeaza ca initializarea a avut sfarsit
         this.controlHub.setConstant(Color.rgb(255,0,0));
         this.controlHub.setConstant(Color.rgb(255,100,20));
-
-
 
     }
 

@@ -29,10 +29,14 @@
 
 package org.firstinspires.ftc.teamcode.Autonomous;
 
+import static org.firstinspires.ftc.teamcode.Implementations.Constants.Direction.RIGHT;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.controller.PIDController;
+import com.outoftheboxrobotics.photoncore.Photon;
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -46,6 +50,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Implementations.Constants.Claw;
 import org.firstinspires.ftc.teamcode.Implementations.Constants.Joint;
+import org.firstinspires.ftc.teamcode.Implementations.Constants.PIDConstantsArm;
+
+import java.util.List;
 
 /*
  * This OpMode illustrates the concept of driving a path based on encoder counts.
@@ -72,23 +79,27 @@ import org.firstinspires.ftc.teamcode.Implementations.Constants.Joint;
  * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
-
+@Photon
 @Config
 @Autonomous(name="Arm State Machine", group = "Robot")
 
 public class Arm_State_Machine extends LinearOpMode {
 
+    public  final double ZERO_OFFSET = 70.0-3.85;
+
     private DcMotorEx elevator1, elevator2;
     private PIDController controller;
 
-    public static double p=0.01d, i=0, d=0.006d;//d=0.004d
-    public static double f=0.04d;
+    public static double p=0d, i=0d, d=0d;//d=0.004d
+    public static double f=0d;
+    public static double target=70.0-3.85;
 
-    public static int target=0;
-    public static int tolerance=5;
-
-    public double val=0;
-    private final double ticks_in_degrees=288/(360.0*0.36); /// gear ratio: 45/125=0.36
+    private static final double MOTOR_CPR = 288.0;
+    private static final double GEAR_RATIO = 125.0 / 45.0;
+    private static final double ARM_TICKS_PER_DEGREE = MOTOR_CPR * GEAR_RATIO / 360.0;
+    // private static final double MAX_ARM_HOLDING_POWER = <some calibrated value here>;
+    private  double targetPosInDegrees=70.0-3.85;
+    public static double powerLimit=0.7;
 
     Servo claw,joint;
 
@@ -101,70 +112,87 @@ public class Arm_State_Machine extends LinearOpMode {
     @Override
     public void runOpMode() {
 
-        telemetry=new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+        List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
 
+        for (LynxModule hub : allHubs) {
+            hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        }
+
+
+
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         InitArm();
 
-        claw=hardwareMap.get(Servo.class,"claw");
-        joint=hardwareMap.get(Servo.class,"joint");
+        claw = hardwareMap.get(Servo.class, "claw");
+        joint = hardwareMap.get(Servo.class, "joint");
 
         waitForStart();
-
-        /*
-        while(opModeIsActive() && !isStopRequested()){
-
-            ShowPos();
-
-        }
-
-         */
-
-        double ceva=0;
 
         joint.setPosition(Joint.UP);
         claw.setPosition(Claw.CLOSED);
 
-        sleep(1500);
+        int stateArm=0;
 
-        /*
+        boolean armtarget=false,OKtarget=false;
+
+
+
+
+
+
+
+        setPosition(ZERO_OFFSET,powerLimit);
 
         while(opModeIsActive() && !isStopRequested()){
-            ShowPos();
+
+            for (LynxModule hub : allHubs) {
+                hub.clearBulkCache();
+            }
+
+            controller.setPID(p,i,d);
+
+            if(isOnTarget(2)){
+
+                setPosition(target,powerLimit);
+
+            }
+
+            armTask();
+            telemetry.addLine("Target: "+target);
+            telemetry.addLine("Pos: "+getPosition());
+            telemetry.update();
 
 
         }
 
+        /*
 
-         */
+        while(!armtarget){
 
-
-
-        while(opModeIsActive() && !isStopRequested()){
-
-            switch (state){
+            switch (stateArm){
 
                 case 0:
 
-                    setPosition(0,1);
-                    state=1;
+                    setPosition(ZERO_OFFSET,1);
+                    stateArm=1;
                     break;
 
                 case 1:
-                    setPosition(381,1);
-                    state=2;
+                    setPosition(240,6);
+                    stateArm=2;
                     break;
 
                 case 2:
-                    if(isOnTarget()) {
-                        state=3;
+                    if(isOnTarget(6)) {
+                        stateArm=3;
                     }
                     break;
 
                 case 3:
 
                     claw.setPosition(Claw.OPEN);
-                    state=4;
+                    stateArm=4;
                     break;
 
                 case 4:
@@ -172,71 +200,83 @@ public class Arm_State_Machine extends LinearOpMode {
 
                     if(Math.abs(claw.getPosition()-Claw.OPEN) <0.03){
 
-                       state=5;
+                        stateArm=5;
                     }
                     break;
 
 
                 case 5:
-                    setPosition(0,1);
-                    state=6;
+                    setPosition(ZERO_OFFSET,1);
+                    stateArm=6;
                     break;
 
                 case 6:
-                    if(isOnTarget()) {
-                        if(target==0){
+                    if(isOnTarget(5)) {
+                        if(Math.abs(getPosition()-ZERO_OFFSET)<5){
 
                             OKtarget=true;
 
                         }
-                        state=7;
+                        stateArm=7;
                     }
                     break;
 
                 case 7:
 
+                    armtarget=true;
                     telemetry.addLine("DONE :D");
-                   // telemetry.update();
+                    // telemetry.update();
 
             }
 
-            if(target==0 && OKtarget==true){
+            if(Math.abs(getPosition()-ZERO_OFFSET)<5 && OKtarget==true){
 
                 elevator1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 elevator2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-                elevator1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                elevator2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-                setPosition(0,0);
-                ArmTask();
+                elevator1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                elevator2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+
+                elevator1.setPower(0);
+                elevator2.setPower(0);
 
             }
 
-            if(target>0){
+            if(Math.abs(getPosition()-ZERO_OFFSET)>=3){
                 OKtarget=false;
 
             }
 
             if(OKtarget==false){
-                ArmTask();
+                armTask();
 
             }
-            telemetry.addLine("Ceva: "+ceva);
-            telemetry.addLine("Pos: "+elevator1.getCurrentPosition());
-            telemetry.addLine("Target: "+target);
-            telemetry.addLine("State: "+state);
-            telemetry.update();
+            // telemetry.addLine("Ceva: "+ceva);
+          //  telemetry.addLine("Pos: "+robot.arm.getPosition());
+           // telemetry.addLine("Target: "+TargetPosInDegrees);
+          //  telemetry.addLine("State: "+stateArm);
+          //  telemetry.update();
+
 
         }
 
-
-
-
+         */
 
 
 
     }
+
+
+
+
+
+
+
+
+
+
 
     public void InitArm()
     {
@@ -252,45 +292,45 @@ public class Arm_State_Machine extends LinearOpMode {
         elevator1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         elevator2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        elevator1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        elevator2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        elevator1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        elevator2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
     }
 
-    public void ArmTask(){
-
-        int elepos=elevator1.getCurrentPosition();
-
-        double pid=controller.calculate(elepos, target);
-        double ff=Math.cos(Math.toRadians(target/ticks_in_degrees))*f;
-
-        double power = pid + ff;
-
-        elevator1.setPower(power);
-        elevator2.setPower(power);
-
-    }
-
-    public boolean isOnTarget()
+    public void armTask()
     {
-        //double currPosInDegrees = arm.getCurrentPosition() / ARM_TICKS_PER_DEGREE;
-
-
-        double currPosInDegrees = elevator1.getCurrentPosition();
-
-        return Math.abs(target- currPosInDegrees) <= tolerance;
+        double targetPosInTicks = (targetPosInDegrees - ZERO_OFFSET) * ARM_TICKS_PER_DEGREE;
+        double currPosInTicks = this.elevator1.getCurrentPosition();
+        double pidOutput = this.controller.calculate(currPosInTicks, targetPosInTicks);
+        // This ff is assuming arm at horizontal position is 90-degree.
+        double ff = PIDConstantsArm.f * Math.sin(Math.toRadians(ticksToRealWorldDegrees(currPosInTicks)));
+        double power = pidOutput + ff;
+        // Clip power to the range of -powerLimit to powerLimit.
+        power = power < -powerLimit ? -powerLimit : Math.min(power, powerLimit);
+        this.elevator1.setPower(power);
+        this.elevator2.setPower(power);
     }
 
-    public void ShowPos(){
-
-        telemetry.addLine("Pos: "+elevator1.getCurrentPosition());
-        telemetry.update();
-
-    }
-
-    public void setPosition(int targetPosInDegrees, int toleranceInDegrees)
+    public boolean isOnTarget(double toleranceInDegrees)
     {
-        target= targetPosInDegrees;
-        tolerance = toleranceInDegrees;
+        double currPosInDegrees = getPosition();
+        return Math.abs(targetPosInDegrees - currPosInDegrees) <= toleranceInDegrees;
+    }
+
+    public void setPosition(double targetPosInDegrees, double powerLimit)
+    {
+        this.targetPosInDegrees = targetPosInDegrees;
+        this.powerLimit = Math.abs(powerLimit);
+    }
+
+
+    public double ticksToRealWorldDegrees(double ticks)
+    {
+        return ticks / ARM_TICKS_PER_DEGREE + ZERO_OFFSET;
+    }
+
+    public double getPosition()
+    {
+        return ticksToRealWorldDegrees(elevator1.getCurrentPosition());
     }
 }

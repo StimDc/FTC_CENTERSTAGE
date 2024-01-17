@@ -8,7 +8,7 @@ public class UniversalConsts {
     public static final double LATERAL_ERROR = 1.1904761d;
     public static final double ROTATE_ERROR = 0.85672725d;
 
-    public static double MAX_RANGE=0.85,MAX_HEADING=0.8,MAX_YAW=0.8;
+    public static double MAX_RANGE=0.4,MAX_HEADING=0.45,MAX_YAW=0.45; //0.85, 0.8, 0.8
     
     // pentru left si center MAX_RANGE=0.185,MAX_HEADING=0.75,MAX_YAW=0.75
     //pentru right MAX_RANGE=0.16,MAX_HEADING=0.5,MAX_YAW=0.5

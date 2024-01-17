@@ -11,6 +11,9 @@ import static org.firstinspires.ftc.teamcode.Implementations.Constants.Universal
 import static org.firstinspires.ftc.teamcode.Implementations.Constants.UniversalConsts.SLEEP;
 import static org.firstinspires.ftc.teamcode.Implementations.Constants.UniversalConsts.YAW_ERROR_GAIN;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
@@ -27,7 +30,10 @@ import java.util.List;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+@Config
 public class Movement {
+    public FtcDashboard dashboard;
+
     public Wheels wheels;
     public IMU imu;
     public Telemetry telemetry;
@@ -244,12 +250,14 @@ public class Movement {
 
         AprilTagDetection desiredTag = null;
         boolean targetFound = false;
-        boolean ok = false;
+        boolean ok = false,okplease=false;
         int oldtarget = -1;
 
         int help=0, ceva=1;
 
         boolean okHeading = false, okYaw = false, okRange = false;
+
+        double rangeErrorSpeed=MAX_RANGE, headingErrorSpeed=MAX_HEADING, yawErrorSpeed=MAX_HEADING;
 
         double rangeError = 100, headingError = 0, yawError = 0;
 
@@ -273,10 +281,10 @@ public class Movement {
                 rangeError = desiredTag.ftcPose.range - 9.5;// pentru red center backdrop: 10 sau 10.5 pentru red right backdrop: 9
 
 
-                headingError = desiredTag.ftcPose.bearing;//5
+                headingError = desiredTag.ftcPose.bearing+2.5;//5
 
 
-                yawError = desiredTag.ftcPose.yaw+2.3; //1.7795
+                yawError = desiredTag.ftcPose.yaw; //1.7795, 2.3
 
                /* if(okRange==true){
                     rangeError=0;
@@ -296,10 +304,16 @@ public class Movement {
                 */
 
                 // Use the speed and turn "gains" to calculate how we want the robot to move.
+                /*
                 double drive = Range.clip(rangeError * RANGE_ERROR_GAIN, -MAX_RANGE, MAX_RANGE);
                 double turn = Range.clip(headingError * HEADING_ERROR_GAIN, -MAX_HEADING, MAX_HEADING);
                 double strafe = Range.clip(-yawError * YAW_ERROR_GAIN, -MAX_YAW, MAX_YAW);
 
+
+                 */
+                double drive = Range.clip(rangeError * RANGE_ERROR_GAIN, -rangeErrorSpeed, rangeErrorSpeed);
+                double turn = Range.clip(headingError * HEADING_ERROR_GAIN, -headingErrorSpeed, headingErrorSpeed);
+                double strafe = Range.clip(-yawError * YAW_ERROR_GAIN, -yawErrorSpeed, yawErrorSpeed);
 
                 help=0;
 
@@ -337,13 +351,26 @@ public class Movement {
                 ok=true;
             }
 
-            if (rangeError > -2 && rangeError < 2 && headingError>-5 && headingError<5) {
+            if (rangeError > -10 && rangeError < 10) {
 
                 //  okRange=true;
-                ok = true;
-                robot.move.generalMovement(0, 0, 0);
+                okplease = true;
+                headingErrorSpeed=0.1;
+                yawErrorSpeed=0.1;
+                rangeErrorSpeed=0.15;
 
             }
+
+            if(okplease==true && rangeError > -2 && rangeError < 2  && headingError>-5 && headingError<5){
+
+                ok=true;
+
+                robot.move.generalMovement(0, 0, 0);
+
+
+            }
+
+
             /*
             else{
                 okRange=false;
@@ -616,5 +643,200 @@ public class Movement {
 
         return STATE;
     }
+
+    public double returnHeadingError(int idtag,Robot robot, AprilTagProcessor atag){
+
+        AprilTagDetection desiredTag = null;
+        boolean targetFound = false;
+
+        //while (!ok && opModeIsActive() && !isStopRequested()) {
+
+        targetFound = false;
+        List<AprilTagDetection> currentDetections = atag.getDetections();
+        for (AprilTagDetection detection : currentDetections) {
+            if ((detection.metadata != null) && (detection.id == idtag || idtag==0)) {
+                targetFound = true;
+                desiredTag = detection;
+                break;  // don't look any further.
+            }
+        }
+
+        if(targetFound) {
+
+            return desiredTag.ftcPose.bearing;
+
+
+        }else{
+
+            return 0;
+
+        }
+
+    }
+
+    public double returnRangeError(int idtag,Robot robot, AprilTagProcessor atag){
+
+        AprilTagDetection desiredTag = null;
+        boolean targetFound = false;
+
+        //while (!ok && opModeIsActive() && !isStopRequested()) {
+
+        targetFound = false;
+        List<AprilTagDetection> currentDetections = atag.getDetections();
+        for (AprilTagDetection detection : currentDetections) {
+            if ((detection.metadata != null) && (detection.id == idtag || idtag==0)) {
+                targetFound = true;
+                desiredTag = detection;
+                break;  // don't look any further.
+            }
+        }
+
+        if(targetFound) {
+
+            return desiredTag.ftcPose.range;
+
+
+        }else{
+
+            return 0;
+
+        }
+
+    }
+
+    public double returnYawError(int idtag,Robot robot, AprilTagProcessor atag){
+
+        AprilTagDetection desiredTag = null;
+        boolean targetFound = false;
+
+        //while (!ok && opModeIsActive() && !isStopRequested()) {
+
+        targetFound = false;
+        List<AprilTagDetection> currentDetections = atag.getDetections();
+        for (AprilTagDetection detection : currentDetections) {
+            if ((detection.metadata != null) && (detection.id == idtag || idtag==0)) {
+                targetFound = true;
+                desiredTag = detection;
+                break;  // don't look any further.
+            }
+        }
+
+        if(targetFound) {
+
+            return desiredTag.ftcPose.yaw;
+
+
+        }else{
+
+            return 0;
+
+        }
+
+    }
+
+
+    public double returnXPoseError(int idtag,Robot robot, AprilTagProcessor atag){
+
+        AprilTagDetection desiredTag = null;
+        boolean targetFound = false;
+
+        //while (!ok && opModeIsActive() && !isStopRequested()) {
+
+        targetFound = false;
+        List<AprilTagDetection> currentDetections = atag.getDetections();
+        for (AprilTagDetection detection : currentDetections) {
+            if ((detection.metadata != null) && (detection.id == idtag || idtag==0)) {
+                targetFound = true;
+                desiredTag = detection;
+                break;  // don't look any further.
+            }
+        }
+
+        if(targetFound) {
+
+            return desiredTag.ftcPose.x;
+
+
+        }else{
+
+            return 0;
+
+        }
+
+    }
+
+    public void showAllPose(int idtag,Robot robot, AprilTagProcessor atag){
+
+        dashboard=FtcDashboard.getInstance();
+        telemetry=new MultipleTelemetry(telemetry, dashboard.getTelemetry());
+
+
+
+        AprilTagDetection desiredTag = null;
+        boolean targetFound = false;
+
+        //while (!ok && opModeIsActive() && !isStopRequested()) {
+
+        targetFound = false;
+        List<AprilTagDetection> currentDetections = atag.getDetections();
+        for (AprilTagDetection detection : currentDetections) {
+            if ((detection.metadata != null) && (detection.id == idtag || idtag==0)) {
+                targetFound = true;
+                desiredTag = detection;
+                break;  // don't look any further.
+            }
+        }
+
+        if(targetFound) {
+
+            telemetry.addLine("XPose: "+desiredTag.ftcPose.x);
+            telemetry.addLine("YPose: "+desiredTag.ftcPose.y);
+            telemetry.addLine("ZPose: "+desiredTag.ftcPose.z);
+
+            telemetry.addLine("Range: "+desiredTag.ftcPose.range);
+            telemetry.addLine("Bearing: "+desiredTag.ftcPose.bearing);
+            telemetry.addLine("Elevation: "+desiredTag.ftcPose.elevation);
+
+            telemetry.addLine("Yaw: "+desiredTag.ftcPose.yaw);
+            telemetry.addLine("Pitch: "+desiredTag.ftcPose.pitch);
+            telemetry.addLine("Roll: "+desiredTag.ftcPose.roll);
+            telemetry.update();
+
+
+
+        }
+
+    }
+
+    public AprilTagDetection returnAprilTAg(int idtag, Robot robot, AprilTagProcessor atag){
+
+        AprilTagDetection desiredTag = null;
+        boolean targetFound = false;
+
+        //while (!ok && opModeIsActive() && !isStopRequested()) {
+
+        targetFound = false;
+        List<AprilTagDetection> currentDetections = atag.getDetections();
+        for (AprilTagDetection detection : currentDetections) {
+            if ((detection.metadata != null) && (detection.id == idtag || idtag==0)) {
+                targetFound = true;
+                desiredTag = detection;
+                break;  // don't look any further.
+            }
+        }
+
+        if(targetFound) {
+
+            return desiredTag;
+
+
+        }else{
+
+            return null;
+
+        }
+
+    }
+
 
 }

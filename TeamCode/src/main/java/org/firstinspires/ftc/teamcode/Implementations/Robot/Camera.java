@@ -212,7 +212,7 @@ public Choising_Color color;
             return this.bluePropFrontstage.getPropPosition();
         }
         else{
-            return this.bluePropFrontstage.getPropPosition();
+            return this.bluePropBackstage.getPropPosition();
 
         }
     }

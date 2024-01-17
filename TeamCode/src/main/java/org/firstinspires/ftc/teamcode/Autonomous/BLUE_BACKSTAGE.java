@@ -88,9 +88,12 @@ public class BLUE_BACKSTAGE extends  LinearOpMode{
 
 
 
-       // String propPosition=robot.camera.GetPropPositionr();
+        String propPosition="nope";
 
-       String propPosition="nope";
+        telemetry.addLine("Prop: "+propPosition);
+        telemetry.update();
+
+       //String propPosition="nope";
 
 
         boolean once=true;
@@ -100,8 +103,8 @@ public class BLUE_BACKSTAGE extends  LinearOpMode{
         while ((propPosition.equals("nope") || once) && opModeIsActive() && !isStopRequested()){
 
             telemetry.addLine("Nope :( "+propPosition);
-            //propPosition=robot.camera.getPositionProp();
-            propPosition="center";
+            propPosition=robot.camera.GetPropPositionr();
+           // propPosition="center";
 
             if(propPosition.equals("left")){
 

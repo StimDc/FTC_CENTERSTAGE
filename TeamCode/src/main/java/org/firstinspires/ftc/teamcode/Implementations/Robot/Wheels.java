@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Implementations.Robot;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -10,17 +11,17 @@ import org.firstinspires.ftc.teamcode.Implementations.Math.MathFunc;
 public class Wheels {
 
 
-    public DcMotor frontLeft;
-    public DcMotor frontRight;
-    public DcMotor backLeft;
-    public DcMotor backRight;
+    public DcMotorEx frontLeft;
+    public DcMotorEx frontRight;
+    public DcMotorEx backLeft;
+    public DcMotorEx backRight;
 
 
     public Wheels(HardwareMap hardwareMap){
-        this.frontLeft = hardwareMap.get(DcMotor.class, "FL");
-        this.frontRight = hardwareMap.get(DcMotor.class, "FR");
-        this.backLeft = hardwareMap.get(DcMotor.class, "BL");
-        this.backRight = hardwareMap.get(DcMotor.class, "BR");
+        this.frontLeft = hardwareMap.get(DcMotorEx.class, "FL");
+        this.frontRight = hardwareMap.get(DcMotorEx.class, "FR");
+        this.backLeft = hardwareMap.get(DcMotorEx.class, "BL");
+        this.backRight = hardwareMap.get(DcMotorEx.class, "BR");
     }
 
     public void setDirection(){

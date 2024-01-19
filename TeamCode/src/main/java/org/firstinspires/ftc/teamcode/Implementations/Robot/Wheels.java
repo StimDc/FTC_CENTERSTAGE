@@ -5,30 +5,50 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Implementations.Annotations.ImplementedBy;
 import org.firstinspires.ftc.teamcode.Implementations.Math.MathFunc;
 
 public class Wheels {
 
 
-    public DcMotorEx frontLeft;
-    public DcMotorEx frontRight;
-    public DcMotorEx backLeft;
-    public DcMotorEx backRight;
+    public DcMotor frontLeft;
+    public DcMotor frontRight;
+    public DcMotor backLeft;
+    public DcMotor backRight;
 
 
     public Wheels(HardwareMap hardwareMap){
-        this.frontLeft = hardwareMap.get(DcMotorEx.class, "FL");
-        this.frontRight = hardwareMap.get(DcMotorEx.class, "FR");
-        this.backLeft = hardwareMap.get(DcMotorEx.class, "BL");
-        this.backRight = hardwareMap.get(DcMotorEx.class, "BR");
+        this.frontLeft = hardwareMap.get(DcMotor.class, "FL");
+        this.frontRight = hardwareMap.get(DcMotor.class, "FR");
+        this.backLeft = hardwareMap.get(DcMotor.class, "BL");
+        this.backRight = hardwareMap.get(DcMotor.class, "BR");
     }
 
     public void setDirection(){
-        this.frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        this.frontRight.setDirection(DcMotorSimple.Direction.FORWARD);
-        this.backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        this.backRight.setDirection(DcMotorSimple.Direction.FORWARD);
+        this.frontLeft.setDirection(DcMotorEx.Direction.REVERSE);
+        this.frontRight.setDirection(DcMotorEx.Direction.FORWARD);
+        this.backLeft.setDirection(DcMotorEx.Direction.REVERSE);
+        this.backRight.setDirection(DcMotorEx.Direction.FORWARD);
+    }
+
+    public void reverseDirection(){
+        this.frontLeft.setDirection(DcMotorEx.Direction.FORWARD);
+        this.frontRight.setDirection(DcMotorEx.Direction.REVERSE);
+        this.backLeft.setDirection(DcMotorEx.Direction.FORWARD);
+        this.backRight.setDirection(DcMotorEx.Direction.REVERSE);
+    }
+
+
+
+    public void GetDirection(Telemetry telemetry){
+
+         telemetry.addLine("Front Left: "+frontLeft.getDirection());
+        telemetry.addLine("Front Right: "+frontRight.getDirection());
+        telemetry.addLine("Back Left: "+backLeft.getDirection());
+        telemetry.addLine("Back Right: "+backRight.getDirection());
+
+
     }
 
     public void setPower(double frontLeftPower, double frontRightPower, double backLeftPower, double backRightPower){

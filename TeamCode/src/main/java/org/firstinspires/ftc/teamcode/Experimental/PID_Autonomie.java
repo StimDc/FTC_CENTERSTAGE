@@ -78,7 +78,7 @@ import java.util.List;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@Photon
+
 @Config
 @Autonomous(name="PID Autonomie", group = "Robot")
 
@@ -114,12 +114,15 @@ public class PID_Autonomie extends LinearOpMode {
 
     @Override
     public void runOpMode() {
+        /*
 
         allHubs = hardwareMap.getAll(LynxModule.class);
 
         for (LynxModule hub : allHubs) {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
         }
+
+         */
 
         try {
             robot = new Robot(hardwareMap,telemetry,-1);
@@ -145,10 +148,16 @@ public class PID_Autonomie extends LinearOpMode {
 
         while(opModeIsActive() && !isStopRequested()){
 
+            robot.wheels.reverseDirection();
+
+            /*
+
             for (LynxModule hub : allHubs) {
                 hub.clearBulkCache();
             }
 
+
+             */
            // AprilPID();
 
 
@@ -157,7 +166,7 @@ public class PID_Autonomie extends LinearOpMode {
 
             if(detection!=null){
 
-                if(detection.ftcPose.range>=-12 && detection.ftcPose.range<=12 && detection.ftcPose.bearing>=-10 && detection.ftcPose.bearing<=10 && detection.ftcPose.yaw>=-30 && detection.ftcPose.yaw<=30){
+                if(detection.ftcPose.range>=-12 && detection.ftcPose.range<=12 && detection.ftcPose.bearing>=-2 && detection.ftcPose.bearing<=2 && detection.ftcPose.yaw>=-2 && detection.ftcPose.yaw<=2){
 
                     hope=1;
                     robot.wheels.setPower(0,0,0,0);

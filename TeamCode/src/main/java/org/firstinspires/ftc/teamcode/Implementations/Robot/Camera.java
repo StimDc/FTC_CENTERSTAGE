@@ -196,7 +196,7 @@ public Choising_Color color;
         }
     }
 
-    public String GetPropPositionr(){
+    public String GetPropPosition(){
         if(robot.parameter.get("alliance").equals("RED") &&
                 robot.parameter.get("position").equals("BACK_STAGE")){
            return this.redPropThresholdBackstage.getPropPosition();

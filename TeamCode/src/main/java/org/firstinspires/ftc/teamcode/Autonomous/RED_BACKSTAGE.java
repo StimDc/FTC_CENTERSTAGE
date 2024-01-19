@@ -87,7 +87,7 @@ public class RED_BACKSTAGE extends  LinearOpMode{
 
 
 
-        String propPosition=robot.camera.GetPropPositionr();
+        String propPosition=robot.camera.GetPropPosition();
 
         telemetry.addLine("Prop: "+propPosition);
         telemetry.update();
@@ -97,13 +97,17 @@ public class RED_BACKSTAGE extends  LinearOpMode{
 
         boolean once=true;
 
+        robot.wheels.GetDirection(telemetry);
+        telemetry.update();
+
+
         waitForStart();
 
 
         while ((propPosition.equals("nope") || once) && opModeIsActive() && !isStopRequested()){
 
             telemetry.addLine("Nope :( "+propPosition);
-            propPosition=robot.camera.GetPropPositionr();
+            propPosition=robot.camera.GetPropPosition();
            // propPosition="left";
 
             if(propPosition.equals("left")){
@@ -150,11 +154,16 @@ public class RED_BACKSTAGE extends  LinearOpMode{
 
         robot.camera.openBackCam();
 
+        robot.wheels.GetDirection(telemetry);
+        telemetry.update();
+
         robot.claw.setPosition(Claw.INTERMEDIARY);
         sleep(750);
         robot.joint.setPosition(Joint.DOWN);
         sleep(900);
         robot.claw.setPosition(Claw.CLOSED);
+
+
 
 
 
@@ -296,6 +305,9 @@ public class RED_BACKSTAGE extends  LinearOpMode{
 
        robot.camera.openBackCam();
 
+        robot.wheels.GetDirection(telemetry);
+        telemetry.update();
+
         robot.claw.setPosition(Claw.INTERMEDIARY);
         sleep(750);
         robot.joint.setPosition(Joint.DOWN);
@@ -432,6 +444,41 @@ public class RED_BACKSTAGE extends  LinearOpMode{
     public void Backstage_RightProp_Red(int parking, double timer){
 
         robot.camera.openBackCam();
+
+        robot.wheels.GetDirection(telemetry);
+        telemetry.update();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         robot.claw.setPosition(Claw.INTERMEDIARY);
         sleep(750);

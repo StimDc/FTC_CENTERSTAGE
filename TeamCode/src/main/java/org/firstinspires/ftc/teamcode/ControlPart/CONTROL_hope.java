@@ -117,12 +117,21 @@ public class CONTROL_hope extends OpMode {
         hang=hardwareMap.get(DcMotorEx.class,"s");
         hang.setDirection(DcMotorSimple.Direction.REVERSE);
         hang.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+
+        wheels.GetDirection(telemetry);
+        telemetry.update();
     }
 
 
     @Experimental()
     @Override
     public void loop() {
+
+        wheels.GetDirection(telemetry);
+        telemetry.update();
+
+        wheels.setDirection();
 
         if(!once){
             joint.setPosition(jointpos.UP);

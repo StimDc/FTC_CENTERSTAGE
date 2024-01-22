@@ -55,9 +55,9 @@ import java.io.IOException;
 import java.util.List;
 
 
-@Autonomous(name="RED BACKSTAGE April", group = "Red Routes")
+@Autonomous(name="RED BACKSTAGE AprilFAST", group = "Red Routes")
 
-public class RED_BACKSTAGE_April extends  LinearOpMode{
+public class RED_BACKSTAGE_April_FAST extends  LinearOpMode{
 
     private int PARKING=1; //-1 for left parking and 1 for right
 
@@ -209,7 +209,7 @@ public class RED_BACKSTAGE_April extends  LinearOpMode{
         sleep(500);
         robot.joint.setPosition(Joint.UP);
 
-        robot.move.rotate(-1,0.6,40);
+        robot.move.rotate(-1,0.6,47);
         sleep(250);
 
         robot.wheels.reverseDirection();
@@ -261,7 +261,7 @@ public class RED_BACKSTAGE_April extends  LinearOpMode{
 
                 case 3:
 
-                    if(timerr.seconds()>1){
+                    if(timerr.milliseconds()>250){
                         robot.claw.setPosition(Claw.OPEN);
                         stateArm=4;
                         timerr.reset();
@@ -273,7 +273,7 @@ public class RED_BACKSTAGE_April extends  LinearOpMode{
                 case 4:
 
 
-                    if(Math.abs(robot.claw.getPosition()-Claw.OPEN) <0.03 && timerr.seconds()>1){
+                    if(timerr.milliseconds()>250){
 
                         stateArm=5;
                     }
@@ -287,20 +287,14 @@ public class RED_BACKSTAGE_April extends  LinearOpMode{
                     break;
 
                 case 6:
-                    if(robot.arm.isOnTarget(5)) {
-                        if(Math.abs(TargetPosInDegrees-ZERO_OFFSET)<5){
-
-                            OKtarget=true;
-
-                        }
-                        stateArm=7;
+                    if(robot.arm.getPosition()<175) {
+                        OKtarget=true;
+                        robot.arm.setPower(0);
+                        armtarget=true;
+                        robot.move.lateral(LEFT,0.8,75);
                     }
                     break;
 
-                case 7:
-
-                    armtarget=true;
-                    telemetry.addLine("DONE :D");
             }
 
             if(Math.abs(TargetPosInDegrees-ZERO_OFFSET)<5 && OKtarget){
@@ -320,12 +314,9 @@ public class RED_BACKSTAGE_April extends  LinearOpMode{
             telemetry.update();
         }
 
-         robot.move.lateral(LEFT,0.6,55);
-
-
-        // robot.move.lateral(LEFT,0.6,40);
-       // sleep(250);
-        //robot.move.forward(BACKWARDS,0.6,25);
+      //  robot.move.lateral(LEFT,0.6,55);
+        sleep(250);
+       // robot.move.forward(BACKWARDS,0.6,25);
     }
 
     public void Backstage_CenterProp_Red(int parking,int timer){
@@ -408,7 +399,7 @@ public class RED_BACKSTAGE_April extends  LinearOpMode{
 
                 case 3:
 
-                    if(timerr.seconds()>1){
+                    if(timerr.milliseconds()>250){
                         robot.claw.setPosition(Claw.OPEN);
                         stateArm=4;
                         timerr.reset();
@@ -420,7 +411,7 @@ public class RED_BACKSTAGE_April extends  LinearOpMode{
                 case 4:
 
 
-                    if(Math.abs(robot.claw.getPosition()-Claw.OPEN) <0.03 && timerr.seconds()>1){
+                    if(timerr.milliseconds()>250){
 
                         stateArm=5;
                     }
@@ -434,20 +425,14 @@ public class RED_BACKSTAGE_April extends  LinearOpMode{
                     break;
 
                 case 6:
-                    if(robot.arm.isOnTarget(5)) {
-                        if(Math.abs(TargetPosInDegrees-ZERO_OFFSET)<5){
-
-                            OKtarget=true;
-
-                        }
-                        stateArm=7;
+                    if(robot.arm.getPosition()<175) {
+                        OKtarget=true;
+                        robot.arm.setPower(0);
+                        armtarget=true;
+                        robot.move.lateral(LEFT,0.8,60);
                     }
                     break;
 
-                case 7:
-
-                    armtarget=true;
-                    telemetry.addLine("DONE :D");
             }
 
             if(Math.abs(TargetPosInDegrees-ZERO_OFFSET)<5 && OKtarget){
@@ -466,13 +451,12 @@ public class RED_BACKSTAGE_April extends  LinearOpMode{
             telemetry.addLine("State: "+stateArm);
             telemetry.update();
         }
+        /*
+        robot.move.lateral(LEFT,0.6,58);
+        sleep(250);
+        robot.move.forward(BACKWARDS,0.6,25);
 
-         robot.move.lateral(LEFT,0.6,55);
-
-
-        // robot.move.lateral(LEFT,0.6,58);
-      //  sleep(250);
-       // robot.move.forward(BACKWARDS,0.6,25);
+         */
 
     }
     public void Backstage_RightProp_Red(int parking, double timer){
@@ -490,7 +474,7 @@ public class RED_BACKSTAGE_April extends  LinearOpMode{
 
 
 
-        robot.move.lateral(RIGHT,0.4,21.5);
+        robot.move.lateral(RIGHT,0.4,24);
         sleep(175);
 
         robot.move.forward(FORWARD,0.6,36.5);
@@ -557,7 +541,7 @@ public class RED_BACKSTAGE_April extends  LinearOpMode{
 
                 case 3:
 
-                    if(timerr.seconds()>1){
+                    if(timerr.milliseconds()>250){
                         robot.claw.setPosition(Claw.OPEN);
                         stateArm=4;
                         timerr.reset();
@@ -569,7 +553,7 @@ public class RED_BACKSTAGE_April extends  LinearOpMode{
                 case 4:
 
 
-                    if(Math.abs(robot.claw.getPosition()-Claw.OPEN) <0.03 && timerr.seconds()>1){
+                    if(timerr.milliseconds()>250){
 
                         stateArm=5;
                     }
@@ -583,20 +567,14 @@ public class RED_BACKSTAGE_April extends  LinearOpMode{
                     break;
 
                 case 6:
-                    if(robot.arm.isOnTarget(5)) {
-                        if(Math.abs(TargetPosInDegrees-ZERO_OFFSET)<5){
-
-                            OKtarget=true;
-
-                        }
-                        stateArm=7;
+                    if(robot.arm.getPosition()<175) {
+                        OKtarget=true;
+                        robot.arm.setPower(0);
+                        armtarget=true;
+                        robot.move.lateral(LEFT,0.8,45);
                     }
                     break;
 
-                case 7:
-
-                    armtarget=true;
-                    telemetry.addLine("DONE :D");
             }
 
             if(Math.abs(TargetPosInDegrees-ZERO_OFFSET)<5 && OKtarget){
@@ -616,12 +594,13 @@ public class RED_BACKSTAGE_April extends  LinearOpMode{
             telemetry.update();
         }
 
-         robot.move.lateral(LEFT,0.6,55);
+        /*
 
+        robot.move.lateral(LEFT,0.6,69);
+        sleep(250);
+        robot.move.forward(BACKWARDS,0.6,25);
 
-        //   robot.move.lateral(LEFT,0.6,69);
-     //   sleep(250);
-     //   robot.move.forward(BACKWARDS,0.6,25);
+         */
     }
 
     private double ForwardPID(){
@@ -680,6 +659,7 @@ public class RED_BACKSTAGE_April extends  LinearOpMode{
     }
 
     private double TurnPID(){
+
 
         Targett=robot.move.returnHeadingError(tagID,robot,robot.camera.atag);
 
@@ -744,6 +724,11 @@ public class RED_BACKSTAGE_April extends  LinearOpMode{
 
     public void Go_to_April(){
 
+        ElapsedTime emergency=new ElapsedTime();
+        emergency.reset();
+
+        boolean alarm=false;
+
         boolean done=false;
 
         while(!done){
@@ -751,6 +736,8 @@ public class RED_BACKSTAGE_April extends  LinearOpMode{
             AprilTagDetection detection=robot.move.returnAprilTAg(tagID,robot,robot.camera.atag);
 
             if(detection!=null){
+
+                emergency.reset();
 
                 if(detection.ftcPose.range>=Distancef-2 && detection.ftcPose.range<=Distancef+2 && detection.ftcPose.bearing>=Distancet-7 && detection.ftcPose.bearing<=Distancet+7 && detection.ftcPose.yaw>=Distances-7 && detection.ftcPose.yaw<=Distances+7){
 
@@ -775,7 +762,25 @@ public class RED_BACKSTAGE_April extends  LinearOpMode{
 
             }else{
 
+                if(emergency.seconds()>5){
+
+                    done=true;
+                    alarm=true;
+
+                }
+
                 robot.wheels.setPower(0,0,0,0);
+
+
+            }
+
+        }
+
+        if(alarm){
+
+            robot.move.lateral(RIGHT,0.8,45);
+
+            while(opModeIsActive() && !isStopRequested()){
 
 
             }

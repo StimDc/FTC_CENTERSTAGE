@@ -9,9 +9,6 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.Implementations.DebugTools.CatchingBugs;
-import org.firstinspires.ftc.teamcode.Implementations.Annotations.Experimental;
-import org.firstinspires.ftc.teamcode.Implementations.Annotations.ImplementedBy;
 
 @TeleOp(name = "Pentru Sponsori")
 public class Sponsori extends OpMode {
@@ -43,7 +40,6 @@ public class Sponsori extends OpMode {
 
     }
 
-    @Experimental()
     @Override
     public void loop() {
         leftY = gamepad1.left_stick_y;
@@ -87,7 +83,6 @@ public class Sponsori extends OpMode {
         }
         stopMotor();
         slider.setPower(0);
-        debug();
 
     }
 
@@ -96,8 +91,6 @@ public class Sponsori extends OpMode {
      * Sets the power of the motor attached to the slider
      * @param power is the power that feeds the motor, 0 represents 0V, 1 means MAX V and -1 means the same but in reverse
      */
-    @Experimental
-    @ImplementedBy(name = "Andrei", date="18.09.23")
     public void setPowerSliderMotor(double power){
         slider.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         for(float i = 0;i< abs(power);i+=0.05){
@@ -112,8 +105,6 @@ public class Sponsori extends OpMode {
      * @param signBackLeft tells if the power fed to the back left motor is positive (+1) or negative(-1 )
      * @param signBackRight tells if the power fed to the back right motor is positive (+1) or negative(-1 )
      */
-    //@Experimental
-    @ImplementedBy(name = "Andrei", date="18.09.23")
     public void setPowerWheelMotor(float power, int signFrontLeft, int signFrontRight, int signBackLeft, int signBackRight){
         frontLeft.setPower(signFrontLeft *power);
         frontRight.setPower(signFrontRight * power);
@@ -122,25 +113,13 @@ public class Sponsori extends OpMode {
     }
 
 
-    @Experimental
-    @ImplementedBy(name = "Andrei", date="18.09.23")
     public void stopMotor(){
         frontLeft.setPower(0);
         frontRight.setPower(0);
         backLeft.setPower(0);
         backRight.setPower(0);
     }
-
-    @Experimental
-    @ImplementedBy(name = "Andrei", date="18.09.23")
-    public void debug(){
-        telemetry.addLine("DEBUG");
-        CatchingBugs.getExperimental(telemetry,this.getClass());
-        CatchingBugs.getNameReport(telemetry,"Andrei");
-        debugGamepad(gamepad1);
-        telemetry.update();
-    }
-
+    
     public void debugGamepad(Gamepad gamepad){
         telemetry.addLine("Gamepad debug");
         telemetry.addLine("Left Stick X : " + gamepad.left_stick_x);

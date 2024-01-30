@@ -1,25 +1,15 @@
 package org.firstinspires.ftc.teamcode.ControlPart;
 
-import static java.lang.Math.abs;
-import static android.os.SystemClock.sleep;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.controller.PIDController;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Gamepad;
-import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.Implementations.DebugTools.CatchingBugs;
-import org.firstinspires.ftc.teamcode.Implementations.Annotations.Experimental;
-import org.firstinspires.ftc.teamcode.Implementations.Annotations.ImplementedBy;
 
 
 @Config
@@ -28,10 +18,10 @@ public class PID_ARM extends OpMode {
 
     private PIDController controller;
 
-    public static double p=0.03, i=0, d=0.00001;
-    public static double f=0.05;
+    public static double p=0, i=0, d=0;
+    public static double f=0.04;
 
-    public static int target=3;
+    public static int target=0;
 
     public double val=0;
 
@@ -54,8 +44,6 @@ public class PID_ARM extends OpMode {
 
     }
 
-
-    @Experimental()
     @Override
     public void loop() {
 

@@ -43,8 +43,6 @@ import org.firstinspires.ftc.teamcode.Implementations.Robot.Robot;
 
 import java.io.IOException;
 
-@Photon()
-@Autonomous(name="RED FRONTSTAGE", group = "Red Routes")
 
 public class RED_FRONTSTAGE extends  LinearOpMode{
 
@@ -54,7 +52,9 @@ public class RED_FRONTSTAGE extends  LinearOpMode{
     private int tagID;
     private   final double ZERO_OFFSET = 70.0-3.85;
     private   double TargetPosInDegrees=70.0-3.85;
-    @Override
+    public RED_FRONTSTAGE(Robot robot){
+        this.robot = robot;
+    }
     public void runOpMode () {
 
         try {

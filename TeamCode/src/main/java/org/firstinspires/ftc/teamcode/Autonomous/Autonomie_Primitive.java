@@ -29,73 +29,139 @@
 
 package org.firstinspires.ftc.teamcode.Autonomous;
 
+import com.outoftheboxrobotics.photoncore.Photon;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.Implementations.ChoiceMenu.ChoiceMenu;
+import org.firstinspires.ftc.teamcode.Implementations.Robot.Robot;
 
 import java.io.IOException;
 import java.util.Dictionary;
 
+@Photon
 @Autonomous(name="AUTONOMIE PEIMITIVE", group = "Robot")
 public class Autonomie_Primitive extends LinearOpMode {
     Dictionary<String,String> paramaters;
 
 
-    private String alliance; // RED=1 && BLUE=2
-    private String startpoint; // FRONTSTAGE=1 && BACKSTAGE=2
-    private String parking; // LEFT=1 && RIGHT=2
-    private int wait;//how much to wait in seconds
-
-
     @Override
     public void runOpMode() {
 
+        Robot robot;
         try {
             paramaters = ChoiceMenu.readFromFile();
+            robot = new Robot(hardwareMap,telemetry);
 
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        robot.camera.openFrontCam();
+        double target = robot.arm.ZERO_OFFSET;
+        String propPosition= robot.camera.GetPropPosition();
 
-        alliance=paramaters.get("alliance"); //RED or BLUE
-        startpoint=paramaters.get("position");//FRONT_STAGE or BACK_STAGE
-        parking=paramaters.get("parking");//LEFT or RIGHT
+        boolean once = true;
+
+
+        // RED=1 && BLUE=2
+        String alliance = paramaters.get("alliance"); //RED or BLUE
+        // FRONTSTAGE=1 && BACKSTAGE=2
+        String startpoint = paramaters.get("position");//FRONT_STAGE or BACK_STAGE
+        // LEFT=1 && RIGHT=2
+        String parking = paramaters.get("parking");//LEFT or RIGHT
 
         String timer=paramaters.get("timer");// HOW TO CONVERT FROM STRING TO INT???
 
         try{
-            wait = Integer.parseInt(timer);
+            //how much to wait in seconds
+            int wait = Integer.parseInt(timer);
         }
         catch (NumberFormatException ex){
             ex.printStackTrace();
         }
 
 
-        telemetry.addLine(alliance+" "+startpoint+" "+parking);
+        telemetry.addLine(alliance +" "+ startpoint +" "+ parking);
         telemetry.update();
 
         waitForStart();
 
-        //routeRed.RED_BACKSTAGE(parking,wait);
+        int[] tags = (alliance.equals("RED")) ? new int[]{4, 5, 6} : new int[]{1, 2, 3};
 
+        //TODO: de facut apelurile functiilor corespunzator pentru programe
+        while((propPosition.equals("nope") || once)&& opModeIsActive() && !isStopRequested()){
+            telemetry.addLine("Nope :( " + propPosition);
+            propPosition = robot.camera.GetPropPosition();
 
-        if(alliance=="RED" && startpoint=="FRONT_STAGE"){
+            switch(propPosition){
+                case "left":
+                    telemetry.addLine(propPosition);
+                    int tagID = tags[0];
+                    once = false;
 
-           // routeRed.RED_FRONTSTAGE(parking,wait);
+                    if(alliance.equals("RED") && startpoint.equals("FRONT_STAGE")){
 
-        }else if(alliance=="RED" && startpoint=="BACK_STAGE"){
+                    }
+                    else if(alliance.equals("RED") && startpoint.equals("BACK_STAGE")){
 
-            //routeRed.RED_BACKSTAGE(parking,wait);
+                    }
+                    else if(alliance.equals("BLUE") && startpoint.equals("FRONT_STAGE")){
 
-        }else if(alliance=="BLUE" && startpoint=="FRONT_STAGE"){
+                    }
+                    else if(alliance.equals("BLUE") && startpoint.equals("BACK_STAGE")){
 
-           //routeBlue.BLUE_FRONTSTAGE(parking,wait);
+                    }
+                    else{
 
-        }else if(alliance=="BLUE" && startpoint=="BACK_STAGE"){
+                    }
+                    break;
 
-           //routeBlue.BLUE_BACKSTAGE(parking,wait);
+                case "center":
+                    telemetry.addLine(propPosition);
+                    tagID = tags[1];
+                    once = false;
+                    if(alliance.equals("RED") && startpoint.equals("FRONT_STAGE")){
 
+                    }
+                    else if(alliance.equals("RED") && startpoint.equals("BACK_STAGE")){
+
+                    }
+                    else if(alliance.equals("BLUE") && startpoint.equals("FRONT_STAGE")){
+
+                    }
+                    else if(alliance.equals("BLUE") && startpoint.equals("BACK_STAGE")){
+
+                    }
+                    else{
+
+                    }
+                    break;
+
+                case "right":
+                    telemetry.addLine(propPosition);
+                    tagID = tags[2];
+                    once = false;
+                    if(alliance.equals("RED") && startpoint.equals("FRONT_STAGE")){
+
+                    }
+                    else if(alliance.equals("RED") && startpoint.equals("BACK_STAGE")){
+
+                    }
+                    else if(alliance.equals("BLUE") && startpoint.equals("FRONT_STAGE")){
+
+                    }
+                    else if(alliance.equals("BLUE") && startpoint.equals("BACK_STAGE")){
+
+                    }
+                    else{
+
+                    }
+                    break;
+            }
+            telemetry.update();
+            robot.controlHub.clearBulkCache();
+            robot.expansionHub.clearBulkCache();
         }
+
     }
 }

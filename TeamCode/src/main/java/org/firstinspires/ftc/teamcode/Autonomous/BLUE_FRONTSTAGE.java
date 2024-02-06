@@ -123,7 +123,7 @@ public class BLUE_FRONTSTAGE extends  LinearOpMode{
 
     }
 
-    public void Backstage_LeftProp_Red(int parking,int timer){
+    public  void Backstage_LeftProp_Red(int parking,int timer){
 
         robot.camera.openBackCam();
 

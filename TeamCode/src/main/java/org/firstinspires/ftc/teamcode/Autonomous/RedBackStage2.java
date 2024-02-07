@@ -43,7 +43,7 @@ import java.io.IOException;
 
 @Autonomous(name="RED BACKSTAGE DOI", group = "Red Routes")
 
-public class RED_BACKSTAGE2 extends  LinearOpMode{
+public class RedBackStage2 extends  LinearOpMode{
 
     private int PARKING=1; //-1 for left parking and 1 for right
 

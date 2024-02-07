@@ -112,7 +112,8 @@ public class Autonomie_Primitive extends LinearOpMode {
 
                     }
                     else{
-
+                        telemetry.addLine("Nu merge");
+                        telemetry.update();
                     }
                     break;
 
@@ -133,7 +134,8 @@ public class Autonomie_Primitive extends LinearOpMode {
 
                     }
                     else{
-
+                        telemetry.addLine("Nu merge");
+                        telemetry.update();
                     }
                     break;
 
@@ -154,7 +156,8 @@ public class Autonomie_Primitive extends LinearOpMode {
 
                     }
                     else{
-
+                        telemetry.addLine("Nu merge");
+                        telemetry.update();
                     }
                     break;
             }

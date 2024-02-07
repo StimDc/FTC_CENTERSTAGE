@@ -4,6 +4,10 @@ import static org.firstinspires.ftc.teamcode.Implementations.Constants.Universal
 import static org.firstinspires.ftc.teamcode.Implementations.Constants.UniversalConsts.WHEEL_CIRCUMFERENCE;
 
 public class MathFunc {
+
+    public static double inchToTicksD(double inch){
+        return ((inch/WHEEL_CIRCUMFERENCE)*GO_TICKS_PER_REV);
+    }
     public static int inchToTicks(double inch){
         return (int)((inch/WHEEL_CIRCUMFERENCE)*GO_TICKS_PER_REV);
     }
@@ -15,5 +19,14 @@ public class MathFunc {
     public static double ticksToInch(double ticks){
         return (ticks/GO_TICKS_PER_REV)*WHEEL_CIRCUMFERENCE;
     }
-    
+
+    public static double MaxPower(double a, double b, double c, double d){
+
+        return Math.max(a,Math.max(b,Math.max(c,d)));
+
+
+
+    }
+
+
 }

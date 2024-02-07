@@ -32,24 +32,27 @@ package org.firstinspires.ftc.teamcode.Autonomous;
 import static org.firstinspires.ftc.teamcode.Implementations.Constants.Direction.BACKWARDS;
 import static org.firstinspires.ftc.teamcode.Implementations.Constants.Direction.FORWARD;
 import static org.firstinspires.ftc.teamcode.Implementations.Constants.Direction.LEFT;
+import static org.firstinspires.ftc.teamcode.Implementations.Constants.Direction.RIGHT;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+
 import org.firstinspires.ftc.teamcode.Implementations.Constants.Claw;
 import org.firstinspires.ftc.teamcode.Implementations.Constants.Joint;
 import org.firstinspires.ftc.teamcode.Implementations.Robot.Robot;
 
 import java.io.IOException;
 
-@Autonomous(name="BLUE BACKSTAGE", group = "Blue Routes")
+@Autonomous(name="BLUE FRONTSTAGE", group = "Blue Routes")
 
-public class BLUE_BACKSTAGE extends  LinearOpMode{
+public class BlueFrontStage extends  LinearOpMode{
 
     private int PARKING=1; //-1 for left parking and 1 for right
 
-    private static double target;
+    public static double target;
     private  Robot robot;
+
     private int tagID;
 
     private   final double ZERO_OFFSET = 70.0-3.85;
@@ -64,9 +67,7 @@ public class BLUE_BACKSTAGE extends  LinearOpMode{
         robot.camera.openFrontCam();
         target=robot.arm.ZERO_OFFSET;
 
-
-
-       String propPosition=robot.camera.GetPropPosition();
+        String propPosition=robot.camera.GetPropPosition();
 
         boolean once=true;
 
@@ -77,61 +78,83 @@ public class BLUE_BACKSTAGE extends  LinearOpMode{
             telemetry.addLine("Nope :( "+propPosition);
             propPosition=robot.camera.GetPropPosition();
 
-            telemetry.addLine(propPosition);
-            if(propPosition.equals("left")){
-                tagID=1;
-                once=false;
+            switch (propPosition) {
+                case "left":
 
-                Backstage_LeftProp_Red(PARKING,0);
+                    telemetry.addLine(propPosition);
+                    telemetry.update();
+                    tagID = 1;
+                    once = false;
 
-            }else if(propPosition.equals("center")){
-                tagID=2;
-                once=false;
+                    Backstage_LeftProp_Red(PARKING, 0);
 
-                Backstage_CenterProp_Red(PARKING,0);
+                    break;
+                case "center":
 
-            }else if(propPosition.equals("right")){
-                tagID=3;
-                once=false;
+                    telemetry.addLine(propPosition);
+                    telemetry.update();
+                    tagID = 2;
+                    once = false;
 
-                Backstage_RightProp_Red(PARKING,0);
+                    Backstage_CenterProp_Red(PARKING, 0);
 
+                    break;
+                case "right":
+
+                    telemetry.addLine(propPosition);
+                    telemetry.update();
+                    tagID = 3;
+                    once = false;
+
+                    Backstage_RightProp_Red(PARKING, 0);
+
+                    break;
             }
+
             telemetry.update();
+            robot.controlHub.clearBulkCache();
+            robot.expansionHub.clearBulkCache();
+
         }
+
+
+
+
     }
 
-    public void Backstage_LeftProp_Red(int parking,int timer){
+    public  void Backstage_LeftProp_Red(int parking,int timer){
 
         robot.camera.openBackCam();
 
+
+        robot.camera.openBackCam();
+
+
         robot.claw.setPosition(Claw.INTERMEDIARY);
-        sleep(750);
+        sleep(1000);
         robot.joint.setPosition(Joint.DOWN);
-        sleep(900);
+        sleep(1000);
         robot.claw.setPosition(Claw.CLOSED);
-
-
-
-        robot.move.lateral(LEFT,0.4,21.5);
-        sleep(175);
-
-        robot.move.forward(FORWARD,0.6,36.5);
-        sleep(175);
-        robot.claw.setPosition(Claw.INTERMEDIARY);
-        sleep(250);
-        robot.move.forward(BACKWARDS,0.5,5.5);
-        sleep(175);
-        robot.claw.setPosition(Claw.CLOSED);
-        sleep(250);
+        sleep(1000);
         robot.joint.setPosition(Joint.UP);
 
-        robot.move.rotate(1,0.6,90);
+        robot.move.forward(FORWARD,0.6,50);
         sleep(250);
+
+        robot.move.rotate(-1,0.6,90);
+
+        robot.joint.setPosition(Joint.DOWN);
+        sleep(1000);
+        robot.claw.setPosition(Claw.INTERMEDIARY);
+        sleep(1000);
+        robot.move.forward(BACKWARDS,0.5,5.5);
+        sleep(250);
+        robot.claw.setPosition(Claw.CLOSED);
+        sleep(1000);
+        robot.joint.setPosition(Joint.UP);
+        sleep(1000);
 
         robot.move.Move_to_AprilAllAxes(tagID,robot,robot.camera.atag);
-
-        sleep(250);
 
         int stateArm=0;
 
@@ -144,18 +167,16 @@ public class BLUE_BACKSTAGE extends  LinearOpMode{
                 case 0:
 
                     robot.arm.setPosition(ZERO_OFFSET,1);
-                    TargetPosInDegrees=ZERO_OFFSET;
                     stateArm=1;
                     break;
 
                 case 1:
-                    robot.arm.setPosition(240,6);
-                    TargetPosInDegrees=230;
+                    robot.arm.setPosition(381,1);
                     stateArm=2;
                     break;
 
                 case 2:
-                    if(robot.arm.isOnTarget(6)) {
+                    if(robot.arm.isOnTarget(1)) {
                         stateArm=3;
                     }
                     break;
@@ -178,13 +199,12 @@ public class BLUE_BACKSTAGE extends  LinearOpMode{
 
                 case 5:
                     robot.arm.setPosition(ZERO_OFFSET,1);
-                    TargetPosInDegrees=ZERO_OFFSET;
                     stateArm=6;
                     break;
 
                 case 6:
-                    if(robot.arm.isOnTarget(5)) {
-                        if(Math.abs(TargetPosInDegrees-ZERO_OFFSET)<5){
+                    if(robot.arm.isOnTarget(1)) {
+                        if(Math.abs(robot.arm.targetPosInDegrees-ZERO_OFFSET)<3){
 
                             OKtarget=true;
 
@@ -197,21 +217,19 @@ public class BLUE_BACKSTAGE extends  LinearOpMode{
 
                     armtarget=true;
                     telemetry.addLine("DONE :D");
-
+                    // telemetry.update();
 
             }
 
-            if(Math.abs(TargetPosInDegrees-ZERO_OFFSET)<5 && OKtarget){
+            if(Math.abs(robot.arm.targetPosInDegrees-ZERO_OFFSET)<3 && OKtarget==true){
 
                 robot.arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
                 robot.arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
                 robot.arm.setPower(0);
 
             }
 
-            if(Math.abs(TargetPosInDegrees-ZERO_OFFSET)>=3){
+            if(Math.abs(robot.arm.targetPosInDegrees-robot.arm.ZERO_OFFSET)>=3){
                 OKtarget=false;
 
             }
@@ -220,20 +238,14 @@ public class BLUE_BACKSTAGE extends  LinearOpMode{
                 robot.arm.armTask();
 
             }
-            // telemetry.addLine("Ceva: "+ceva);
-            telemetry.addLine("Pos: "+robot.arm.getPosition());
-            telemetry.addLine("Target: "+TargetPosInDegrees);
+            telemetry.addLine("Pos: "+robot.arm.elevator1.getCurrentPosition());
+            telemetry.addLine("Target: "+target);
             telemetry.addLine("State: "+stateArm);
             telemetry.update();
-
-
         }
+        sleep(1000);
 
-        robot.move.lateral(LEFT,0.6,69);
-
-        sleep(250);
-
-        robot.move.forward(BACKWARDS,0.6,25);
+        robot.move.lateral(RIGHT,0.6,27);
     }
 
     public void Backstage_CenterProp_Red(int parking,int timer){
@@ -261,10 +273,8 @@ public class BLUE_BACKSTAGE extends  LinearOpMode{
         sleep(500);
         robot.joint.setPosition(Joint.UP);
 
-        robot.move.rotate(1,0.6,90);
+        robot.move.rotate(-1,0.6,90);
         sleep(250);
-
-        //   robot.move.forward(BACKWARDS,0.6,30);
 
         robot.move.Move_to_AprilAllAxes(tagID,robot,robot.camera.atag);
 
@@ -334,16 +344,12 @@ public class BLUE_BACKSTAGE extends  LinearOpMode{
 
                     armtarget=true;
                     telemetry.addLine("DONE :D");
-                    // telemetry.update();
 
             }
 
             if(Math.abs(TargetPosInDegrees-ZERO_OFFSET)<5 && OKtarget){
-
                 robot.arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
                 robot.arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
                 robot.arm.setPower(0);
 
             }
@@ -357,6 +363,7 @@ public class BLUE_BACKSTAGE extends  LinearOpMode{
                 robot.arm.armTask();
 
             }
+
             telemetry.addLine("Pos: "+robot.arm.getPosition());
             telemetry.addLine("Target: "+TargetPosInDegrees);
             telemetry.addLine("State: "+stateArm);
@@ -365,7 +372,7 @@ public class BLUE_BACKSTAGE extends  LinearOpMode{
 
         }
 
-        robot.move.lateral(LEFT,0.6,58);
+        robot.move.lateral(RIGHT,0.6,58);
 
         sleep(250);
 
@@ -384,45 +391,41 @@ public class BLUE_BACKSTAGE extends  LinearOpMode{
 
 
 
-        robot.move.forward(FORWARD,0.6,39);
+        robot.move.lateral(RIGHT,0.4,21.5);
         sleep(175);
 
-        robot.move.rotate(1,0.6,51.5);
-        sleep(1500);
-
-
-        robot.move.forward(FORWARD,0.5,12);
-        sleep(750);
-
+        robot.move.forward(FORWARD,0.6,36.5);
+        sleep(175);
         robot.claw.setPosition(Claw.INTERMEDIARY);
-        sleep(750);
-
-
+        sleep(250);
         robot.move.forward(BACKWARDS,0.5,5.5);
         sleep(175);
         robot.claw.setPosition(Claw.CLOSED);
-        sleep(500);
+        sleep(250);
         robot.joint.setPosition(Joint.UP);
 
-        robot.move.rotate(1,0.6,40);
+        robot.move.rotate(-1,0.6,90);
         sleep(250);
-
-
 
         robot.move.Move_to_AprilAllAxes(tagID,robot,robot.camera.atag);
 
-        sleep(250);
+        sleep(500);
 
         int stateArm=0;
 
         boolean armtarget=false,OKtarget=false;
+
         while(!armtarget){
+
             switch (stateArm){
+
                 case 0:
+
                     robot.arm.setPosition(ZERO_OFFSET,1);
                     TargetPosInDegrees=ZERO_OFFSET;
                     stateArm=1;
                     break;
+
                 case 1:
                     robot.arm.setPosition(240,6);
                     TargetPosInDegrees=230;
@@ -442,62 +445,42 @@ public class BLUE_BACKSTAGE extends  LinearOpMode{
                         stateArm=5;
                     }
                     break;
-
-
                 case 5:
                     robot.arm.setPosition(ZERO_OFFSET,1);
                     TargetPosInDegrees=ZERO_OFFSET;
                     stateArm=6;
                     break;
-
                 case 6:
                     if(robot.arm.isOnTarget(5)) {
                         if(Math.abs(TargetPosInDegrees-ZERO_OFFSET)<5){
-
                             OKtarget=true;
-
                         }
                         stateArm=7;
                     }
                     break;
-
                 case 7:
-
                     armtarget=true;
                     telemetry.addLine("DONE :D");
-
-
             }
 
             if(Math.abs(TargetPosInDegrees-ZERO_OFFSET)<5 && OKtarget){
-
                 robot.arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
                 robot.arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
                 robot.arm.setPower(0);
-
             }
-
             if(Math.abs(TargetPosInDegrees-ZERO_OFFSET)>=3){
                 OKtarget=false;
-
             }
-
             if(!OKtarget){
                 robot.arm.armTask();
-
             }
             telemetry.addLine("Pos: "+robot.arm.getPosition());
             telemetry.addLine("Target: "+TargetPosInDegrees);
             telemetry.addLine("State: "+stateArm);
             telemetry.update();
         }
-
-        robot.move.lateral(LEFT,0.6,40);
-
+        robot.move.lateral(RIGHT,0.6,69);
         sleep(250);
-
         robot.move.forward(BACKWARDS,0.6,25);
     }
 }

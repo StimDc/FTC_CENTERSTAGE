@@ -1,8 +1,10 @@
 package org.firstinspires.ftc.teamcode.Implementations.Robot;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class Wheels {
 
@@ -21,10 +23,29 @@ public class Wheels {
     }
 
     public void setDirection(){
-        this.frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        this.frontRight.setDirection(DcMotorSimple.Direction.FORWARD);
-        this.backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        this.backRight.setDirection(DcMotorSimple.Direction.FORWARD);
+        this.frontLeft.setDirection(DcMotorEx.Direction.REVERSE);
+        this.frontRight.setDirection(DcMotorEx.Direction.FORWARD);
+        this.backLeft.setDirection(DcMotorEx.Direction.REVERSE);
+        this.backRight.setDirection(DcMotorEx.Direction.FORWARD);
+    }
+
+    public void reverseDirection(){
+        this.frontLeft.setDirection(DcMotorEx.Direction.FORWARD);
+        this.frontRight.setDirection(DcMotorEx.Direction.REVERSE);
+        this.backLeft.setDirection(DcMotorEx.Direction.FORWARD);
+        this.backRight.setDirection(DcMotorEx.Direction.REVERSE);
+    }
+
+
+
+    public void GetDirection(Telemetry telemetry){
+
+        telemetry.addLine("Front Left: "+frontLeft.getDirection());
+        telemetry.addLine("Front Right: "+frontRight.getDirection());
+        telemetry.addLine("Back Left: "+backLeft.getDirection());
+        telemetry.addLine("Back Right: "+backRight.getDirection());
+
+
     }
 
     public void setPower(double frontLeftPower, double frontRightPower, double backLeftPower, double backRightPower){
@@ -61,9 +82,10 @@ public class Wheels {
         this.backRight.setTargetPosition(backRightTarget);
     }
 
-    @SuppressWarnings("StatemenentWithEmptyBody")
     public void waitMotors(){
-        while(this.frontRight.isBusy() && this.frontLeft.isBusy() && this.backRight.isBusy() && this.backLeft.isBusy());
+        while(this.frontRight.isBusy() && this.frontLeft.isBusy() && this.backRight.isBusy() && this.backLeft.isBusy()){
+
+        }
     }
 
     public boolean isDistNotReached(double dist){

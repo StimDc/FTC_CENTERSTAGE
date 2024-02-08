@@ -1,11 +1,13 @@
-package org.firstinspires.ftc.teamcode.Experimental;
+package org.firstinspires.ftc.teamcode.ControlPart;
 
+import static org.firstinspires.ftc.teamcode.Implementations.Constants.Direction.RIGHT;
 import static org.firstinspires.ftc.teamcode.Implementations.Constants.UniversalConsts.HEADING_ERROR_GAIN;
 import static org.firstinspires.ftc.teamcode.Implementations.Constants.UniversalConsts.MAX_HEADING;
 import static org.firstinspires.ftc.teamcode.Implementations.Constants.UniversalConsts.MAX_RANGE;
 import static org.firstinspires.ftc.teamcode.Implementations.Constants.UniversalConsts.MAX_YAW;
 import static org.firstinspires.ftc.teamcode.Implementations.Constants.UniversalConsts.RANGE_ERROR_GAIN;
 import static org.firstinspires.ftc.teamcode.Implementations.Constants.UniversalConsts.YAW_ERROR_GAIN;
+import static org.firstinspires.ftc.teamcode.Implementations.Math.MathFunc.MaxPower;
 
 import android.util.Size;
 
@@ -50,12 +52,9 @@ public class Experiment_Control extends OpMode {
     static final double CLAWCLOSED=0.655444d, CLAWOPEN=0.377222d, CLAWINTERMEDIARY=0.555d;
     static final double JOINTUP=1, JOINTDOWN=0.119333d;
 
-    static final double AVIONSTART=0, AVIONRELEASE=0.5d;
-
 
     private DcMotorEx viper,hang;
 
-    private DcMotor frontLeft,frontRight, backLeft, backRight;
 
     public Wheels wheels;
 
@@ -286,13 +285,6 @@ public class Experiment_Control extends OpMode {
         double strafe=0;
         double turn =0;
 
-      /*NORMAL METHOD
-        drive=-gamepad1.left_stick_y/2.0;
-        strafe=-gamepad1.left_stick_x/2.0;
-        turn=-gamepad1.right_stick_x/3.0;
-       */
-
-
         aprilk=false;
 
         // If Left Bumper is being pressed, AND we have found the desired target, Drive to target Automatically .
@@ -330,6 +322,13 @@ public class Experiment_Control extends OpMode {
             }
             setPosition(armTarget,0.6);
             eleDown=false;
+
+        }else if(gamepad2.left_bumper){
+
+                armTarget=210;
+                setPosition(armTarget,0.6);
+                eleDown=false;
+
 
         }else if(gamepad2.left_bumper){
             armTarget=ZERO_OFFSET;
@@ -400,62 +399,6 @@ public class Experiment_Control extends OpMode {
 
     }
 
-    public void moveElevator(){
-
-        controller.setPID(p,i,d);
-        int elepos=elevator1.getCurrentPosition();
-
-        double pid=controller.calculate(elepos, target);
-        double ff=Math.cos(Math.toRadians(target/ticks_in_degrees))*f;
-
-        double power = pid + ff;
-
-        power = power < -0.15 ? -0.15 : Math.min(power, 0.7);
-
-
-        elevator1.setPower(power);
-        elevator2.setPower(power);
-
-        telemetry.addData("pos ",elepos);
-        telemetry.addData("target ", target);
-        telemetry.update();
-
-        if(gamepad2.left_trigger>0 && elevator1.getCurrentPosition()>=val-2 && elevator1.getCurrentPosition()<=val+2 && val+20<=300){
-
-            val=elevator1.getCurrentPosition()+10;
-
-            // val+=gamepad2.left_trigger*5;
-            // val+=20;
-        }else if(gamepad2.right_trigger>0 && val-gamepad2.right_trigger>0){
-            val-=gamepad2.right_trigger*0.75;
-        }
-
-        else if(gamepad2.left_trigger==0 && gamepad2.right_trigger==0){
-
-            val=elevator1.getCurrentPosition();
-
-        }
-
-
-
-        target=(int) val;
-
-        if(target<=0 && elepos>=-5 && elepos<=5){
-            elevator1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            elevator2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-            elevator1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            elevator2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-            elevator1.setPower(0);
-            elevator2.setPower(0);
-
-            val=0;
-        }
-
-        target=(int) val;
-
-    }
 
     public void InitCamera(){
 
@@ -504,127 +447,6 @@ public class Experiment_Control extends OpMode {
 
     }
 
-    public void Move_to_AprilAxes() {
-
-        AprilTagDetection desiredTag = null;
-        boolean targetFound = false;
-        boolean ok = false;
-        int oldtarget = -1;
-
-        int help=0, ceva=1;
-
-        boolean okHeading = false, okYaw = false, okRange = false;
-
-        double rangeError = 100, headingError = 0, yawError = 0;
-
-
-        //while (!ok && opModeIsActive() && !isStopRequested()) {
-
-        targetFound = false;
-        List<AprilTagDetection> currentDetections = apriltagProcesor.getDetections();
-        for (AprilTagDetection detection : currentDetections) {
-            if ((detection.metadata != null) && (detection.id==5 || detection.id==2)) {
-                targetFound = true;
-                desiredTag = detection;
-                break;  // don't look any further.
-            }
-        }
-
-        if (targetFound) {
-
-            rangeError = desiredTag.ftcPose.range - 7;// pentru red center backdrop: 10 sau 10.5 pentru red right backdrop: 9
-
-
-            headingError = desiredTag.ftcPose.bearing;//5
-
-
-            yawError = desiredTag.ftcPose.yaw+2.3; //1.7795
-
-               /* if(okRange==true){
-                    rangeError=0;
-                }
-
-                if(okRange==true && okHeading==true){
-
-                    headingError=0;
-
-                }
-                if(okRange==true && okYaw==true){
-
-                    yawError=0;
-
-                }
-
-                */
-
-            // Use the speed and turn "gains" to calculate how we want the robot to move.
-            double drive = Range.clip(rangeError * RANGE_ERROR_GAIN, -MAX_RANGE, MAX_RANGE);
-            double turn = Range.clip(headingError * HEADING_ERROR_GAIN, -MAX_HEADING, MAX_HEADING);
-            double strafe = Range.clip(-yawError * YAW_ERROR_GAIN, -MAX_YAW, MAX_YAW);
-
-
-            help=0;
-
-            moveRobot(-drive, -strafe, turn);
-
-
-        } else {
-
-                /*
-                help=help+ceva;
-
-                if(help==100000){
-
-                    help=0;
-                    ceva=ceva*(-1);
-                    robot.move.generalMovement(0, 0, 100);
-
-
-                }else if(help==-100000){
-
-                    help=0;
-                    ceva=ceva*(-1);
-                    robot.move.generalMovement(0, 0, -100);
-
-                }
-
-                 */
-
-            moveRobot(0, 0, 0);
-        }
-
-            /*
-            else{
-                okRange=false;
-            }
-
-            if(headingError>-1 && headingError<1){
-                okHeading=true;
-            }else{
-                okHeading=false;
-            }
-
-            if(yawError>-1 && yawError<1){
-                okYaw=true;
-            }else{
-                okYaw=false;
-            }
-
-            if(okYaw==true && okHeading==true && okRange==true){
-
-                ok=true;
-                robot.move.generalMovement(0,0,0);
-
-
-            }
-
-             */
-
-
-
-
-    }
-
     private static final double MOTOR_CPR = 288.0;
     private static final double GEAR_RATIO = 125.0 / 45.0;
     private static final double ARM_TICKS_PER_DEGREE = MOTOR_CPR * GEAR_RATIO / 360.0;
@@ -670,15 +492,10 @@ public class Experiment_Control extends OpMode {
         return ticksToRealWorldDegrees(elevator1.getCurrentPosition());
     }
 
-
-
-/*
-
-
     private double ForwardPID(){
 
 
-        Targetf=move.returnRangeError(tagID,robot,robot.camera.atag);
+    //    Targetf=robot.move.returnRangeError(tagID,robot,robot.camera.atag);
 
         double power;
 
@@ -700,10 +517,11 @@ public class Experiment_Control extends OpMode {
         //  robot.wheels.setPower(-power,-power,-power,-power);
 
     }
+    /*
 
     private double StrafePID(){
 
-        Targets=robot.move.returnYawError(tagID,robot,robot.camera.atag);
+    //    Targets=robot.move.returnYawError(tagID,robot,robot.camera.atag);
 
         // target=matee.inchToTicksD(target);
 
@@ -732,7 +550,8 @@ public class Experiment_Control extends OpMode {
 
     private double TurnPID(){
 
-        Targett=robot.move.returnHeadingError(tagID,robot,robot.camera.atag);
+
+      //  Targett=robot.move.returnHeadingError(tagID,robot,robot.camera.atag);
 
         double power;
 
@@ -765,7 +584,7 @@ public class Experiment_Control extends OpMode {
         double powerBackLeft=-powerForward+powerStrafe-powerTurn;
         double powerBackRight=-powerForward-powerStrafe+powerTurn;
 
-        double maxPower=mate.MaxPower(powerFrontLeft,powerFrontRight,powerBackLeft,powerBackRight);
+        double maxPower=MaxPower(powerFrontLeft,powerFrontRight,powerBackLeft,powerBackRight);
 
         if(maxPower>1){
 
@@ -775,7 +594,7 @@ public class Experiment_Control extends OpMode {
             powerBackRight/=maxPower;
         }
 
-        maxPower=mate.MaxPower(powerFrontLeft,powerFrontRight,powerBackLeft,powerBackRight);
+        maxPower=MaxPower(powerFrontLeft,powerFrontRight,powerBackLeft,powerBackRight);
 
         if(maxPower>POWER_LiMIT){
 
@@ -788,7 +607,7 @@ public class Experiment_Control extends OpMode {
         }
 
 
-        robot.wheels.setPower(powerFrontLeft,powerFrontRight,powerBackLeft,powerBackRight);
+        wheels.setPower(powerFrontLeft,powerFrontRight,powerBackLeft,powerBackRight);
 
 
     }
@@ -799,15 +618,14 @@ public class Experiment_Control extends OpMode {
 
         while(!done){
 
-            AprilTagDetection detection=robot.move.returnAprilTAg(tagID,robot,robot.camera.atag);
+            AprilTagDetection detection=move.returnAprilTAg(tagID,robot,robot.camera.atag);
 
             if(detection!=null){
 
                 if(detection.ftcPose.range>=Distancef-2 && detection.ftcPose.range<=Distancef+2 && detection.ftcPose.bearing>=Distancet-7 && detection.ftcPose.bearing<=Distancet+7 && detection.ftcPose.yaw>=Distances-7 && detection.ftcPose.yaw<=Distances+7){
 
                     hope=1;
-                    done=true;
-                    robot.wheels.setPower(0,0,0,0);
+
 
                 }else if(hope==0){
                     AprilPID();
@@ -820,37 +638,16 @@ public class Experiment_Control extends OpMode {
                 telemetry.addLine("Yaw: "+detection.ftcPose.yaw);
 
 
-
-
+            //
 
                 //  telemetry.update();
-
-            }else{
-
-                robot.wheels.setPower(0,0,0,0);
-
 
             }
 
         }
 
-
     }
-
- */
-
-
-
-
-
-
-
-
-
-
-
-
-
+    */
 
 }
 

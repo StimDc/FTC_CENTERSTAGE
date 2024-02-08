@@ -21,6 +21,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 
+import org.checkerframework.common.value.qual.StringVal;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Implementations.Math.MathFunc;
@@ -819,7 +820,7 @@ public class Movement {
         targetFound = false;
         List<AprilTagDetection> currentDetections = atag.getDetections();
         for (AprilTagDetection detection : currentDetections) {
-            if ((detection.metadata != null) && (detection.id == idtag || idtag==0)) {
+            if ((detection.metadata != null) && (detection.id == idtag || idtag==0 || detection.id-3==idtag || detection.id+3==idtag)) {
                 targetFound = true;
                 desiredTag = detection;
                 break;  // don't look any further.
@@ -838,6 +839,65 @@ public class Movement {
         }
 
     }
+
+
+    public void showAprilTags(Robot robot, AprilTagProcessor atag){
+
+
+        String s;
+        boolean ok=false;
+        //while (!ok && opModeIsActive() && !isStopRequested()) {
+
+        int[] fr={0,0,0,0,0,0,0,0,0,0,0};
+
+        List<AprilTagDetection> currentDetections = atag.getDetections();
+        for (AprilTagDetection detection : currentDetections) {
+            if (detection.metadata != null) {
+
+                fr[detection.id]=1;
+
+            }
+        }
+
+        for(int i=1;i<=6;i++){
+
+            if(fr[i]!=0){
+
+                ok=true;
+
+                s= String.valueOf(i);
+
+                telemetry.addLine(s);
+
+            }
+
+        }
+        if(ok==false){
+
+            telemetry.addLine("Nope Atags :/");
+
+        }
+
+
+    }
+
+
+    public boolean anyAprilTags (Robot robot, AprilTagProcessor atag){
+
+        List<AprilTagDetection> currentDetections = atag.getDetections();
+        for (AprilTagDetection detection : currentDetections) {
+            if (detection.metadata != null) {
+
+
+                return true;
+            }
+        }
+
+        return false;
+
+    }
+
+
 
 
 }

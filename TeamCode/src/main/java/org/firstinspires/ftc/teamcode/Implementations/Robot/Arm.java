@@ -16,12 +16,13 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Implementations.Constants.PIDConstantsArm;
 
 public class Arm {
-    public PIDController controller;
+    public PIDController controller,armControl;
     public DcMotorEx elevator1, elevator2;
     public Telemetry telemetry;
     private static int target = 3;
 
     public Arm(HardwareMap hardwareMap, Telemetry telemetry){
+        this.armControl=new PIDController(PIDConstantsArm.pNEW,PIDConstantsArm.iNEW,PIDConstantsArm.dNEW);
         this.controller = new PIDController(PIDConstantsArm.p,PIDConstantsArm.i,PIDConstantsArm.d);
         this.telemetry =new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
@@ -134,6 +135,48 @@ public class Arm {
         {
             return ticksToRealWorldDegrees(elevator1.getCurrentPosition());
         }
+
+
+
+
+
+    public void armTaskC()
+    {
+        double targetPosInTicks = (targetPosInDegrees - ZERO_OFFSET) * ARM_TICKS_PER_DEGREE;
+        double currPosInTicks = this.elevator1.getCurrentPosition();
+        double pidOutput = this.armControl.calculate(currPosInTicks, targetPosInTicks);
+        // This ff is assuming arm at horizontal position is 90-degree.
+        double ff = PIDConstantsArm.fNEW * Math.sin(Math.toRadians(ticksToRealWorldDegrees(currPosInTicks)));
+        double power = pidOutput + ff;
+        // Clip power to the range of -powerLimit to powerLimit.
+        power = power < -powerLimit ? -powerLimit : Math.min(power, powerLimit);
+        this.elevator1.setPower(power);
+        this.elevator2.setPower(power);
+    }
+
+    public boolean isOnTargetC(double toleranceInDegrees)
+    {
+        double currPosInDegrees = getPosition();
+        return Math.abs(targetPosInDegrees - currPosInDegrees) <= toleranceInDegrees;
+    }
+
+    public void setPositionC(double targetPosInDegrees, double powerLimit)
+    {
+        this.targetPosInDegrees = targetPosInDegrees;
+        this.powerLimit = Math.abs(powerLimit);
+    }
+
+
+    public double ticksToRealWorldDegreesC(double ticks)
+    {
+        return ticks / ARM_TICKS_PER_DEGREE + ZERO_OFFSET;
+    }
+
+    public double getPositionC()
+    {
+        return ticksToRealWorldDegrees(elevator1.getCurrentPosition());
+    }
+
 
         //
     // In your OpMode

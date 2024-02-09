@@ -81,7 +81,7 @@ public class NEW_Control extends OpMode {
     public static double Pt=0.02d, It=0.01d, Dt=0.00005d;
 
 
-    private static double Targetf=0,Targets=0,Targett;
+    private static double Targetf=1,Targets=1,Targett=1;
 
     public double val=0;
 
@@ -90,10 +90,10 @@ public class NEW_Control extends OpMode {
     public static double Distancef =8,Distances=6,Distancet=6;
     public static double DistancefAVION =18,DistancesAVION=15,DistancetAVION=15;
 
-    public static double DistancefBACKDROP =8,DistancesBACKDROP=6,DistancetBACKDROP=6;
+    public static double DistancefBACKDROP =8,DistancesBACKDROP=2,DistancetBACKDROP=5;
 
 
-    public static double POWER_LiMIT=0.7;
+    public static double POWER_LiMIT=0.3;
 
     private int hope=0;
 
@@ -139,8 +139,8 @@ public class NEW_Control extends OpMode {
 
     @Override
     public void loop() {
-        robot.wheels.setDirection();
-        robot.arm.armTask();
+        robot.wheels.reverseDirection();
+        robot.arm.armTaskC();
 
         if(!once){
             robot.joint.setPosition(UP);
@@ -262,6 +262,7 @@ public class NEW_Control extends OpMode {
         }else{
 
             // change color control hub to red
+            telemetry.addLine("No April Tags :(");
 
         }
 
@@ -275,7 +276,7 @@ public class NEW_Control extends OpMode {
             Distances=DistancesBACKDROP;
             Distancet=DistancetBACKDROP;
 
-            robot.wheels.reverseDirection();
+           robot.wheels.setDirection();
 
             Go_to_April();
 
@@ -293,7 +294,7 @@ public class NEW_Control extends OpMode {
             Distances=DistancesBACKDROP;
             Distancet=DistancetBACKDROP;
 
-            robot.wheels.reverseDirection();
+           robot.wheels.setDirection();
 
             Go_to_April();
 
@@ -310,7 +311,7 @@ public class NEW_Control extends OpMode {
             Distances=DistancesBACKDROP;
             Distancet=DistancetBACKDROP;
 
-            robot.wheels.reverseDirection();
+          robot.wheels.setDirection();
 
             Go_to_April();
         }
@@ -327,13 +328,13 @@ public class NEW_Control extends OpMode {
             Distances=DistancesAVION;
             Distancet=DistancetAVION;
 
-            robot.wheels.reverseDirection();
+            robot.wheels.setDirection();
 
             Go_to_April();
         }
         else{
 
-            robot.wheels.setDirection();
+            robot.wheels.reverseDirection();
             aprilk=false;
 
         }
@@ -357,14 +358,14 @@ public class NEW_Control extends OpMode {
             moveRobot(drive,strafe,turn);
         }
 
-
+        //BRAT
         if(gamepad2.left_trigger>0){ // arm goes up
 
             if(timerr.seconds()>0.1 && armTarget<=270){
                 armTarget+=gamepad2.left_trigger*10;
                 timerr.reset();
             }
-            robot.arm.setPosition(armTarget,0.6);
+            robot.arm.setPositionC(armTarget,0.6);
             eleDown=false;
 
         }
@@ -372,7 +373,7 @@ public class NEW_Control extends OpMode {
         else if(gamepad2.left_bumper){ // arm goes up automatically
 
             armTarget=210;
-            robot.arm.setPosition(armTarget,0.6);
+            robot.arm.setPositionC(armTarget,0.6);
             eleDown=false;
 
 
@@ -381,7 +382,7 @@ public class NEW_Control extends OpMode {
         else if(gamepad2.right_bumper){ // arm goes down automatically
             armTarget=ZERO_OFFSET;
 
-            robot.arm.setPosition(ZERO_OFFSET,0.45);
+            robot.arm.setPositionC(ZERO_OFFSET,0.45);
             eleDown=true;
 
 
@@ -389,24 +390,24 @@ public class NEW_Control extends OpMode {
 
         else if(gamepad2.right_trigger>0){ // arm goes down
 
-            if(timerr.seconds()>0.1 && armTarget-gamepad2.right_trigger*10>=ZERO_OFFSET){
+            if(timerr.seconds()>0.1 && armTarget-gamepad2.right_trigger*10>ZERO_OFFSET){
                 armTarget-=gamepad2.right_trigger*10;
                 timerr.reset();
             }
 
-            robot.arm.setPosition(armTarget,0.45);
+            robot.arm.setPositionC(armTarget,0.45);
             eleDown=true;
 
 
         }
 
-        if(Math.abs(robot.arm.getPosition()-ZERO_OFFSET)<5 && eleDown){
+        if(Math.abs(robot.arm.getPositionC()-ZERO_OFFSET)<5 && eleDown){
 
             robot.arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
             robot.arm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-            robot.arm.setPower(0.0);
+            robot.arm.setPower(0);
         }
 
         telemetry.update();
@@ -443,7 +444,7 @@ public class NEW_Control extends OpMode {
     private double ForwardPID(){
 
 
-        //    Targetf=robot.move.returnRangeError(tagID,robot,robot.camera.atag);
+         Targetf=robot.move.returnRangeError(tagID,robot,robot.camera.atag);
 
         double power;
 
@@ -470,7 +471,7 @@ public class NEW_Control extends OpMode {
 
     private double StrafePID(){
 
-        //    Targets=robot.move.returnYawError(tagID,robot,robot.camera.atag);
+         Targets=robot.move.returnYawError(tagID,robot,robot.camera.atag);
 
         // target=matee.inchToTicksD(target);
 
@@ -500,7 +501,7 @@ public class NEW_Control extends OpMode {
     private double TurnPID(){
 
 
-        //  Targett=robot.move.returnHeadingError(tagID,robot,robot.camera.atag);
+          Targett=robot.move.returnHeadingError(tagID,robot,robot.camera.atag);
 
         double power;
 
@@ -568,15 +569,21 @@ public class NEW_Control extends OpMode {
 
             if(detection!=null){
 
-                if(detection.ftcPose.range>=Distancef-2 && detection.ftcPose.range<=Distancef+2 && detection.ftcPose.bearing>=Distancet-7 && detection.ftcPose.bearing<=Distancet+7 && detection.ftcPose.yaw>=Distances-7 && detection.ftcPose.yaw<=Distances+7){
+
+
+                if(detection.ftcPose.range>=Distancef-2 && detection.ftcPose.range<=Distancef+7 && detection.ftcPose.bearing>=Distancet-7 && detection.ftcPose.bearing<=Distancet+7 && detection.ftcPose.yaw>=Distances-7 && detection.ftcPose.yaw<=Distances+7){
 
                     robot.wheels.setPower(0);
+                    telemetry.addLine("AJUNS");
 
 
                 }else{
                     AprilPID();
+                    telemetry.addLine("PID YAY");
 
                 }
+
+
 
                 /*
 

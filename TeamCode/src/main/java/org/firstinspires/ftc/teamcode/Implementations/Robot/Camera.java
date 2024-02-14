@@ -103,7 +103,26 @@ public class Camera {
         while(vision.getCameraState()!=VisionPortal.CameraState.STREAMING){
 
         }
+
     }
+
+    public void FrontCamAtag(){
+
+        if(vision.getCameraState()== VisionPortal.CameraState.STREAMING){
+            vision.setActiveCamera(frontCam);
+        }
+
+        vision.setProcessorEnabled(atag,true);
+        //vision.setProcessorEnabled(redPropThresholdBackstage,true);
+        vision.setProcessorEnabled(this.processor,false);
+
+
+        while(vision.getCameraState()!=VisionPortal.CameraState.STREAMING){
+
+        }
+
+    }
+
     public void getProcessor(){
         if(robot.parameter.get("alliance").equals("RED") &&
                 robot.parameter.get("position").equals("BACK_STAGE")){

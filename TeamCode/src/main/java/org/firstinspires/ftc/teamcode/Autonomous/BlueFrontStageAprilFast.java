@@ -43,9 +43,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.Implementations.Camera.BluePropThreshold_Backstage;
-import org.firstinspires.ftc.teamcode.Implementations.Camera.RedPropThreshold_Backstage;
-import org.firstinspires.ftc.teamcode.Implementations.Camera.RedPropThreshold_Backstage;
 import org.firstinspires.ftc.teamcode.Implementations.Constants.Claw;
 import org.firstinspires.ftc.teamcode.Implementations.Constants.Joint;
 import org.firstinspires.ftc.teamcode.Implementations.Math.MathFunc;
@@ -54,9 +51,10 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 import java.io.IOException;
 
-@Autonomous(name="BLUE BACKSTAGE April FAST", group = "Blue Routes")
+@Autonomous(name="BLUE FRONTSTAGE April FastE", group = "Blue Routes")
 
-public class BlueBackStageAprilFast extends  LinearOpMode{
+public class BlueFrontStageAprilFast extends  LinearOpMode{
+
     private int PARKING=1; //-1 for left parking and 1 for right
     //  private BluePropThreshold_Backstage blueProp;
     private PIDController controller;
@@ -68,6 +66,7 @@ public class BlueBackStageAprilFast extends  LinearOpMode{
 
     private final double ticks_in_degrees=288*(125/45.0)/360; /// gear ratio: 45/125=0.36
 
+    private DcMotorEx elevator1, elevator2;
     private  Robot robot;
 
     private int tagID;
@@ -79,6 +78,10 @@ public class BlueBackStageAprilFast extends  LinearOpMode{
     private ElapsedTime AUTO;
 
 
+
+
+
+    public MathFunc mate;
 
 
     public FtcDashboard dashboard;
@@ -95,9 +98,9 @@ public class BlueBackStageAprilFast extends  LinearOpMode{
 
 
 
-    public static double Distancef =8,Distances=6,Distancet=6;
+    public static double Distancef =8,Distances=0,Distancet=0;//-10
 
-    public static double POWER_LiMIT=0.7;
+    public static double POWER_LiMIT=0.7;//0.7
 
     private int hope=0;
 
@@ -152,6 +155,7 @@ public class BlueBackStageAprilFast extends  LinearOpMode{
         while ((propPosition.equals("nope") || once) && opModeIsActive() && !isStopRequested()){
 
             telemetry.addLine("Nope :( "+propPosition);
+
             propPosition=robot.camera.GetPropPosition();
             // propPosition="center";
 
@@ -171,7 +175,7 @@ public class BlueBackStageAprilFast extends  LinearOpMode{
                 tagID=2;
                 once=false;
 
-                Backstage_CenterProp_Red(PARKING,0);
+                Frontstage_CenterProp_Blue(PARKING,0);
 
             }else if(propPosition.equals("right")){
 
@@ -296,11 +300,11 @@ public class BlueBackStageAprilFast extends  LinearOpMode{
                     break;
 
                 case 6:
-                    if(robot.arm.getPosition()<175) {
+                    if(robot.arm.getPosition()<160) {
                         OKtarget=true;
                         robot.arm.setPower(0);
                         armtarget=true;
-                        robot.move.lateral(LEFT,0.8,45);
+                        robot.move.lateral(RIGHT,0.8,45);
                     }
                     break;
 
@@ -326,26 +330,27 @@ public class BlueBackStageAprilFast extends  LinearOpMode{
 
         robot.move.lateral(LEFT,0.6,69);
 
-        sleep(250);
+        sleep(250)
 
         robot.move.forward(BACKWARDS,0.6,25);
 
          */
     }
 
-    public void Backstage_CenterProp_Red(int parking,int timer){
+    public void Frontstage_CenterProp_Blue(int parking,int timer){
 
-        robot.camera.openBackCam();
+        robot.camera.FrontCamAtag();
 
-        robot.claw.setPosition(Claw.INTERMEDIARY);
-        sleep(750);
-        robot.joint.setPosition(Joint.DOWN);
-        sleep(900);
+        robot.wheels.GetDirection(telemetry);
+        telemetry.update();
+
+
         robot.claw.setPosition(Claw.CLOSED);
+        sleep(500);
 
+        robot.joint.setPosition(Joint.DOWN);
 
-
-        robot.move.lateral(LEFT,0.4,8);
+        robot.move.lateral(RIGHT,0.4,8);
         sleep(175);
 
         robot.move.forward(FORWARD,0.6,57);
@@ -361,13 +366,60 @@ public class BlueBackStageAprilFast extends  LinearOpMode{
         robot.move.rotate(1,0.6,90);
         sleep(250);
 
-        //   robot.move.forward(BACKWARDS,0.6,30);
+        robot.move.lateral(LEFT,0.3,6.5);
+
+        int oldtag=tagID;
+        double oldPower=POWER_LiMIT;
+
+        POWER_LiMIT=0.3;
+
+        tagID=9;
+
+
+
+             robot.wheels.reverseDirection();
+
+        TurnPrecision();
+
+             robot.wheels.setDirection();
+
+
+
+        telemetry.addLine("Tag ID: "+tagID);
+
+
+        robot.camera.openBackCam();
+
+        tagID=oldtag;
+        POWER_LiMIT=oldPower;
+
+        telemetry.addLine("Tag ID: "+tagID);
+
+
+        Targetf=0;
+        Targets=0;
+        Targett=0;
+
+        Distancef =8;
+        Distances=6;
+        Distancet=6;
+
+        telemetry.addLine("Tag ID: "+tagID);
+
+        hope=0;
+
+        sleep(250);
+
+        robot.move.forward(BACKWARDS,0.7,150);
+
 
         robot.wheels.reverseDirection();
 
         Go_to_April();
 
         robot.wheels.setDirection();
+
+
 
         ElapsedTime timerr=new ElapsedTime();
 
@@ -442,7 +494,7 @@ public class BlueBackStageAprilFast extends  LinearOpMode{
                         OKtarget=true;
                         robot.arm.setPower(0);
                         armtarget=true;
-                        robot.move.lateral(LEFT,0.8,45);
+                        robot.move.lateral(LEFT,0.8,60);
                     }
                     break;
 
@@ -464,12 +516,14 @@ public class BlueBackStageAprilFast extends  LinearOpMode{
             telemetry.addLine("State: "+stateArm);
             telemetry.update();
         }
+
+
+
+
+
         /*
-
         robot.move.lateral(LEFT,0.6,58);
-
         sleep(250);
-
         robot.move.forward(BACKWARDS,0.6,25);
 
          */
@@ -477,45 +531,94 @@ public class BlueBackStageAprilFast extends  LinearOpMode{
     }
     public void Backstage_RightProp_Red(int parking, double timer){
 
-        robot.camera.openBackCam();
+        robot.camera.FrontCamAtag();
 
-        robot.claw.setPosition(Claw.INTERMEDIARY);
-        sleep(750);
+        robot.wheels.GetDirection(telemetry);
+        telemetry.update();
+
+        robot.claw.setPosition(Claw.CLOSED);
+        sleep(500);
+
         robot.joint.setPosition(Joint.DOWN);
-        sleep(900);
-        robot.claw.setPosition(Claw.CLOSED);
 
 
 
-        robot.move.forward(FORWARD,0.6,39);
+
+        robot.move.lateral(RIGHT,0.5,24);
         sleep(175);
 
-        robot.move.rotate(1,0.6,51.5);
-        sleep(500);
-
-
-        robot.move.forward(FORWARD,0.5,10);
-        sleep(500);
-
+        robot.move.forward(FORWARD,0.5,36.5);
+        sleep(175);
         robot.claw.setPosition(Claw.INTERMEDIARY);
-        sleep(750);
-
-
-        robot.move.forward(BACKWARDS,0.5,5.5);
+        sleep(250);
+        robot.move.forward(BACKWARDS,0.3,5.5);
         sleep(175);
         robot.claw.setPosition(Claw.CLOSED);
-        sleep(500);
-        robot.joint.setPosition(Joint.UP);
-        sleep(500);
-
-        robot.move.rotate(1,0.6,40);
         sleep(250);
+        robot.joint.setPosition(0.39);
+
+        robot.move.rotate(1,0.4,90);
+        sleep(250);
+
+        robot.move.forward(BACKWARDS,0.3,22);
+
+
+        int oldtag=tagID;
+        double oldPower=POWER_LiMIT;
+
+        POWER_LiMIT=0.3;
+
+        tagID=10;
+
+
 
         robot.wheels.reverseDirection();
 
-        Go_to_April();
+        TurnPrecision();
 
         robot.wheels.setDirection();
+        sleep(250);
+
+
+
+        robot.camera.openBackCam();
+
+        robot.move.lateral(LEFT,0.6,95);
+        sleep(250);
+
+        robot.move.forward(BACKWARDS,0.7,169);
+        sleep(175);
+
+       robot.move.rotate(-1,0.4,20);
+     //   robot.move.lateral(RIGHT,0.85,50);
+
+        tagID=oldtag;
+        POWER_LiMIT=oldPower;
+
+        telemetry.addLine("Tag ID: "+tagID);
+        telemetry.update();
+
+        Targetf=0;
+        Targets=0;
+        Targett=0;
+
+        Distancef =2;
+        Distances=6;
+        Distancet=6;
+
+        robot.joint.setPosition(Joint.UP);
+
+
+        telemetry.addLine("Tag ID: "+tagID);
+
+
+        hope=0;
+
+       // robot.wheels.reverseDirection();
+
+        Go_to_April();
+
+      //  robot.wheels.setDirection();
 
         ElapsedTime timerr=new ElapsedTime();
 
@@ -614,10 +717,9 @@ public class BlueBackStageAprilFast extends  LinearOpMode{
         }
 
         /*
-        robot.move.lateral(LEFT,0.6,40);
 
+        robot.move.lateral(LEFT,0.6,69);
         sleep(250);
-
         robot.move.forward(BACKWARDS,0.6,25);
 
          */
@@ -703,6 +805,93 @@ public class BlueBackStageAprilFast extends  LinearOpMode{
 
     }
 
+    public void TurnCalibration(){
+
+        double powerTurn=StrafePID();
+
+        double powerFrontLeft=-powerTurn;
+        double powerFrontRight=powerTurn;
+        double powerBackLeft=-powerTurn;
+        double powerBackRight=powerTurn;
+
+        double maxPower=mate.MaxPower(powerFrontLeft,powerFrontRight,powerBackLeft,powerBackRight);
+
+        if(maxPower>1){
+
+            powerFrontLeft/=maxPower;
+            powerFrontRight/=maxPower;
+            powerBackLeft/=maxPower;
+            powerBackRight/=maxPower;
+        }
+
+        maxPower=mate.MaxPower(powerFrontLeft,powerFrontRight,powerBackLeft,powerBackRight);
+
+        if(maxPower>POWER_LiMIT){
+
+            double coeficient= maxPower/POWER_LiMIT;
+
+            powerFrontLeft/=coeficient;
+            powerFrontRight/=coeficient;
+            powerBackLeft/=coeficient;
+            powerBackRight/=coeficient;
+        }
+
+
+        robot.wheels.setPower(powerFrontLeft,powerFrontRight,powerBackLeft,powerBackRight);
+
+
+    }
+
+    public void TurnPrecision(){
+
+
+        boolean done=false;
+
+        while(!done){
+
+            AprilTagDetection detection=robot.move.returnAprilTAg(tagID,robot,robot.camera.atag);
+
+            if(detection!=null){
+
+                telemetry.addLine("Bearing: "+detection.ftcPose.yaw);
+
+                if(detection.ftcPose.yaw>=Distancet-3.5 && detection.ftcPose.yaw<=Distancet+3.5){
+
+                    hope=1;
+                    done=true;
+                    telemetry.addLine("DONE");
+                    robot.wheels.setPower(0,0,0,0);
+
+                }else if(hope==0){
+                    TurnCalibration();
+                    telemetry.addLine("NOT DONE");
+
+                }
+
+                telemetry.update();
+
+                /*
+                telemetry.addLine("Range: "+detection.ftcPose.range);
+                telemetry.addLine("Bearing: "+detection.ftcPose.bearing);
+                telemetry.addLine("Yaw: "+detection.ftcPose.yaw);
+
+
+                 */
+
+                //  telemetry.update();
+
+            }else{
+
+                robot.wheels.setPower(0,0,0,0);
+
+            }
+
+        }
+
+
+
+    }
+
     public void AprilPID(){
 
         double powerForward=ForwardPID();
@@ -714,7 +903,7 @@ public class BlueBackStageAprilFast extends  LinearOpMode{
         double powerBackLeft=-powerForward+powerStrafe-powerTurn;
         double powerBackRight=-powerForward-powerStrafe+powerTurn;
 
-        double maxPower=MathFunc.MaxPower(powerFrontLeft,powerFrontRight,powerBackLeft,powerBackRight);
+        double maxPower=mate.MaxPower(powerFrontLeft,powerFrontRight,powerBackLeft,powerBackRight);
 
         if(maxPower>1){
 
@@ -724,7 +913,7 @@ public class BlueBackStageAprilFast extends  LinearOpMode{
             powerBackRight/=maxPower;
         }
 
-        maxPower=MathFunc.MaxPower(powerFrontLeft,powerFrontRight,powerBackLeft,powerBackRight);
+        maxPower=mate.MaxPower(powerFrontLeft,powerFrontRight,powerBackLeft,powerBackRight);
 
         if(maxPower>POWER_LiMIT){
 
@@ -759,17 +948,26 @@ public class BlueBackStageAprilFast extends  LinearOpMode{
 
                 emergency.reset();
 
+                telemetry.addLine("Tag ID:"+tagID);
+                telemetry.addLine("Range:"+ detection.ftcPose.range);
+                telemetry.addLine("YAw:"+ detection.ftcPose.yaw);
+                telemetry.addLine("Bearing:"+ detection.ftcPose.bearing);
+
+
+
                 if(detection.ftcPose.range>=Distancef-2 && detection.ftcPose.range<=Distancef+2 && detection.ftcPose.bearing>=Distancet-7 && detection.ftcPose.bearing<=Distancet+7 && detection.ftcPose.yaw>=Distances-7 && detection.ftcPose.yaw<=Distances+7){
 
+
+                    telemetry.addLine("THERE");
                     hope=1;
                     done=true;
                     robot.wheels.setPower(0,0,0,0);
 
                 }else if(hope==0){
                     AprilPID();
+                    telemetry.addLine("Not there yet");
 
                 }
-
                 /*
                 telemetry.addLine("Range: "+detection.ftcPose.range);
                 telemetry.addLine("Bearing: "+detection.ftcPose.bearing);
@@ -779,6 +977,7 @@ public class BlueBackStageAprilFast extends  LinearOpMode{
                  */
 
                 //  telemetry.update();
+
 
             }else{
 
@@ -793,6 +992,9 @@ public class BlueBackStageAprilFast extends  LinearOpMode{
 
 
             }
+
+            telemetry.update();
+
 
         }
 
@@ -809,6 +1011,6 @@ public class BlueBackStageAprilFast extends  LinearOpMode{
 
 
     }
-}
 
-//759 lines and 40 warnings 331 lines and 27 warnings
+
+}

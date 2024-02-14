@@ -53,7 +53,7 @@ public class April_Move extends LinearOpMode {
 
     private  Robot robot;
 
-    private int tagID=5;
+    private int tagID=3;
 
     public FtcDashboard dashboard;
     private PIDController forward,strafe,turn;
@@ -102,7 +102,8 @@ public class April_Move extends LinearOpMode {
 
         waitForStart();
 
-        robot.wheels.reverseDirection();
+     //   robot.wheels.reverseDirection();
+        robot.wheels.setDirection();
 
         while(opModeIsActive() && !isStopRequested()){
 

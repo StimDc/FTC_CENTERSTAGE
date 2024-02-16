@@ -99,7 +99,7 @@ public class RedBackStageAprilFast extends  LinearOpMode{
 
     public static double Distancef =8,Distances=6,Distancet=6;
 
-    public static double POWER_LiMIT=0.5;
+    public static double POWER_LiMIT=0.6;
 
     private int hope=0;
 

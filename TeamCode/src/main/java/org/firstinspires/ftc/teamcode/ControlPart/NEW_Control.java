@@ -102,7 +102,7 @@ public class NEW_Control extends OpMode {
     public static double DistancefBACKDROP =8,DistancesBACKDROP=2,DistancetBACKDROP=5;
 
 
-    public static double POWER_LiMIT=0.3;
+    public static double POWER_LiMIT=0.6;
 
     private int hope=0;
 

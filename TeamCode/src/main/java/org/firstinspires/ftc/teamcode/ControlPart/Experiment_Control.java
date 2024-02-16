@@ -15,6 +15,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.controller.PIDController;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -37,6 +38,7 @@ import java.util.List;
 
 @Config
 @TeleOp(name = "Experiment Control")
+@Disabled
 
 public class Experiment_Control extends OpMode {
 
@@ -330,7 +332,7 @@ public class Experiment_Control extends OpMode {
                 eleDown=false;
 
 
-        }else if(gamepad2.left_bumper){
+        }else if(gamepad2.right_bumper){
             armTarget=ZERO_OFFSET;
 
             setPosition(ZERO_OFFSET,0.45);

@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.ControlPart;
 
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -12,6 +13,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Implementations.Robot.Wheels;
 
 @TeleOp(name = "FIFA Control")
+@Disabled
 
 public class FIFA_Control extends OpMode {
 

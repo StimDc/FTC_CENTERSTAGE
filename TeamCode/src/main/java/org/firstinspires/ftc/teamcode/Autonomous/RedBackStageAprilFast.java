@@ -29,6 +29,7 @@
 
 package org.firstinspires.ftc.teamcode.Autonomous;
 
+import static android.os.SystemClock.sleep;
 import static org.firstinspires.ftc.teamcode.Implementations.Constants.Direction.BACKWARDS;
 import static org.firstinspires.ftc.teamcode.Implementations.Constants.Direction.FORWARD;
 import static org.firstinspires.ftc.teamcode.Implementations.Constants.Direction.LEFT;
@@ -45,14 +46,18 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
 import org.firstinspires.ftc.teamcode.Implementations.Constants.Claw;
 import org.firstinspires.ftc.teamcode.Implementations.Constants.Joint;
 import org.firstinspires.ftc.teamcode.Implementations.Math.MathFunc;
 import org.firstinspires.ftc.teamcode.Implementations.Robot.Robot;
+import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 
 @Autonomous(name="RED BACKSTAGE AprilFAST", group = "Red Routes")
@@ -94,7 +99,7 @@ public class RedBackStageAprilFast extends  LinearOpMode{
 
     public static double Distancef =8,Distances=6,Distancet=6;
 
-    public static double POWER_LiMIT=0.7;
+    public static double POWER_LiMIT=0.5;
 
     private int hope=0;
 
@@ -125,9 +130,6 @@ public class RedBackStageAprilFast extends  LinearOpMode{
         turn.setPID(Pt,It,Dt);
 
         telemetry=new MultipleTelemetry(telemetry, dashboard.getTelemetry());
-
-
-
 
 
         String propPosition=robot.camera.GetPropPosition();
@@ -180,14 +182,28 @@ public class RedBackStageAprilFast extends  LinearOpMode{
 
         robot.camera.openBackCam();
 
+        setManualExposure(1,1);
+
+
         robot.wheels.GetDirection(telemetry);
         telemetry.update();
 
-        robot.claw.setPosition(Claw.INTERMEDIARY);
+      /*  robot.claw.setPosition(Claw.INTERMEDIARY);
         sleep(750);
         robot.joint.setPosition(Joint.DOWN);
         sleep(900);
         robot.claw.setPosition(Claw.CLOSED);
+        */
+
+        robot.wheels.GetDirection(telemetry);
+        telemetry.update();
+
+        robot.claw.setPosition(Claw.CLOSED);
+        sleep(500);
+
+        robot.joint.setPosition(Joint.DOWN);
+
+
 
         robot.move.forward(FORWARD,0.6,38);
         sleep(175);
@@ -323,14 +339,19 @@ public class RedBackStageAprilFast extends  LinearOpMode{
 
         robot.camera.openBackCam();
 
+        setManualExposure(1,1);
+
+
         robot.wheels.GetDirection(telemetry);
         telemetry.update();
-
+/*
         robot.claw.setPosition(Claw.INTERMEDIARY);
         sleep(750);
         robot.joint.setPosition(Joint.DOWN);
         sleep(900);
         robot.claw.setPosition(Claw.CLOSED);
+
+ */
 
 
 
@@ -463,14 +484,28 @@ public class RedBackStageAprilFast extends  LinearOpMode{
 
         robot.camera.openBackCam();
 
+        setManualExposure(1,1);
+
+
         robot.wheels.GetDirection(telemetry);
         telemetry.update();
 
+        /*
         robot.claw.setPosition(Claw.INTERMEDIARY);
         sleep(750);
         robot.joint.setPosition(Joint.DOWN);
         sleep(900);
         robot.claw.setPosition(Claw.CLOSED);
+
+         */
+
+        robot.wheels.GetDirection(telemetry);
+        telemetry.update();
+
+        robot.claw.setPosition(Claw.CLOSED);
+        sleep(500);
+
+        robot.joint.setPosition(Joint.DOWN);
 
 
 
@@ -789,5 +824,56 @@ public class RedBackStageAprilFast extends  LinearOpMode{
 
 
     }
+
+
+
+    private boolean   setManualExposure(int exposureMS, int gain) {
+        // Ensure Vision Portal has been setup.
+        if (robot.camera.vision == null) {
+            return false;
+        }
+
+        // Wait for the camera to be open
+        if (robot.camera.vision.getCameraState() != VisionPortal.CameraState.STREAMING) {
+            telemetry.addData("Camera", "Waiting");
+            telemetry.update();
+            while ((robot.camera.vision.getCameraState() != VisionPortal.CameraState.STREAMING)) {
+                sleep(20);
+            }
+            telemetry.addData("Camera", "Ready");
+            telemetry.update();
+        }
+
+        // Set camera controls unless we are stopping.
+        if (!false)
+        {
+            // Set exposure.  Make sure we are in Manual Mode for these values to take effect.
+            ExposureControl exposureControl = robot.camera.vision.getCameraControl(ExposureControl.class);
+            if (exposureControl.getMode() != ExposureControl.Mode.Manual) {
+                exposureControl.setMode(ExposureControl.Mode.Manual);
+                sleep(50);
+            }
+            exposureControl.setExposure(7, TimeUnit.MILLISECONDS);
+            sleep(20);
+
+            telemetry.addLine("Exposure Ceva: "+exposureControl);
+
+            // Set Gain.
+            GainControl gainControl = robot.camera.vision.getCameraControl(GainControl.class);
+
+            telemetry.addLine("Gain Ceva: "+gainControl);
+
+            if(gainControl!=null){
+                boolean haide= gainControl.setGain(255);
+
+            }
+            sleep(20);
+            return (true);
+        } else {
+            return (false);
+        }
+    }
+
+
 
 }

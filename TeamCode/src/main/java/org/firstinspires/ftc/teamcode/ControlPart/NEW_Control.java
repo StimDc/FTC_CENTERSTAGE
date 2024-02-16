@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.ControlPart;
 
+import static android.os.SystemClock.sleep;
 import static org.firstinspires.ftc.teamcode.Implementations.Constants.Claw.CLOSED;
 import static org.firstinspires.ftc.teamcode.Implementations.Constants.Claw.INTERMEDIARY;
 import static org.firstinspires.ftc.teamcode.Implementations.Constants.Claw.OPEN;
@@ -8,6 +9,7 @@ import static org.firstinspires.ftc.teamcode.Implementations.Constants.Joint.UP;
 import static org.firstinspires.ftc.teamcode.Implementations.Math.MathFunc.MaxPower;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.outoftheboxrobotics.photoncore.Photon;
@@ -20,16 +22,23 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
 import org.firstinspires.ftc.teamcode.Implementations.Math.MathFunc;
 import org.firstinspires.ftc.teamcode.Implementations.Robot.Robot;
+import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 @Photon
+@Config
 @TeleOp(name = "NEW Control")
 
 public class NEW_Control extends OpMode {
+
+
 
     private ElapsedTime timerr;
 
@@ -76,9 +85,9 @@ public class NEW_Control extends OpMode {
     public FtcDashboard dashboard;
     private PIDController forward,strafe,turn;
 
-    public static double Pf=0.02d, If=0d, Df=0d;
-    public static double Ps=0.045d, Is=0d, Ds=0d;
-    public static double Pt=0.02d, It=0.01d, Dt=0.00005d;
+    public double Pf=0.02d, If=0d, Df=0d;
+    public double Ps=0.045d, Is=0d, Ds=0d;
+    public  double Pt=0.02d, It=0.01d, Dt=0.00005d;
 
 
     private static double Targetf=1,Targets=1,Targett=1;
@@ -99,6 +108,9 @@ public class NEW_Control extends OpMode {
 
     @Override
     public void init() {
+
+        telemetry=new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+
 
         try {
             robot = new Robot(hardwareMap,telemetry);
@@ -135,6 +147,8 @@ public class NEW_Control extends OpMode {
 
         timerr=new ElapsedTime();
         timerr.reset();
+
+        setManualExposure(1,1);
     }
 
     @Override
@@ -351,7 +365,7 @@ public class NEW_Control extends OpMode {
 
             drive=-gamepad1.left_stick_y/1.25;
             strafe=-gamepad1.left_stick_x*1.1/1.25;
-            turn=-gamepad1.right_stick_x/2.5;
+            turn=-gamepad1.right_stick_x/1.5;//2.5
         }
 
         if(aprilk==false){
@@ -602,6 +616,54 @@ public class NEW_Control extends OpMode {
 
             }
 
+    }
+
+
+    private boolean   setManualExposure(int exposureMS, int gain) {
+        // Ensure Vision Portal has been setup.
+        if (robot.camera.vision == null) {
+            return false;
+        }
+
+        // Wait for the camera to be open
+        if (robot.camera.vision.getCameraState() != VisionPortal.CameraState.STREAMING) {
+            telemetry.addData("Camera", "Waiting");
+            telemetry.update();
+            while ((robot.camera.vision.getCameraState() != VisionPortal.CameraState.STREAMING)) {
+                sleep(20);
+            }
+            telemetry.addData("Camera", "Ready");
+            telemetry.update();
+        }
+
+        // Set camera controls unless we are stopping.
+        if (!false)
+        {
+            // Set exposure.  Make sure we are in Manual Mode for these values to take effect.
+            ExposureControl exposureControl = robot.camera.vision.getCameraControl(ExposureControl.class);
+            if (exposureControl.getMode() != ExposureControl.Mode.Manual) {
+                exposureControl.setMode(ExposureControl.Mode.Manual);
+                sleep(50);
+            }
+            exposureControl.setExposure(7, TimeUnit.MILLISECONDS);
+            sleep(20);
+
+            telemetry.addLine("Exposure Ceva: "+exposureControl);
+
+            // Set Gain.
+            GainControl gainControl = robot.camera.vision.getCameraControl(GainControl.class);
+
+            telemetry.addLine("Gain Ceva: "+gainControl);
+
+            if(gainControl!=null){
+                boolean haide= gainControl.setGain(255);
+
+            }
+            sleep(20);
+            return (true);
+        } else {
+            return (false);
+        }
     }
 
 

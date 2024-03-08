@@ -36,6 +36,8 @@ import static org.firstinspires.ftc.teamcode.Implementations.Constants.Direction
 import static org.firstinspires.ftc.teamcode.Implementations.Constants.Direction.RIGHT;
 
 
+import android.os.Environment;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.controller.PIDController;
@@ -56,6 +58,7 @@ import org.firstinspires.ftc.teamcode.Implementations.Robot.Robot;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -145,7 +148,7 @@ public class RedBackStageAprilFast{
 
     }
 
-    public void backStageLeftProp(int parking,int timer){
+    public void backStageLeftProp(int parking,int timer) throws IOException {
 
         this.robot.camera.openBackCam();
 
@@ -155,12 +158,12 @@ public class RedBackStageAprilFast{
         this.robot.wheels.GetDirection(this.telemetry);
         this.telemetry.update();
 
-      /*  robot.claw.setPosition(Claw.INTERMEDIARY);
+        robot.claw.setPosition(Claw.CLOSED);
         sleep(750);
         robot.joint.setPosition(Joint.DOWN);
         sleep(900);
         robot.claw.setPosition(Claw.CLOSED);
-        */
+        sleep(900);
 
         this.robot.wheels.GetDirection(telemetry);
         telemetry.update();
@@ -302,7 +305,7 @@ public class RedBackStageAprilFast{
         // robot.move.forward(BACKWARDS,0.6,25);
     }
 
-    public void backStageCenterProp(int parking,int timer){
+    public void backStageCenterProp(int parking,int timer) throws IOException {
 
         this.robot.camera.openBackCam();
 
@@ -311,15 +314,13 @@ public class RedBackStageAprilFast{
 
         this.robot.wheels.GetDirection(this.telemetry);
         this.telemetry.update();
-/*
-        robot.claw.setPosition(Claw.INTERMEDIARY);
-        sleep(750);
+
+        robot.claw.setPosition(Claw.CLOSED);
+        sleep(900);
         robot.joint.setPosition(Joint.DOWN);
         sleep(900);
         robot.claw.setPosition(Claw.CLOSED);
-
- */
-
+        sleep(900);
 
 
         this.robot.move.lateral(RIGHT,0.4,8);
@@ -449,7 +450,7 @@ public class RedBackStageAprilFast{
          */
 
     }
-    public void backStageRightProp(int parking, double timer){
+    public void backStageRightProp(int parking, double timer) throws IOException {
 
         this.robot.camera.openBackCam();
 
@@ -459,14 +460,14 @@ public class RedBackStageAprilFast{
         this.robot.wheels.GetDirection(this.telemetry);
         this.telemetry.update();
 
-        /*
-        robot.claw.setPosition(Claw.INTERMEDIARY);
+
+        robot.claw.setPosition(Claw.CLOSED);
         sleep(750);
         robot.joint.setPosition(Joint.DOWN);
         sleep(900);
         robot.claw.setPosition(Claw.CLOSED);
+        sleep(900);
 
-         */
 
         this.robot.wheels.GetDirection(this.telemetry);
         this.telemetry.update();
@@ -728,7 +729,7 @@ public class RedBackStageAprilFast{
 
     }
 
-    public void Go_to_April(){
+    public void Go_to_April() throws IOException {
 
         ElapsedTime emergency=new ElapsedTime();
         emergency.reset();
@@ -766,6 +767,9 @@ public class RedBackStageAprilFast{
                  */
 
                 //  telemetry.update();
+                String logFilePath = String.format("%s/FIRST/data/debug.txt", Environment.getExternalStorageDirectory().getAbsolutePath());
+                FileWriter fw = new FileWriter(logFilePath);
+                fw.write(detection.ftcPose.toString());
 
             }else{
 

@@ -35,6 +35,8 @@ import static org.firstinspires.ftc.teamcode.Implementations.Constants.Direction
 import static org.firstinspires.ftc.teamcode.Implementations.Constants.Direction.LEFT;
 import static org.firstinspires.ftc.teamcode.Implementations.Constants.Direction.RIGHT;
 
+import android.os.Environment;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.controller.PIDController;
@@ -54,6 +56,7 @@ import org.firstinspires.ftc.teamcode.Implementations.Math.MathFunc;
 import org.firstinspires.ftc.teamcode.Implementations.Robot.Robot;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
+import java.io.FileWriter;
 import java.io.IOException;
 
 
@@ -140,7 +143,7 @@ public class BlueBackStageAprilFast {
 
     }
 
-    public void backStageLeftProp(int parking,int timer){
+    public void backStageLeftProp(int parking,int timer) throws IOException {
 
         this.robot.camera.openBackCam();
     /*
@@ -287,7 +290,7 @@ public class BlueBackStageAprilFast {
          */
     }
 
-    public void backStageCenterProp(int parking,int timer){
+    public void backStageCenterProp(int parking,int timer) throws IOException {
 
         this.robot.camera.openBackCam();
 
@@ -434,7 +437,7 @@ public class BlueBackStageAprilFast {
          */
 
     }
-    public void backStageRightProp(int parking, double timer){
+    public void backStageRightProp(int parking, double timer) throws IOException {
 
         this.robot.camera.openBackCam();
 
@@ -587,6 +590,7 @@ public class BlueBackStageAprilFast {
         robot.move.forward(BACKWARDS,0.6,25);
 
          */
+
     }
 
 
@@ -707,7 +711,7 @@ public class BlueBackStageAprilFast {
 
     }
 
-    public void Go_to_April(){
+    public void Go_to_April() throws IOException {
 
         ElapsedTime emergency=new ElapsedTime();
         emergency.reset();
@@ -745,6 +749,10 @@ public class BlueBackStageAprilFast {
                  */
 
                 //  telemetry.update();
+
+                String logFilePath = String.format("%s/FIRST/data/debug.txt", Environment.getExternalStorageDirectory().getAbsolutePath());
+                FileWriter fw = new FileWriter(logFilePath);
+                fw.write(detection.ftcPose.toString());
 
             }else{
 

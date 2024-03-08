@@ -159,6 +159,7 @@ public class NEW_Control extends OpMode {
             hangLeft.setPosition(0.35);
             hangRight.setPosition(0.65);
             once=true;
+            //da
         }
 
         if(gamepad2.dpad_up){

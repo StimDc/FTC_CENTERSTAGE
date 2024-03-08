@@ -57,7 +57,7 @@ public class Camera_Experiment extends LinearOpMode {
 
         visionPortal = new VisionPortal.Builder()
                 .addProcessors(redProp,blueProp)
-                .setCamera(hardwareMap.get(WebcamName.class,"Cameraq1"))
+                .setCamera(hardwareMap.get(WebcamName.class,"Camera2"))
                 .setCameraResolution(new Size(640,480))
                 .build();
 

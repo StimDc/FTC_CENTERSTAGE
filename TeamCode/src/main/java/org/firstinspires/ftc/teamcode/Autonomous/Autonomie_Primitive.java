@@ -153,22 +153,46 @@ public class Autonomie_Primitive extends LinearOpMode {
         if(startpoint.equals("BACK_STAGE")) {
             if (alliance.equals("RED") && propPosition.equals("center")) {
                 redBack.passTag(tagID);
-                redBack.backStageCenterProp(-1, 0);
+                try {
+                    redBack.backStageCenterProp(-1, 0);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             } else if (alliance.equals("RED") && propPosition.equals("left")) {
                 redBack.passTag(tagID);
-                redBack.backStageLeftProp(-1, 0);
+                try {
+                    redBack.backStageLeftProp(-1, 0);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             } else if (alliance.equals("RED") && propPosition.equals("right")) {
                 redBack.passTag(tagID);
-                redBack.backStageRightProp(-1, 0);
+                try {
+                    redBack.backStageRightProp(-1, 0);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             } else if (alliance.equals("BLUE") && propPosition.equals("left")) {
                 blueOpMode.passTag(tagID);
-                blueOpMode.backStageLeftProp(-1, 0);
+                try {
+                    blueOpMode.backStageLeftProp(-1, 0);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             } else if (alliance.equals("BLUE") && propPosition.equals("center")) {
                 blueOpMode.passTag(tagID);
-                blueOpMode.backStageCenterProp(-1, 0);
+                try {
+                    blueOpMode.backStageCenterProp(-1, 0);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             } else if (alliance.equals("BLUE") && propPosition.equals("right")) {
                 blueOpMode.passTag(tagID);
-                blueOpMode.backStageRightProp(-1, 0);
+                try {
+                    blueOpMode.backStageRightProp(-1, 0);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
         else if(startpoint.equals("FRONT_STAGE")){

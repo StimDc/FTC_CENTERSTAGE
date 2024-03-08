@@ -13,7 +13,6 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.outoftheboxrobotics.photoncore.Photon;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -32,7 +31,6 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-@Photon
 @Config
 @TeleOp(name = "NEW Control")
 
@@ -47,20 +45,17 @@ public class NEW_Control extends OpMode {
 
     private int PARKING=1; //-1 for left parking and 1 for right
     //  private BluePropThreshold_Backstage blueProp;
-    private PIDController controller;
 
     public static double p=0.04, i=0, d=0.00001;//d=0.00001
     public static double f=0.002;
 
     public static double target;
 
-    private final double ticks_in_degrees=288*(125/45.0)/360; /// gear ratio: 45/125=0.36
-
-    private DcMotorEx elevator1, elevator2;
     private Robot robot;
 
     private Servo hangLeft,hangRight;
     private DcMotorEx viper,hang;
+    private Servo plane;
 
 
 
@@ -94,7 +89,7 @@ public class NEW_Control extends OpMode {
 
     public double val=0;
 
-
+    public int SENS=1; //sensul in care merg motoarele
 
     public static double Distancef =8,Distances=6,Distancet=6;
     public static double DistancefAVION =18,DistancesAVION=15,DistancetAVION=15;
@@ -144,18 +139,20 @@ public class NEW_Control extends OpMode {
         hang.setDirection(DcMotorSimple.Direction.REVERSE);
         hang.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+        plane = hardwareMap.get(Servo.class, "avion");
 
         timerr=new ElapsedTime();
         timerr.reset();
 
         setManualExposure(1,1);
+        
+
     }
 
     @Override
     public void loop() {
-        robot.wheels.reverseDirection();
         robot.arm.armTaskC();
-
+        robot.wheels.setDirection();
         if(!once){
             robot.joint.setPosition(UP);
             robot.claw.setPosition(INTERMEDIARY);//CLAWINTERMEDIARY
@@ -169,12 +166,19 @@ public class NEW_Control extends OpMode {
             hangLeft.setPosition(0.7561111);
             hangRight.setPosition(0.24399999);
 
-        }else if(gamepad2.dpad_down){
+        }if(gamepad2.dpad_down){
 
             hangLeft.setPosition(0.35);
             hangRight.setPosition(0.65);
 
 
+        }
+        if(gamepad2.y){
+            plane.setPosition(0.3172);
+
+        }
+        if(gamepad2.x){
+            plane.setPosition(0);
         }
 
         if(gamepad2.b){
@@ -280,6 +284,10 @@ public class NEW_Control extends OpMode {
 
         }
 
+        if(gamepad1.right_bumper){
+            SENS=SENS*(-1);
+        }
+
         if (gamepad1.dpad_left) {
 
             aprilk=true;
@@ -348,7 +356,7 @@ public class NEW_Control extends OpMode {
         }
         else{
 
-            robot.wheels.reverseDirection();
+            //robot.wheels.reverseDirection();
             aprilk=false;
 
         }
@@ -577,25 +585,24 @@ public class NEW_Control extends OpMode {
     }
 
     public void Go_to_April(){
+            try{
+                AprilTagDetection detection=robot.camera.returnAprilTAg(tagID);
+
+                if(detection!=null){
 
 
-            AprilTagDetection detection=robot.move.returnAprilTAg(tagID,robot,robot.camera.atag);
 
-            if(detection!=null){
+                    if(detection.ftcPose.range>=Distancef-2 && detection.ftcPose.range<=Distancef+7 && detection.ftcPose.bearing>=Distancet-7 && detection.ftcPose.bearing<=Distancet+7 && detection.ftcPose.yaw>=Distances-7 && detection.ftcPose.yaw<=Distances+7){
 
-
-
-                if(detection.ftcPose.range>=Distancef-2 && detection.ftcPose.range<=Distancef+7 && detection.ftcPose.bearing>=Distancet-7 && detection.ftcPose.bearing<=Distancet+7 && detection.ftcPose.yaw>=Distances-7 && detection.ftcPose.yaw<=Distances+7){
-
-                    robot.wheels.setPower(0);
-                    telemetry.addLine("AJUNS");
+                        robot.wheels.setPower(0);
+                        telemetry.addLine("AJUNS");
 
 
-                }else{
-                    AprilPID();
-                    telemetry.addLine("PID YAY");
+                    }else{
+                        AprilPID();
+                        telemetry.addLine("PID YAY");
 
-                }
+                    }
 
 
 
@@ -607,14 +614,20 @@ public class NEW_Control extends OpMode {
 
 
                  */
-                 telemetry.update();
+                    telemetry.update();
 
 
-        }else{
+                }else{
 
-                robot.wheels.setPower(0);
+                    robot.wheels.setPower(0);
+
+                }
+            }catch(NullPointerException e){
 
             }
+
+
+
 
     }
 

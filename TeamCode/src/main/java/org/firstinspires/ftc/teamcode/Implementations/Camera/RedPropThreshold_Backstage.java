@@ -21,7 +21,8 @@ public class RedPropThreshold_Backstage implements VisionProcessor {
     Mat lowMat=new Mat();
     Mat finalMat=new Mat();
 
-    double redThreshold=0.04d;//0.049d
+    public static double RedPixels;
+    double redThreshold=0.1d;//0.049d
 
     String outStr="center";
 
@@ -89,6 +90,8 @@ public class RedPropThreshold_Backstage implements VisionProcessor {
 
         left=averageLeftBox;
         center=averageCenterBox;
+
+        RedPixels = centerBox;
 
         // double averageRightBox=rightBox/RIGHTT_RECTANGLE.area()/255;
 

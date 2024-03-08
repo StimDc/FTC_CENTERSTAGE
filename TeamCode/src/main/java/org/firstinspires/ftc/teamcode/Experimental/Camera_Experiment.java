@@ -44,7 +44,7 @@ import org.firstinspires.ftc.vision.VisionPortal;
 
 public class Camera_Experiment extends LinearOpMode {
 
-    private RedPropThreshold_Frontstage redProp;
+    private RedPropThreshold_Backstage redProp;
 
     private BluePropThreshold_Backstage blueProp;
     private VisionPortal visionPortal;
@@ -52,12 +52,12 @@ public class Camera_Experiment extends LinearOpMode {
     @Override
     public void runOpMode() {
 
-        redProp=new RedPropThreshold_Frontstage();
+        redProp=new RedPropThreshold_Backstage();
         blueProp=new BluePropThreshold_Backstage();
 
         visionPortal = new VisionPortal.Builder()
                 .addProcessors(redProp,blueProp)
-                .setCamera(hardwareMap.get(WebcamName.class,"Camera2"))
+                .setCamera(hardwareMap.get(WebcamName.class,"Cameraq1"))
                 .setCameraResolution(new Size(640,480))
                 .build();
 

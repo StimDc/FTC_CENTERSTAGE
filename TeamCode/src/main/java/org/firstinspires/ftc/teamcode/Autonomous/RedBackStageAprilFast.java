@@ -46,6 +46,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
 import org.firstinspires.ftc.teamcode.Implementations.Constants.Claw;
@@ -60,9 +61,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 
-@Autonomous(name="RED BACKSTAGE AprilFAST", group = "Red Routes")
-
-public class RedBackStageAprilFast extends  LinearOpMode{
+public class RedBackStageAprilFast{
 
     private int PARKING=1; //-1 for left parking and 1 for right
 
@@ -73,7 +72,7 @@ public class RedBackStageAprilFast extends  LinearOpMode{
 
     private   final double ZERO_OFFSET = 70.0-3.85;
     private   double TargetPosInDegrees=70.0-3.85;
-
+    private Telemetry telemetry;
 
     private ElapsedTime AUTO;
 
@@ -97,24 +96,24 @@ public class RedBackStageAprilFast extends  LinearOpMode{
 
 
 
-    public static double Distancef =8,Distances=6,Distancet=6;
+    public static double Distancef =7,Distances=6,Distancet=6;
 
-    public static double POWER_LiMIT=0.6;
+    public static double POWER_LiMIT=0.4;
 
     private int hope=0;
 
+    public RedBackStageAprilFast(Robot robot, Telemetry telemetry,int tagID) {
+        this.robot =robot;
+        this.telemetry = telemetry;
+        this.tagID = tagID;
+    }
 
-
-
-    @Override
-    public void runOpMode () {
-        try {
-            robot = new Robot(hardwareMap,telemetry);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        robot.camera.openFrontCam();
-        target=robot.arm.ZERO_OFFSET;
+    public void passTag(int tagID){
+        this.tagID = tagID;
+    }
+    public void init () {
+        // this.robot.camera.openFrontCam();
+        target=this.robot.arm.ZERO_OFFSET;
 
         AUTO=new ElapsedTime();
 
@@ -129,64 +128,32 @@ public class RedBackStageAprilFast extends  LinearOpMode{
         turn=new PIDController(Pt,It,Dt);
         turn.setPID(Pt,It,Dt);
 
-        telemetry=new MultipleTelemetry(telemetry, dashboard.getTelemetry());
+        this.telemetry=new MultipleTelemetry(this.telemetry, dashboard.getTelemetry());
 
 
-        String propPosition=robot.camera.GetPropPosition();
+      //  String propPosition=this.robot.camera.GetPropPosition();
 
-        telemetry.addLine("Prop: "+propPosition);
-        telemetry.update();
+      //  this.telemetry.addLine("Prop: "+propPosition);
+      //  this.telemetry.update();
 
         boolean once=true;
 
-        robot.wheels.GetDirection(telemetry);
-        telemetry.update();
+        this.robot.wheels.GetDirection(this.telemetry);
+        this.telemetry.update();
 
-        waitForStart();
-        AUTO.reset();
 
-        robot.wheels.setDirection();
 
-        while ((propPosition.equals("nope") || once) && opModeIsActive() && !isStopRequested()){
-
-            telemetry.addLine("Nope :( "+propPosition);
-            propPosition=robot.camera.GetPropPosition();
-            telemetry.addLine(propPosition);
-            switch (propPosition) {
-                case "left":
-                    tagID = 4;
-                    once = false;
-
-                    Backstage_LeftProp_Red(PARKING, 0);
-
-                    break;
-                case "center":
-                    tagID = 5;
-                    once = false;
-
-                    Backstage_CenterProp_Red(PARKING, 0);
-
-                    break;
-                case "right":
-                    tagID = 6;
-                    once = false;
-                    Backstage_RightProp_Red(PARKING, 0);
-                    break;
-            }
-            //robot.clearBulkCache();
-            telemetry.update();
-        }
     }
 
-    public void Backstage_LeftProp_Red(int parking,int timer){
+    public void backStageLeftProp(int parking,int timer){
 
-        robot.camera.openBackCam();
+        this.robot.camera.openBackCam();
 
         setManualExposure(1,1);
 
 
-        robot.wheels.GetDirection(telemetry);
-        telemetry.update();
+        this.robot.wheels.GetDirection(this.telemetry);
+        this.telemetry.update();
 
       /*  robot.claw.setPosition(Claw.INTERMEDIARY);
         sleep(750);
@@ -195,44 +162,44 @@ public class RedBackStageAprilFast extends  LinearOpMode{
         robot.claw.setPosition(Claw.CLOSED);
         */
 
-        robot.wheels.GetDirection(telemetry);
+        this.robot.wheels.GetDirection(telemetry);
         telemetry.update();
 
-        robot.claw.setPosition(Claw.CLOSED);
+        this.robot.claw.setPosition(Claw.CLOSED);
         sleep(500);
 
-        robot.joint.setPosition(Joint.DOWN);
+        this.robot.joint.setPosition(Joint.DOWN);
 
 
 
-        robot.move.forward(FORWARD,0.6,38);
+        this.robot.move.forward(FORWARD,0.6,38);
         sleep(175);
 
-        robot.move.rotate(-1,0.6,51.5);
+        this.robot.move.rotate(-1,0.6,51.5);
         sleep(200);
 
 
-        robot.move.forward(FORWARD,0.4,12);
+        this.robot.move.forward(FORWARD,0.4,12);
         sleep(200);
 
-        robot.claw.setPosition(Claw.INTERMEDIARY);
+        this.robot.claw.setPosition(Claw.INTERMEDIARY);
         sleep(500);
 
 
-        robot.move.forward(BACKWARDS,0.5,5.5);
+        this.robot.move.forward(BACKWARDS,0.5,5.5);
         sleep(175);
-        robot.claw.setPosition(Claw.CLOSED);
+        this.robot.claw.setPosition(Claw.CLOSED);
         sleep(500);
-        robot.joint.setPosition(Joint.UP);
+        this.robot.joint.setPosition(Joint.UP);
 
-        robot.move.rotate(-1,0.6,47);
+        this.robot.move.rotate(-1,0.6,47);
         sleep(250);
 
-        robot.wheels.reverseDirection();
+        this.robot.wheels.reverseDirection();
 
         Go_to_April();
 
-        robot.wheels.setDirection();
+        this.robot.wheels.setDirection();
 
         ElapsedTime timerr=new ElapsedTime();
 
@@ -257,19 +224,19 @@ public class RedBackStageAprilFast extends  LinearOpMode{
 
                 case 0:
 
-                    robot.arm.setPosition(ZERO_OFFSET,0.4);
+                    this.robot.arm.setPosition(ZERO_OFFSET,0.4);
                     TargetPosInDegrees=ZERO_OFFSET;
                     stateArm=1;
                     break;
 
                 case 1:
-                    robot.arm.setPosition(240,0.5);
+                    this.robot.arm.setPosition(240,0.5);
                     TargetPosInDegrees=230;
                     stateArm=2;
                     break;
 
                 case 2:
-                    if(robot.arm.isOnTarget(6)) {
+                    if(this.robot.arm.isOnTarget(6)) {
                         stateArm=3;
                         timerr.reset();
                     }
@@ -278,7 +245,7 @@ public class RedBackStageAprilFast extends  LinearOpMode{
                 case 3:
 
                     if(timerr.milliseconds()>250){
-                        robot.claw.setPosition(Claw.OPEN);
+                        this.robot.claw.setPosition(Claw.OPEN);
                         stateArm=4;
                         timerr.reset();
 
@@ -297,26 +264,26 @@ public class RedBackStageAprilFast extends  LinearOpMode{
 
 
                 case 5:
-                    robot.arm.setPosition(ZERO_OFFSET,0.4);
+                    this.robot.arm.setPosition(ZERO_OFFSET,0.4);
                     TargetPosInDegrees=ZERO_OFFSET;
                     stateArm=6;
                     break;
 
                 case 6:
-                    if(robot.arm.getPosition()<175) {
+                    if(this.robot.arm.getPosition()<175) {
                         OKtarget=true;
-                        robot.arm.setPower(0);
+                        this.robot.arm.setPower(0);
                         armtarget=true;
-                        robot.move.lateral(LEFT,0.8,75);
+                        this.robot.move.lateral(LEFT,0.8,75);
                     }
                     break;
 
             }
 
             if(Math.abs(TargetPosInDegrees-ZERO_OFFSET)<5 && OKtarget){
-                robot.arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                robot.arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                robot.arm.setPower(0);
+                this.robot.arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                this.robot.arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                this.robot.arm.setPower(0);
             }
             if(Math.abs(TargetPosInDegrees-ZERO_OFFSET)>=3){
                 OKtarget=false;
@@ -324,10 +291,10 @@ public class RedBackStageAprilFast extends  LinearOpMode{
             if(!OKtarget){
                 robot.arm.armTask();
             }
-            telemetry.addLine("Pos: "+robot.arm.getPosition());
-            telemetry.addLine("Target: "+TargetPosInDegrees);
-            telemetry.addLine("State: "+stateArm);
-            telemetry.update();
+            this.telemetry.addLine("Pos: "+this.robot.arm.getPosition());
+            this.telemetry.addLine("Target: "+TargetPosInDegrees);
+            this.telemetry.addLine("State: "+stateArm);
+            this.telemetry.update();
         }
 
         //  robot.move.lateral(LEFT,0.6,55);
@@ -335,15 +302,15 @@ public class RedBackStageAprilFast extends  LinearOpMode{
         // robot.move.forward(BACKWARDS,0.6,25);
     }
 
-    public void Backstage_CenterProp_Red(int parking,int timer){
+    public void backStageCenterProp(int parking,int timer){
 
-        robot.camera.openBackCam();
+        this.robot.camera.openBackCam();
 
         setManualExposure(1,1);
 
 
-        robot.wheels.GetDirection(telemetry);
-        telemetry.update();
+        this.robot.wheels.GetDirection(this.telemetry);
+        this.telemetry.update();
 /*
         robot.claw.setPosition(Claw.INTERMEDIARY);
         sleep(750);
@@ -355,27 +322,29 @@ public class RedBackStageAprilFast extends  LinearOpMode{
 
 
 
-        robot.move.lateral(RIGHT,0.4,8);
+        this.robot.move.lateral(RIGHT,0.4,8);
         sleep(175);
 
-        robot.move.forward(FORWARD,0.6,57);
+        this.robot.move.forward(FORWARD,0.6,57);
         sleep(175);
-        robot.claw.setPosition(Claw.INTERMEDIARY);
+        this.robot.joint.setPosition(Joint.DOWN);
         sleep(500);
-        robot.move.forward(BACKWARDS,0.5,5.5);
+        this.robot.claw.setPosition(Claw.INTERMEDIARY);
+        sleep(500);
+        this.robot.move.forward(BACKWARDS,0.5,5.5);
         sleep(175);
-        robot.claw.setPosition(Claw.CLOSED);
+        this.robot.claw.setPosition(Claw.CLOSED);
         sleep(500);
-        robot.joint.setPosition(Joint.UP);
+        this.robot.joint.setPosition(Joint.UP);
 
-        robot.move.rotate(-1,0.6,90);
+        this.robot.move.rotate(-1,0.6,90);
         sleep(250);
 
-        robot.wheels.reverseDirection();
+        this.robot.wheels.reverseDirection();
 
         Go_to_April();
 
-        robot.wheels.setDirection();
+        this.robot.wheels.setDirection();
 
         ElapsedTime timerr=new ElapsedTime();
 
@@ -400,19 +369,19 @@ public class RedBackStageAprilFast extends  LinearOpMode{
 
                 case 0:
 
-                    robot.arm.setPosition(ZERO_OFFSET,0.4);
+                    this.robot.arm.setPosition(ZERO_OFFSET,0.4);
                     TargetPosInDegrees=ZERO_OFFSET;
                     stateArm=1;
                     break;
 
                 case 1:
-                    robot.arm.setPosition(240,0.5);
+                    this.robot.arm.setPosition(240,0.5);
                     TargetPosInDegrees=230;
                     stateArm=2;
                     break;
 
                 case 2:
-                    if(robot.arm.isOnTarget(6)) {
+                    if(this.robot.arm.isOnTarget(6)) {
                         stateArm=3;
                         timerr.reset();
                     }
@@ -421,7 +390,7 @@ public class RedBackStageAprilFast extends  LinearOpMode{
                 case 3:
 
                     if(timerr.milliseconds()>250){
-                        robot.claw.setPosition(Claw.OPEN);
+                        this.robot.claw.setPosition(Claw.OPEN);
                         stateArm=4;
                         timerr.reset();
 
@@ -440,37 +409,37 @@ public class RedBackStageAprilFast extends  LinearOpMode{
 
 
                 case 5:
-                    robot.arm.setPosition(ZERO_OFFSET,0.4);
+                    this.robot.arm.setPosition(ZERO_OFFSET,0.4);
                     TargetPosInDegrees=ZERO_OFFSET;
                     stateArm=6;
                     break;
 
                 case 6:
-                    if(robot.arm.getPosition()<175) {
+                    if(this.robot.arm.getPosition()<165) {
                         OKtarget=true;
-                        robot.arm.setPower(0);
+                        this.robot.arm.setPower(0);
                         armtarget=true;
-                        robot.move.lateral(LEFT,0.8,60);
+                        this.robot.move.lateral(LEFT,0.8,60);
                     }
                     break;
 
             }
 
             if(Math.abs(TargetPosInDegrees-ZERO_OFFSET)<5 && OKtarget){
-                robot.arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                robot.arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                robot.arm.setPower(0);
+                this.robot.arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                this.robot.arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                this.robot.arm.setPower(0);
             }
             if(Math.abs(TargetPosInDegrees-ZERO_OFFSET)>=3){
                 OKtarget=false;
             }
             if(!OKtarget){
-                robot.arm.armTask();
+                this.robot.arm.armTask();
             }
-            telemetry.addLine("Pos: "+robot.arm.getPosition());
-            telemetry.addLine("Target: "+TargetPosInDegrees);
-            telemetry.addLine("State: "+stateArm);
-            telemetry.update();
+            this.telemetry.addLine("Pos: "+this.robot.arm.getPosition());
+            this.telemetry.addLine("Target: "+TargetPosInDegrees);
+            this.telemetry.addLine("State: "+stateArm);
+            this.telemetry.update();
         }
         /*
         robot.move.lateral(LEFT,0.6,58);
@@ -480,15 +449,15 @@ public class RedBackStageAprilFast extends  LinearOpMode{
          */
 
     }
-    public void Backstage_RightProp_Red(int parking, double timer){
+    public void backStageRightProp(int parking, double timer){
 
-        robot.camera.openBackCam();
+        this.robot.camera.openBackCam();
 
         setManualExposure(1,1);
 
 
-        robot.wheels.GetDirection(telemetry);
-        telemetry.update();
+        this.robot.wheels.GetDirection(this.telemetry);
+        this.telemetry.update();
 
         /*
         robot.claw.setPosition(Claw.INTERMEDIARY);
@@ -499,39 +468,41 @@ public class RedBackStageAprilFast extends  LinearOpMode{
 
          */
 
-        robot.wheels.GetDirection(telemetry);
-        telemetry.update();
+        this.robot.wheels.GetDirection(this.telemetry);
+        this.telemetry.update();
 
-        robot.claw.setPosition(Claw.CLOSED);
+        this.robot.claw.setPosition(Claw.CLOSED);
         sleep(500);
 
-        robot.joint.setPosition(Joint.DOWN);
+        this.robot.joint.setPosition(Joint.DOWN);
 
 
 
-        robot.move.lateral(RIGHT,0.4,24);
+        this.robot.move.lateral(RIGHT,0.4,24);
         sleep(175);
 
-        robot.move.forward(FORWARD,0.6,36.5);
+        this.robot.move.forward(FORWARD,0.6,36.5);
         sleep(175);
-        robot.claw.setPosition(Claw.INTERMEDIARY);
+        this.robot.claw.setPosition(Claw.INTERMEDIARY);
         sleep(250);
-        robot.move.forward(BACKWARDS,0.5,5.5);
+        this.robot.move.forward(BACKWARDS,0.5,5.5);
         sleep(175);
-        robot.claw.setPosition(Claw.CLOSED);
+        this.robot.claw.setPosition(Claw.CLOSED);
         sleep(250);
-        robot.joint.setPosition(Joint.UP);
+        this.robot.joint.setPosition(Joint.UP);
 
-        robot.move.rotate(-1,0.6,90);
+        this.robot.move.rotate(-1,0.6,90);
         sleep(250);
 
         // robot.move.Move_to_AprilAllAxes(tagID,robot,robot.camera.atag);
 
-        robot.wheels.reverseDirection();
+        //this.robot.move.forward(BACKWARDS,0.6,20);
+        //this.robot.move.lateral(RIGHT,0.6,20);
+        this.robot.wheels.reverseDirection();
 
         Go_to_April();
 
-        robot.wheels.setDirection();
+        this.robot.wheels.setDirection();
 
         ElapsedTime timerr=new ElapsedTime();
 
@@ -556,19 +527,19 @@ public class RedBackStageAprilFast extends  LinearOpMode{
 
                 case 0:
 
-                    robot.arm.setPosition(ZERO_OFFSET,0.4);
+                    this.robot.arm.setPosition(ZERO_OFFSET,0.4);
                     TargetPosInDegrees=ZERO_OFFSET;
                     stateArm=1;
                     break;
 
                 case 1:
-                    robot.arm.setPosition(240,0.5);
+                    this.robot.arm.setPosition(240,0.5);
                     TargetPosInDegrees=230;
                     stateArm=2;
                     break;
 
                 case 2:
-                    if(robot.arm.isOnTarget(6)) {
+                    if(this.robot.arm.isOnTarget(6)) {
                         stateArm=3;
                         timerr.reset();
                     }
@@ -577,7 +548,7 @@ public class RedBackStageAprilFast extends  LinearOpMode{
                 case 3:
 
                     if(timerr.milliseconds()>250){
-                        robot.claw.setPosition(Claw.OPEN);
+                        this.robot.claw.setPosition(Claw.OPEN);
                         stateArm=4;
                         timerr.reset();
 
@@ -596,37 +567,37 @@ public class RedBackStageAprilFast extends  LinearOpMode{
 
 
                 case 5:
-                    robot.arm.setPosition(ZERO_OFFSET,0.4);
+                    this.robot.arm.setPosition(ZERO_OFFSET,0.4);
                     TargetPosInDegrees=ZERO_OFFSET;
                     stateArm=6;
                     break;
 
                 case 6:
-                    if(robot.arm.getPosition()<175) {
+                    if(this.robot.arm.getPosition()<175) {
                         OKtarget=true;
-                        robot.arm.setPower(0);
+                        this.robot.arm.setPower(0);
                         armtarget=true;
-                        robot.move.lateral(LEFT,0.8,45);
+                        this.robot.move.lateral(LEFT,0.8,45);
                     }
                     break;
 
             }
 
             if(Math.abs(TargetPosInDegrees-ZERO_OFFSET)<5 && OKtarget){
-                robot.arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                robot.arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                robot.arm.setPower(0);
+                this.robot.arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                this.robot.arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                this.robot.arm.setPower(0);
             }
             if(Math.abs(TargetPosInDegrees-ZERO_OFFSET)>=3){
                 OKtarget=false;
             }
             if(!OKtarget){
-                robot.arm.armTask();
+                this.robot.arm.armTask();
             }
-            telemetry.addLine("Pos: "+robot.arm.getPosition());
-            telemetry.addLine("Target: "+TargetPosInDegrees);
-            telemetry.addLine("State: "+stateArm);
-            telemetry.update();
+            this.telemetry.addLine("Pos: "+this.robot.arm.getPosition());
+            this.telemetry.addLine("Target: "+TargetPosInDegrees);
+            this.telemetry.addLine("State: "+stateArm);
+            this.telemetry.update();
         }
 
         /*
@@ -641,7 +612,7 @@ public class RedBackStageAprilFast extends  LinearOpMode{
     private double ForwardPID(){
 
 
-        Targetf=robot.move.returnRangeError(tagID,robot,robot.camera.atag);
+        Targetf=this.robot.move.returnRangeError(this.tagID,this.robot,this.robot.camera.atag);
 
         double power;
 
@@ -666,7 +637,7 @@ public class RedBackStageAprilFast extends  LinearOpMode{
 
     private double StrafePID(){
 
-        Targets=robot.move.returnYawError(tagID,robot,robot.camera.atag);
+        Targets=this.robot.move.returnYawError(this.tagID,this.robot,this.robot.camera.atag);
 
         // target=matee.inchToTicksD(target);
 
@@ -696,7 +667,7 @@ public class RedBackStageAprilFast extends  LinearOpMode{
     private double TurnPID(){
 
 
-        Targett=robot.move.returnHeadingError(tagID,robot,robot.camera.atag);
+        Targett=this.robot.move.returnHeadingError(this.tagID,this.robot,this.robot.camera.atag);
 
         double power;
 
@@ -752,7 +723,7 @@ public class RedBackStageAprilFast extends  LinearOpMode{
         }
 
 
-        robot.wheels.setPower(powerFrontLeft,powerFrontRight,powerBackLeft,powerBackRight);
+        this.robot.wheels.setPower(powerFrontLeft,powerFrontRight,powerBackLeft,powerBackRight);
 
 
     }
@@ -765,10 +736,11 @@ public class RedBackStageAprilFast extends  LinearOpMode{
         boolean alarm=false;
 
         boolean done=false;
+        boolean exit = false;
 
         while(!done){
 
-            AprilTagDetection detection=robot.move.returnAprilTAg(tagID,robot,robot.camera.atag);
+            AprilTagDetection detection=this.robot.move.returnAprilTAg(this.tagID,this.robot,this.robot.camera.atag);
 
             if(detection!=null){
 
@@ -778,7 +750,7 @@ public class RedBackStageAprilFast extends  LinearOpMode{
 
                     hope=1;
                     done=true;
-                    robot.wheels.setPower(0,0,0,0);
+                    this.robot.wheels.setPower(0,0,0,0);
 
                 }else if(hope==0){
                     AprilPID();
@@ -801,10 +773,11 @@ public class RedBackStageAprilFast extends  LinearOpMode{
 
                     done=true;
                     alarm=true;
+                    exit = true;
 
                 }
 
-                robot.wheels.setPower(0,0,0,0);
+                this.robot.wheels.setPower(0,0,0,0);
 
 
             }
@@ -813,10 +786,9 @@ public class RedBackStageAprilFast extends  LinearOpMode{
 
         if(alarm){
 
-            robot.move.lateral(RIGHT,0.8,45);
+            this.robot.move.lateral(RIGHT,0.8,45);
 
-            while(opModeIsActive() && !isStopRequested()){
-
+            while(exit){
 
             }
 
@@ -829,26 +801,26 @@ public class RedBackStageAprilFast extends  LinearOpMode{
 
     private boolean   setManualExposure(int exposureMS, int gain) {
         // Ensure Vision Portal has been setup.
-        if (robot.camera.vision == null) {
+        if (this.robot.camera.vision == null) {
             return false;
         }
 
         // Wait for the camera to be open
-        if (robot.camera.vision.getCameraState() != VisionPortal.CameraState.STREAMING) {
-            telemetry.addData("Camera", "Waiting");
-            telemetry.update();
-            while ((robot.camera.vision.getCameraState() != VisionPortal.CameraState.STREAMING)) {
+        if (this.robot.camera.vision.getCameraState() != VisionPortal.CameraState.STREAMING) {
+            this.telemetry.addData("Camera", "Waiting");
+            this.telemetry.update();
+            while ((this.robot.camera.vision.getCameraState() != VisionPortal.CameraState.STREAMING)) {
                 sleep(20);
             }
-            telemetry.addData("Camera", "Ready");
-            telemetry.update();
+            this.telemetry.addData("Camera", "Ready");
+            this.telemetry.update();
         }
 
         // Set camera controls unless we are stopping.
         if (!false)
         {
             // Set exposure.  Make sure we are in Manual Mode for these values to take effect.
-            ExposureControl exposureControl = robot.camera.vision.getCameraControl(ExposureControl.class);
+            ExposureControl exposureControl = this.robot.camera.vision.getCameraControl(ExposureControl.class);
             if (exposureControl.getMode() != ExposureControl.Mode.Manual) {
                 exposureControl.setMode(ExposureControl.Mode.Manual);
                 sleep(50);
@@ -856,15 +828,17 @@ public class RedBackStageAprilFast extends  LinearOpMode{
             exposureControl.setExposure(7, TimeUnit.MILLISECONDS);
             sleep(20);
 
-            telemetry.addLine("Exposure Ceva: "+exposureControl);
+            this.telemetry.addLine("Exposure Ceva: "+exposureControl.getExposure(TimeUnit.MILLISECONDS));
 
             // Set Gain.
-            GainControl gainControl = robot.camera.vision.getCameraControl(GainControl.class);
+            GainControl gainControl = this.robot.camera.vision.getCameraControl(GainControl.class);
 
-            telemetry.addLine("Gain Ceva: "+gainControl);
+            this.telemetry.addLine("Gain Ceva: "+gainControl);
+
 
             if(gainControl!=null){
                 boolean haide= gainControl.setGain(255);
+              this.telemetry.addLine("Gain: "+gainControl.getGain());
 
             }
             sleep(20);

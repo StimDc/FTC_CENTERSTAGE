@@ -48,40 +48,37 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 
 @Config
-@Autonomous(name="Choice Menu", group = "Autonomie Primitiva")
+@Autonomous(name="Config autonomous", group = "Configuration")
 
 public class Choice_Menu extends LinearOpMode {
     ArrayList<ChoiceItem> buffer = new ArrayList<>();
 
 
     @Override
-
     public void runOpMode() {
 
-
-
-        String[] alliances= {"BLUE", "RED"};
+        String[] alliances = {"BLUE", "RED"};
         ItemLogic("alliance", alliances);
         sleep(500);
-        String[] positions= {"FRONT_STAGE","BACK_STAGE"};
-        ItemLogic("position",positions);
+        String[] positions = {"FRONT_STAGE", "BACK_STAGE"};
+        ItemLogic("position", positions);
         sleep(500);
         String[] parkings = {"LEFT", "RIGHT"};
         ItemLogic("parking", parkings);
         sleep(500);
-        int timer =0;
+        int timer = 0;
         boolean timerChange = false;
         sleep(1000);
-        while(!timerChange){
+        while (!timerChange ) {
             telemetry.addLine("Please select the timer");
-            if(gamepad1.dpad_up)
-                timer+=500;
+            if (gamepad1.dpad_up)
+                timer += 500;
 
-            if(gamepad1.dpad_down)
-                timer-=500;
+            if (gamepad1.dpad_down)
+                timer -= 500;
 
             telemetry.addLine(timer + "ms");
-            if(gamepad1.a){
+            if (gamepad1.a) {
                 timerChange = true;
                 ChoiceItem timerChoice = new ChoiceItem("timer", String.valueOf(timer));
                 buffer.add(timerChoice);
@@ -96,12 +93,20 @@ public class Choice_Menu extends LinearOpMode {
 
         try {
             writeToFile();
-            readFromFile();
+            //readFromFile();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
+        telemetry.addLine("To confirm press the start button");
+        telemetry.update();
         waitForStart();
+        telemetry.addLine("Configuration set exiting in 3 sec");
+        telemetry.update();
+        sleep(3000);
+        requestOpModeStop();
+
+
     }
 
 
@@ -110,7 +115,7 @@ public class Choice_Menu extends LinearOpMode {
         FileWriter fw = new FileWriter(logFilePath);
 
         for(ChoiceItem choiceItem : buffer){
-            telemetry.addLine(choiceItem.getText());
+            //telemetry.addLine(choiceItem.getText());
             fw.write(choiceItem.getText() + " " + choiceItem.getValue());
             fw.write('\n');
 
@@ -119,13 +124,12 @@ public class Choice_Menu extends LinearOpMode {
         fw.close();
 
     }
-
     public static Dictionary<String,String> readFromFile() throws IOException{
         String logFilePath = String.format("%s/FIRST/data/autonomie.txt", Environment.getExternalStorageDirectory().getAbsolutePath());
         File file = new File(logFilePath);
         BufferedReader br = new BufferedReader(new FileReader(file));
         String st;
-        String split[];
+        String[] split;
         Dictionary<String, String> parsedFile = new Hashtable<>();
         while((st = br.readLine()) !=null){
             try {
@@ -140,11 +144,10 @@ public class Choice_Menu extends LinearOpMode {
 
         return parsedFile;
     }
-
     public void ItemLogic(String text,String[] choices){
         boolean change = false;
         int choice  =0;
-        while(!change){
+        while(!change ){
             telemetry.addLine("Please select the "+ text);
             if(gamepad1.dpad_up)
                 choice = 1;

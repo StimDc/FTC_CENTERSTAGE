@@ -108,7 +108,7 @@ public class RedBackStageApril extends  LinearOpMode{
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        robot.camera.openFrontCam();
+        robot.camera.openBackCam();
         target=robot.arm.ZERO_OFFSET;
 
         AUTO=new ElapsedTime();
@@ -748,7 +748,7 @@ public class RedBackStageApril extends  LinearOpMode{
 
         while(!done){
 
-            AprilTagDetection detection=robot.move.returnAprilTAg(tagID,robot,robot.camera.atag);
+            AprilTagDetection detection=robot.camera.returnAprilTAg(tagID);
 
             if(detection!=null){
 

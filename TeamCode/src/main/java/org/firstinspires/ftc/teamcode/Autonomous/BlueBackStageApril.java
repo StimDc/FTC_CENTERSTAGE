@@ -108,6 +108,7 @@ public class BlueBackStageApril extends  LinearOpMode{
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        robot.wheels.setDirection();
         robot.camera.openFrontCam();
         target=robot.arm.ZERO_OFFSET;
 
@@ -754,7 +755,7 @@ public class BlueBackStageApril extends  LinearOpMode{
 
         while(!done){
 
-            AprilTagDetection detection=robot.move.returnAprilTAg(tagID,robot,robot.camera.atag);
+            AprilTagDetection detection=robot.camera.returnAprilTAg(tagID);
 
             if(detection!=null){
 

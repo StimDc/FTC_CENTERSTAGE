@@ -5,6 +5,7 @@ import static java.lang.Thread.sleep;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
@@ -17,12 +18,16 @@ import org.firstinspires.ftc.teamcode.Implementations.Camera.RedPropThreshold_Ba
 import org.firstinspires.ftc.teamcode.Implementations.Camera.RedPropThreshold_Frontstage;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.VisionProcessor;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import java.util.concurrent.TimeUnit;
 
+import java.util.List;
+
 public class Camera {
     public AprilTagProcessor atag;
+    private Telemetry telemetry;
 
     private ExposureControl exposure;
     private GainControl gain;
@@ -68,24 +73,24 @@ public class Camera {
         this.atag = new AprilTagProcessor.Builder().build();
         this.robot = robot;
 
-        backCam = hardwareMap.get(WebcamName.class, "Camera1");
-        frontCam = hardwareMap.get(WebcamName.class, "Camera2");
+        this.backCam = hardwareMap.get(WebcamName.class, "Camera1");
+        this.frontCam = hardwareMap.get(WebcamName.class, "Camera2");
         CameraName switchableCamera = ClassFactory.getInstance()
-                .getCameraManager().nameForSwitchableCamera(backCam,frontCam);
+                .getCameraManager().nameForSwitchableCamera(this.backCam,this.frontCam);
 
 
         this.getProcessor();
-        vision = new VisionPortal.Builder()
+        this.vision = new VisionPortal.Builder()
                 .setCamera(switchableCamera)
                //.addProcessors(atag,redPropThresholdBackstage)
-                .addProcessors(atag,processor)
+                .addProcessors(this.atag,this.processor)
                 .build();
 
-        while(vision.getCameraState() != VisionPortal.CameraState.STREAMING){
+        while(this.vision.getCameraState() != VisionPortal.CameraState.STREAMING){
 
         }
         //vision.setProcessorEnabled(redPropThresholdBackstage,false);
-       vision.setProcessorEnabled(processor,false);
+       this.vision.setProcessorEnabled(this.processor,false);
 
       //  exposure=vision.getCameraControl(ExposureControl.class);
       //  exposure.setMode(ExposureControl.Mode.Manual);
@@ -95,18 +100,20 @@ public class Camera {
        // gain.setGain(28);
 
     }
-
+    public void passTelemetry(Telemetry telemetry){
+        this.telemetry = telemetry;
+    }
     public void openBackCam(){
-        if(vision.getCameraState() == VisionPortal.CameraState.STREAMING){
-            vision.setActiveCamera(backCam);
+        if(this.vision.getCameraState() == VisionPortal.CameraState.STREAMING){
+            this.vision.setActiveCamera(this.backCam);
         }
 
-        vision.setProcessorEnabled(atag,true);
+        this.vision.setProcessorEnabled(this.atag,true);
         //vision.setProcessorEnabled(redPropThresholdBackstage,false);
-        vision.setProcessorEnabled(this.processor,false);
+        this.vision.setProcessorEnabled(this.processor,false);
 
 
-        while(vision.getCameraState()!=VisionPortal.CameraState.STREAMING){
+        while(this.vision.getCameraState()!=VisionPortal.CameraState.STREAMING){
 
         }
 
@@ -115,7 +122,7 @@ public class Camera {
 
     public int getMaxGain(){
 
-        gain=vision.getCameraControl(GainControl.class);
+        gain=this.vision.getCameraControl(GainControl.class);
 
         return  gain.getMaxGain();
 
@@ -123,7 +130,7 @@ public class Camera {
 
     public int getMinGain(){
 
-        gain=vision.getCameraControl(GainControl.class);
+        gain=this.vision.getCameraControl(GainControl.class);
 
         return  gain.getMinGain();
 
@@ -131,23 +138,23 @@ public class Camera {
 
     public boolean isExposure(){
 
-        exposure=vision.getCameraControl(ExposureControl.class);
+        exposure=this.vision.getCameraControl(ExposureControl.class);
 
         return exposure.isExposureSupported();
 
     }
 
     public void openFrontCam(){
-        if(vision.getCameraState()== VisionPortal.CameraState.STREAMING){
-            vision.setActiveCamera(frontCam);
+        if(this.vision.getCameraState()== VisionPortal.CameraState.STREAMING){
+            this.vision.setActiveCamera(this.frontCam);
         }
 
-        vision.setProcessorEnabled(atag,false);
+        this.vision.setProcessorEnabled(this.atag,false);
        //vision.setProcessorEnabled(redPropThresholdBackstage,true);
-        vision.setProcessorEnabled(this.processor,true);
+        this.vision.setProcessorEnabled(this.processor,true);
 
 
-        while(vision.getCameraState()!=VisionPortal.CameraState.STREAMING){
+        while(this.vision.getCameraState()!=VisionPortal.CameraState.STREAMING){
 
         }
 
@@ -155,34 +162,34 @@ public class Camera {
 
     public void FrontCamAtag(){
 
-        if(vision.getCameraState()== VisionPortal.CameraState.STREAMING){
-            vision.setActiveCamera(frontCam);
+        if(this.vision.getCameraState()== VisionPortal.CameraState.STREAMING){
+            this.vision.setActiveCamera(this.frontCam);
         }
 
-        vision.setProcessorEnabled(atag,true);
+        this.vision.setProcessorEnabled(this.atag,true);
         //vision.setProcessorEnabled(redPropThresholdBackstage,true);
-        vision.setProcessorEnabled(this.processor,false);
+        this.vision.setProcessorEnabled(this.processor,false);
 
 
-        while(vision.getCameraState()!=VisionPortal.CameraState.STREAMING){
+        while(this.vision.getCameraState()!=VisionPortal.CameraState.STREAMING){
 
         }
 
     }
 
     public void getProcessor(){
-        if(robot.parameter.get("alliance").equals("RED") &&
-                robot.parameter.get("position").equals("BACK_STAGE")){
+        if(this.robot.parameter.get("alliance").equals("RED") &&
+                this.robot.parameter.get("position").equals("BACK_STAGE")){
             this.processor = this.redPropThresholdBackstage;
 
         }
-        else if(robot.parameter.get("alliance").equals("RED") &&
-                robot.parameter.get("position").equals("FRONT_STAGE")){
+        else if(this.robot.parameter.get("alliance").equals("RED") &&
+                this.robot.parameter.get("position").equals("FRONT_STAGE")){
             this.processor = this.redPropThresholdFrontstage;
         }
 
-        else if(robot.parameter.get("alliance").equals("BLUE") &&
-                robot.parameter.get("position").equals("FRONT_STAGE")){
+        else if(this.robot.parameter.get("alliance").equals("BLUE") &&
+                this.robot.parameter.get("position").equals("FRONT_STAGE")){
             this.processor = this.bluePropFrontstage;
         }
         else{
@@ -192,24 +199,53 @@ public class Camera {
     }
 
     public String GetPropPosition(){
-        if(robot.parameter.get("alliance").equals("RED") &&
-                robot.parameter.get("position").equals("BACK_STAGE")){
+        if(this.robot.parameter.get("alliance").equals("RED") &&
+                this.robot.parameter.get("position").equals("BACK_STAGE")){
            return this.redPropThresholdBackstage.getPropPosition();
 
         }
-        else if(robot.parameter.get("alliance").equals("RED") &&
-                robot.parameter.get("position").equals("FRONT_STAGE")){
+        else if(this.robot.parameter.get("alliance").equals("RED") &&
+                this.robot.parameter.get("position").equals("FRONT_STAGE")){
             return this.redPropThresholdFrontstage.getPropPosition();
         }
 
-        else if(robot.parameter.get("alliance").equals("BLUE") &&
-                robot.parameter.get("position").equals("FRONT_STAGE")){
+        else if(this.robot.parameter.get("alliance").equals("BLUE") &&
+                this.robot.parameter.get("position").equals("FRONT_STAGE")){
             return this.bluePropFrontstage.getPropPosition();
         }
         else{
             return this.bluePropBackstage.getPropPosition();
 
         }
+    }
+    public AprilTagDetection returnAprilTAg(int idtag){
+
+        AprilTagDetection desiredTag = null;
+        boolean targetFound = false;
+
+        //while (!ok && opModeIsActive() && !isStopRequested()) {
+
+        List<AprilTagDetection> currentDetections = this.atag.getDetections();
+        for (AprilTagDetection detection : currentDetections) {
+            if ((detection.metadata != null) && (detection.id == idtag || idtag==0)) {
+                targetFound = true;
+                desiredTag = detection;
+                break;  // don't look any further.
+            }
+        }
+
+        if(targetFound) {
+
+
+            return desiredTag;
+
+
+        }else{
+
+            return null;
+
+        }
+
     }
 
 

@@ -9,10 +9,10 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class Wheels {
 
 
-    public DcMotor frontLeft;
-    public DcMotor frontRight;
-    public DcMotor backLeft;
-    public DcMotor backRight;
+    private final DcMotor frontLeft;
+    private final DcMotor frontRight;
+    private final DcMotor backLeft;
+    private final DcMotor backRight;
 
 
     public Wheels(HardwareMap hardwareMap){
@@ -20,6 +20,7 @@ public class Wheels {
         this.frontRight = hardwareMap.get(DcMotor.class, "FR");
         this.backLeft = hardwareMap.get(DcMotor.class, "BL");
         this.backRight = hardwareMap.get(DcMotor.class, "BR");
+        this.setDirection();
     }
 
     public void setDirection(){
@@ -40,10 +41,10 @@ public class Wheels {
 
     public void GetDirection(Telemetry telemetry){
 
-        telemetry.addLine("Front Left: "+frontLeft.getDirection());
-        telemetry.addLine("Front Right: "+frontRight.getDirection());
-        telemetry.addLine("Back Left: "+backLeft.getDirection());
-        telemetry.addLine("Back Right: "+backRight.getDirection());
+        telemetry.addLine("Front Left: "+this.frontLeft.getDirection());
+        telemetry.addLine("Front Right: "+this.frontRight.getDirection());
+        telemetry.addLine("Back Left: "+this.backLeft.getDirection());
+        telemetry.addLine("Back Right: "+this.backRight.getDirection());
 
 
     }

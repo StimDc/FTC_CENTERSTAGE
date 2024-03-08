@@ -45,25 +45,24 @@ public class Movement {
         this.wheels = wheels;
         this.imu = imu;
         this.telemetry = telemetry;
-        wheels = new Wheels(hardwareMap);
-        wheels.setDirection();
-        wheels.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        this.wheels.setDirection();
+        this.wheels.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
     }
 
     public void forward(int sign, double pow, double dist) {
         //sign = MathFunc.valueToOne(sign);
         dist = (int) (MathFunc.inchToTicks(MathFunc.cmToInch(dist)));
-        wheels.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        wheels.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        wheels.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        this.wheels.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        this.wheels.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        this.wheels.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         double x = dist - (int) MathFunc.inchToTicks(MathFunc.cmToInch(10 * pow / 0.6));
 
-        while (wheels.isDistNotReached(x)) {
-            wheels.setPower(sign * pow);
+        while (this.wheels.isDistNotReached(x)) {
+            this.wheels.setPower(sign * pow);
         }
-        while (wheels.isDistNotReached(dist)) {
+        while (this.wheels.isDistNotReached(dist)) {
 
             if (dist > 10) {
 
@@ -77,10 +76,10 @@ public class Movement {
             }
 
 
-            wheels.setPower(sign * pow);
+            this.wheels.setPower(sign * pow);
         }
-        wheels.setPower(0);
-        wheels.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        this.wheels.setPower(0);
+        this.wheels.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         sleep(SLEEP);
     }
 
@@ -89,15 +88,15 @@ public class Movement {
         dist = dist * LATERAL_ERROR;
 
         int ticks = (int) ((MathFunc.inchToTicks(MathFunc.cmToInch(dist)) * (1 / Math.sin(45))) * 35 / 42);
-        wheels.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        wheels.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        wheels.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        wheels.setTargetPosition(ticks * sign, -ticks * sign, -ticks * sign, ticks * sign);
-        wheels.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        wheels.setPower(pow);
-        wheels.waitMotors();
-        wheels.setPower(0);
-        wheels.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        this.wheels.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        this.wheels.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        this.wheels.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        this.wheels.setTargetPosition(ticks * sign, -ticks * sign, -ticks * sign, ticks * sign);
+        this.wheels.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        this.wheels.setPower(pow);
+        this.wheels.waitMotors();
+        this.wheels.setPower(0);
+        this.wheels.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         sleep(SLEEP);
     }
 
@@ -115,7 +114,7 @@ public class Movement {
             backRightPower /= max;
             backLeftPower /= max;
         }
-        wheels.setPower(frontLeftPower, frontRightPower, backLeftPower, backRightPower);
+        this.wheels.setPower(frontLeftPower, frontRightPower, backLeftPower, backRightPower);
         sleep(SLEEP);
     }
 
@@ -129,16 +128,16 @@ public class Movement {
             this.wheels.setPower(pow * sign, -pow * sign, pow * sign, -pow * sign);
             botHeading = Math.abs(this.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS)) - Math.abs(HEADING);
 
-            telemetry.addLine("Heading" + this.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES));
-            telemetry.update();
+            this.telemetry.addLine("Heading" + this.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES));
+            this.telemetry.update();
         }
 
         this.wheels.setPower(0);
         this.wheels.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         HEADING = this.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
-        telemetry.addLine("Heading" + this.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES));
-        telemetry.update();
+        this.telemetry.addLine("Heading" + this.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES));
+        this.telemetry.update();
         sleep(SLEEP);
     }
 
@@ -199,20 +198,20 @@ public class Movement {
                 //moveRobot(-drive, -strafe, turn);
 
                 if (okHeading == true && okYaw == true) {
-                    robot.move.generalMovement(-drive, 0, 0);
+                    this.generalMovement(-drive, 0, 0);
                 } else {
-                    robot.move.generalMovement(0, -strafe, turn);
+                    this.generalMovement(0, -strafe, turn);
 
                 }
-                //    robot.move.generalMovement(-drive, -strafe, turn);
+                //    this.generalMovement(-drive, -strafe, turn);
 
             } else {
-                robot.move.generalMovement(0, 0, 0);
+                this.generalMovement(0, 0, 0);
             }
             if (rangeError < 25) {
 
                 ok = true;
-                robot.move.generalMovement(0, 0, 0);
+                this.generalMovement(0, 0, 0);
             }
         }
 
@@ -239,10 +238,10 @@ public class Movement {
 
                 //moveRobot(-drive, -strafe, turn);
 
-                robot.move.generalMovement(0, 0, turn);
+                this.generalMovement(0, 0, turn);
 
             } else {
-                robot.move.generalMovement(0, 0, 0);
+                this.generalMovement(0, 0, 0);
             }
         }
 
@@ -319,7 +318,7 @@ public class Movement {
 
                 help=0;
 
-                robot.move.generalMovement(-drive, -strafe, turn);
+                this.generalMovement(-drive, -strafe, turn);
 
 
             } else {
@@ -331,14 +330,14 @@ public class Movement {
 
                     help=0;
                     ceva=ceva*(-1);
-                    robot.move.generalMovement(0, 0, 100);
+                    this.generalMovement(0, 0, 100);
 
 
                 }else if(help==-100000){
 
                     help=0;
                     ceva=ceva*(-1);
-                    robot.move.generalMovement(0, 0, -100);
+                    this.generalMovement(0, 0, -100);
 
                 }
 
@@ -346,7 +345,7 @@ public class Movement {
 
                 error++;
 
-                robot.move.generalMovement(0, 0, 0);
+                this.generalMovement(0, 0, 0);
             }
 
             if(error>15){
@@ -367,7 +366,7 @@ public class Movement {
 
                 ok=true;
 
-                robot.move.generalMovement(0, 0, 0);
+                this.generalMovement(0, 0, 0);
 
 
             }
@@ -393,17 +392,17 @@ public class Movement {
             if(okYaw==true && okHeading==true && okRange==true){
 
                 ok=true;
-                robot.move.generalMovement(0,0,0);
+                this.generalMovement(0,0,0);
 
 
             }
 
              */
 
-            telemetry.addLine("Range Error "+ rangeError);
-            telemetry.addLine("Heading Error "+headingError);
-            telemetry.addLine("Yaw Error "+yawError);
-            telemetry.update();
+            this.telemetry.addLine("Range Error "+ rangeError);
+            this.telemetry.addLine("Heading Error "+headingError);
+            this.telemetry.addLine("Yaw Error "+yawError);
+            this.telemetry.update();
 
         }
 
@@ -463,7 +462,7 @@ public class Movement {
 
                 help=0;
 
-                robot.move.generalMovement(0, 0, turn);
+                this.generalMovement(0, 0, turn);
 
 
             } else {
@@ -475,26 +474,26 @@ public class Movement {
 
                     help=0;
                     ceva=ceva*(-1);
-                    robot.move.generalMovement(0, 0, 100);
+                    this.generalMovement(0, 0, 100);
 
 
                 }else if(help==-100000){
 
                     help=0;
                     ceva=ceva*(-1);
-                    robot.move.generalMovement(0, 0, -100);
+                    this.generalMovement(0, 0, -100);
 
                 }
 
                  */
 
-                robot.move.generalMovement(0, 0, 0);
+                this.generalMovement(0, 0, 0);
             }
             if (headingError > -5 && headingError < 5) {
 
                 //  okRange=true;
                 ok = true;
-                robot.move.generalMovement(0, 0, 0);
+                this.generalMovement(0, 0, 0);
 
             }
             /*
@@ -517,7 +516,7 @@ public class Movement {
             if(okYaw==true && okHeading==true && okRange==true){
 
                 ok=true;
-                robot.move.generalMovement(0,0,0);
+                this.generalMovement(0,0,0);
 
 
             }
@@ -590,22 +589,22 @@ public class Movement {
             double strafe = Range.clip(-yawError * YAW_ERROR_GAIN, -MAX_YAW, MAX_YAW);
 
 
-            robot.move.generalMovement(-drive, -strafe, turn);
+            this.generalMovement(-drive, -strafe, turn);
 
         } else {
-            robot.move.generalMovement(0, 0, 0);
+            this.generalMovement(0, 0, 0);
         }
         if (rangeError > -2 && rangeError < 2) {
 
             //  okRange=true;
             STATE=true;
-            robot.move.generalMovement(0, 0, 0);
+            this.generalMovement(0, 0, 0);
 
         }
 
         if(STATE){
 
-            robot.move.generalMovement(0, 0, 0);
+            this.generalMovement(0, 0, 0);
 
 
         }
@@ -630,7 +629,7 @@ public class Movement {
             if(okYaw==true && okHeading==true && okRange==true){
 
                 ok=true;
-                robot.move.generalMovement(0,0,0);
+                this.generalMovement(0,0,0);
 
 
             }
@@ -683,7 +682,6 @@ public class Movement {
 
         //while (!ok && opModeIsActive() && !isStopRequested()) {
 
-        targetFound = false;
         List<AprilTagDetection> currentDetections = atag.getDetections();
         for (AprilTagDetection detection : currentDetections) {
             if ((detection.metadata != null) && (detection.id == idtag || idtag==0)) {

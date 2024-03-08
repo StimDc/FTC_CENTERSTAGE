@@ -47,6 +47,7 @@ public class Experiment_Control extends OpMode {
     private Claw clawpos;
 
     private Joint jointpos;
+    private Servo plane;
     private boolean OKJoint=true,OKClaw=true, PressClaw=false, PressJoint=false;
 
     private boolean once=false;
@@ -92,6 +93,7 @@ public class Experiment_Control extends OpMode {
 
     private double Zero_Offset=66.15;
     private double armTarget=Zero_Offset;
+
 
     private ElapsedTime timerr;
 
@@ -164,6 +166,8 @@ public class Experiment_Control extends OpMode {
         hang=hardwareMap.get(DcMotorEx.class,"s");
         hang.setDirection(DcMotorSimple.Direction.REVERSE);
         hang.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        plane=hardwareMap.get(Servo.class, "avion");
     }
 
     @Override
@@ -172,6 +176,14 @@ public class Experiment_Control extends OpMode {
         armTask();
 
         wheels.setDirection();
+
+        if(gamepad2.y){
+            plane.setPosition(0.3172);
+
+        }
+        if(gamepad2.x){
+            plane.setPosition(0);
+        }
 
         if(!once){
             joint.setPosition(jointpos.UP);

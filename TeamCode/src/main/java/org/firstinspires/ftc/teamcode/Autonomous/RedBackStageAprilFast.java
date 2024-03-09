@@ -73,6 +73,8 @@ public class RedBackStageAprilFast{
 
     private int tagID;
 
+    private boolean FALSE=false;
+
     private   final double ZERO_OFFSET = 70.0-3.85;
     private   double TargetPosInDegrees=70.0-3.85;
     private Telemetry telemetry;
@@ -150,6 +152,22 @@ public class RedBackStageAprilFast{
 
     public void backStageLeftProp(int parking,int timer) throws IOException {
 
+       int parkDist;
+
+       if(parking==-1){
+
+           parkDist=70;
+
+       }else{
+
+           parkDist=40;
+
+       }
+
+        this.AUTO.reset();
+
+        POWER_LiMIT=0.35;
+
         this.robot.camera.openBackCam();
 
         setManualExposure(1,1);
@@ -175,7 +193,7 @@ public class RedBackStageAprilFast{
 
 
 
-        this.robot.move.forward(FORWARD,0.6,38);
+        this.robot.move.forward(FORWARD,0.6,45);
         sleep(175);
 
         this.robot.move.rotate(-1,0.6,51.5);
@@ -216,11 +234,17 @@ public class RedBackStageAprilFast{
         boolean armtarget=false,OKtarget=false;
 
 
-        while(!armtarget){
+        while(!armtarget && !FALSE){
 
-            if(AUTO.seconds()>27){
+            if(AUTO.seconds()>26){
 
-                stateArm=5;
+                this.robot.arm.setPosition(ZERO_OFFSET,0.4);
+
+                this.robot.move.lateral(parking,0.8,parkDist);
+
+                stateArm =10;
+
+                armtarget=true;
             }
 
             switch (stateArm){
@@ -247,7 +271,7 @@ public class RedBackStageAprilFast{
 
                 case 3:
 
-                    if(timerr.milliseconds()>250){
+                    if(timerr.milliseconds()>350){//250
                         this.robot.claw.setPosition(Claw.OPEN);
                         stateArm=4;
                         timerr.reset();
@@ -277,9 +301,13 @@ public class RedBackStageAprilFast{
                         OKtarget=true;
                         this.robot.arm.setPower(0);
                         armtarget=true;
-                        this.robot.move.lateral(LEFT,0.8,75);
+                        this.robot.move.lateral(parking,0.8,parkDist);
                     }
                     break;
+
+                case 10:
+                    break;
+
 
             }
 
@@ -307,6 +335,21 @@ public class RedBackStageAprilFast{
 
     public void backStageCenterProp(int parking,int timer) throws IOException {
 
+        int parkDist;
+
+        if(parking==-1){
+
+            parkDist=60;
+
+        }else{
+
+            parkDist=60;
+
+        }
+
+        this.AUTO.reset();
+
+
         this.robot.camera.openBackCam();
 
         setManualExposure(1,1);
@@ -326,7 +369,7 @@ public class RedBackStageAprilFast{
         this.robot.move.lateral(RIGHT,0.4,8);
         sleep(175);
 
-        this.robot.move.forward(FORWARD,0.6,57);
+        this.robot.move.forward(FORWARD,0.6,60);//57
         sleep(175);
         this.robot.joint.setPosition(Joint.DOWN);
         sleep(500);
@@ -359,11 +402,17 @@ public class RedBackStageAprilFast{
         boolean armtarget=false,OKtarget=false;
 
 
-        while(!armtarget){
+        while(!armtarget && !FALSE){
 
-            if(AUTO.seconds()>27){
+            if(AUTO.seconds()>26){
 
-                stateArm=5;
+                this.robot.arm.setPosition(ZERO_OFFSET,0.4);
+
+                this.robot.move.lateral(parking,0.8,parkDist);
+
+                stateArm =10;
+
+                armtarget=true;
             }
 
             switch (stateArm){
@@ -390,7 +439,7 @@ public class RedBackStageAprilFast{
 
                 case 3:
 
-                    if(timerr.milliseconds()>250){
+                    if(timerr.milliseconds()>350){//250
                         this.robot.claw.setPosition(Claw.OPEN);
                         stateArm=4;
                         timerr.reset();
@@ -416,13 +465,17 @@ public class RedBackStageAprilFast{
                     break;
 
                 case 6:
-                    if(this.robot.arm.getPosition()<165) {
+                    if(this.robot.arm.getPosition()<175) {
                         OKtarget=true;
                         this.robot.arm.setPower(0);
                         armtarget=true;
-                        this.robot.move.lateral(LEFT,0.8,60);
+                        this.robot.move.lateral(parking,0.8,parkDist);
                     }
                     break;
+
+                case 10:
+                    break;
+
 
             }
 
@@ -435,7 +488,7 @@ public class RedBackStageAprilFast{
                 OKtarget=false;
             }
             if(!OKtarget){
-                this.robot.arm.armTask();
+                robot.arm.armTask();
             }
             this.telemetry.addLine("Pos: "+this.robot.arm.getPosition());
             this.telemetry.addLine("Target: "+TargetPosInDegrees);
@@ -451,6 +504,18 @@ public class RedBackStageAprilFast{
 
     }
     public void backStageRightProp(int parking, double timer) throws IOException {
+
+        int parkDist;
+
+        if(parking==-1){
+
+            parkDist=40;
+
+        }else{
+
+            parkDist=70;
+
+        }
 
         this.robot.camera.openBackCam();
 
@@ -517,11 +582,17 @@ public class RedBackStageAprilFast{
         boolean armtarget=false,OKtarget=false;
 
 
-        while(!armtarget){
+        while(!armtarget && !FALSE){
 
-            if(AUTO.seconds()>27){
+            if(AUTO.seconds()>26){
 
-                stateArm=5;
+                this.robot.arm.setPosition(ZERO_OFFSET,0.4);
+
+                this.robot.move.lateral(parking,0.8,parkDist);
+
+                stateArm =10;
+
+                armtarget=true;
             }
 
             switch (stateArm){
@@ -548,7 +619,7 @@ public class RedBackStageAprilFast{
 
                 case 3:
 
-                    if(timerr.milliseconds()>250){
+                    if(timerr.milliseconds()>350){//250
                         this.robot.claw.setPosition(Claw.OPEN);
                         stateArm=4;
                         timerr.reset();
@@ -578,9 +649,13 @@ public class RedBackStageAprilFast{
                         OKtarget=true;
                         this.robot.arm.setPower(0);
                         armtarget=true;
-                        this.robot.move.lateral(LEFT,0.8,45);
+                        this.robot.move.lateral(parking,0.8,parkDist);
                     }
                     break;
+
+                case 10:
+                    break;
+
 
             }
 
@@ -593,7 +668,7 @@ public class RedBackStageAprilFast{
                 OKtarget=false;
             }
             if(!OKtarget){
-                this.robot.arm.armTask();
+                robot.arm.armTask();
             }
             this.telemetry.addLine("Pos: "+this.robot.arm.getPosition());
             this.telemetry.addLine("Target: "+TargetPosInDegrees);
@@ -758,15 +833,15 @@ public class RedBackStageAprilFast{
 
                 }
 
-                /*
+
                 telemetry.addLine("Range: "+detection.ftcPose.range);
                 telemetry.addLine("Bearing: "+detection.ftcPose.bearing);
                 telemetry.addLine("Yaw: "+detection.ftcPose.yaw);
 
 
-                 */
 
-                //  telemetry.update();
+
+                telemetry.update();
                 String logFilePath = String.format("%s/FIRST/data/debug.txt", Environment.getExternalStorageDirectory().getAbsolutePath());
                 FileWriter fw = new FileWriter(logFilePath);
                 fw.write(detection.ftcPose.toString());
@@ -792,9 +867,7 @@ public class RedBackStageAprilFast{
 
             this.robot.move.lateral(RIGHT,0.8,45);
 
-            while(exit){
-
-            }
+            FALSE=true;
 
         }
 

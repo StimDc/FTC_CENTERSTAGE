@@ -93,8 +93,8 @@ public class Camera {
        this.vision.setProcessorEnabled(this.processor,false);
 
       //  exposure=vision.getCameraControl(ExposureControl.class);
-      //  exposure.setMode(ExposureControl.Mode.Manual);
-     //   exposure.setExposure(15, TimeUnit.MILLISECONDS);
+       // exposure.setMode(ExposureControl.Mode.Manual);
+      //  exposure.setExposure(15, TimeUnit.MILLISECONDS);
 
       //  gain=vision.getCameraControl(GainControl.class);
        // gain.setGain(28);
@@ -116,6 +116,10 @@ public class Camera {
         while(this.vision.getCameraState()!=VisionPortal.CameraState.STREAMING){
 
         }
+
+       // exposure=vision.getCameraControl(ExposureControl.class);
+       // exposure.setMode(ExposureControl.Mode.Manual);
+       // exposure.setExposure(15, TimeUnit.MILLISECONDS);
 
 
     }

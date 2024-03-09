@@ -62,12 +62,19 @@ public class Autonomie_Primitive extends LinearOpMode {
         boolean once = true;
 
 
+        int parkare=-1;
         // RED=1 && BLUE=2
         String alliance = paramaters.get("alliance"); //RED or BLUE
         // FRONTSTAGE=1 && BACKSTAGE=2
         String startpoint = paramaters.get("position");//FRONT_STAGE or BACK_STAGE
-        // LEFT=1 && RIGHT=2
+        // LEFT=-1 && RIGHT=1
         String parking = paramaters.get("parking");//LEFT or RIGHT
+
+        if(parking.equals("RIGHT")){
+
+            parkare=1;
+
+        }
 
         String timer=paramaters.get("timer");// HOW TO CONVERT FROM STRING TO INT???
         try{
@@ -154,42 +161,42 @@ public class Autonomie_Primitive extends LinearOpMode {
             if (alliance.equals("RED") && propPosition.equals("center")) {
                 redBack.passTag(tagID);
                 try {
-                    redBack.backStageCenterProp(-1, 0);
+                    redBack.backStageCenterProp(parkare, 0);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             } else if (alliance.equals("RED") && propPosition.equals("left")) {
                 redBack.passTag(tagID);
                 try {
-                    redBack.backStageLeftProp(-1, 0);
+                    redBack.backStageLeftProp(parkare, 0);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             } else if (alliance.equals("RED") && propPosition.equals("right")) {
                 redBack.passTag(tagID);
                 try {
-                    redBack.backStageRightProp(-1, 0);
+                    redBack.backStageRightProp(parkare, 0);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             } else if (alliance.equals("BLUE") && propPosition.equals("left")) {
                 blueOpMode.passTag(tagID);
                 try {
-                    blueOpMode.backStageLeftProp(-1, 0);
+                    blueOpMode.backStageLeftProp(parkare, 0);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             } else if (alliance.equals("BLUE") && propPosition.equals("center")) {
                 blueOpMode.passTag(tagID);
                 try {
-                    blueOpMode.backStageCenterProp(-1, 0);
+                    blueOpMode.backStageCenterProp(parkare, 0);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             } else if (alliance.equals("BLUE") && propPosition.equals("right")) {
                 blueOpMode.passTag(tagID);
                 try {
-                    blueOpMode.backStageRightProp(-1, 0);
+                    blueOpMode.backStageRightProp(parkare, 0);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }

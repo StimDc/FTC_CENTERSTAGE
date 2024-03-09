@@ -47,6 +47,8 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
 import org.firstinspires.ftc.teamcode.Implementations.Camera.BluePropThreshold_Backstage;
 import org.firstinspires.ftc.teamcode.Implementations.Camera.RedPropThreshold_Backstage;
 import org.firstinspires.ftc.teamcode.Implementations.Camera.RedPropThreshold_Backstage;
@@ -54,10 +56,12 @@ import org.firstinspires.ftc.teamcode.Implementations.Constants.Claw;
 import org.firstinspires.ftc.teamcode.Implementations.Constants.Joint;
 import org.firstinspires.ftc.teamcode.Implementations.Math.MathFunc;
 import org.firstinspires.ftc.teamcode.Implementations.Robot.Robot;
+import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 
 public class BlueBackStageAprilFast {
@@ -69,6 +73,9 @@ public class BlueBackStageAprilFast {
     public static double f=0.002;
 
     public static double target;
+
+    private boolean FALSE=false;
+
 
     private final double ticks_in_degrees=288*(125/45.0)/360; /// gear ratio: 45/125=0.36
 
@@ -101,7 +108,7 @@ public class BlueBackStageAprilFast {
 
     public static double Distancef =8,Distances=6,Distancet=6;
 
-    public static double POWER_LiMIT=0.7;
+    public static double POWER_LiMIT=0.35;
 
     private int hope=0;
     private Telemetry telemetry;
@@ -145,7 +152,23 @@ public class BlueBackStageAprilFast {
 
     public void backStageLeftProp(int parking,int timer) throws IOException {
 
+        int parkDist;
+
+        if(parking==-1){
+
+            parkDist=70;
+
+        }else{
+
+            parkDist=40;
+
+        }
+
+        AUTO.reset();
+
         this.robot.camera.openBackCam();
+
+        setManualExposure(1,1);
     /*
         this.robot.claw.setPosition(Claw.INTERMEDIARY);
         sleep(750);
@@ -196,11 +219,17 @@ public class BlueBackStageAprilFast {
         boolean armtarget=false,OKtarget=false;
 
 
-        while(!armtarget){
+        while(!armtarget && !FALSE){
 
-            if(AUTO.seconds()>27){
+            if(AUTO.seconds()>26){
 
-                stateArm=5;
+                this.robot.arm.setPosition(ZERO_OFFSET,0.4);
+
+                this.robot.move.lateral(parking,0.8,parkDist);
+
+                stateArm =10;
+
+                armtarget=true;
             }
 
             switch (stateArm){
@@ -227,7 +256,7 @@ public class BlueBackStageAprilFast {
 
                 case 3:
 
-                    if(timerr.milliseconds()>250){
+                    if(timerr.milliseconds()>350){//250
                         this.robot.claw.setPosition(Claw.OPEN);
                         stateArm=4;
                         timerr.reset();
@@ -257,9 +286,13 @@ public class BlueBackStageAprilFast {
                         OKtarget=true;
                         this.robot.arm.setPower(0);
                         armtarget=true;
-                        this.robot.move.lateral(LEFT,0.8,45);
+                        this.robot.move.lateral(parking,0.8,parkDist);
                     }
                     break;
+
+                case 10:
+                    break;
+
 
             }
 
@@ -272,7 +305,7 @@ public class BlueBackStageAprilFast {
                 OKtarget=false;
             }
             if(!OKtarget){
-                this.robot.arm.armTask();
+                robot.arm.armTask();
             }
             this.telemetry.addLine("Pos: "+this.robot.arm.getPosition());
             this.telemetry.addLine("Target: "+TargetPosInDegrees);
@@ -292,7 +325,23 @@ public class BlueBackStageAprilFast {
 
     public void backStageCenterProp(int parking,int timer) throws IOException {
 
+        int parkDist;
+
+        if(parking==-1){
+
+            parkDist=60;
+
+        }else{
+
+            parkDist=60;
+
+        }
+
+        AUTO.reset();
+
         this.robot.camera.openBackCam();
+
+        setManualExposure(1,1);
 
         /*
         this.robot.claw.setPosition(Claw.INTERMEDIARY);
@@ -343,11 +392,17 @@ public class BlueBackStageAprilFast {
         boolean armtarget=false,OKtarget=false;
 
 
-        while(!armtarget){
+        while(!armtarget && !FALSE){
 
-            if(AUTO.seconds()>27){
+            if(AUTO.seconds()>26){
 
-                stateArm=5;
+                this.robot.arm.setPosition(ZERO_OFFSET,0.4);
+
+                this.robot.move.lateral(parking,0.8,parkDist);
+
+                stateArm =10;
+
+                armtarget=true;
             }
 
             switch (stateArm){
@@ -374,7 +429,7 @@ public class BlueBackStageAprilFast {
 
                 case 3:
 
-                    if(timerr.milliseconds()>250){
+                    if(timerr.milliseconds()>350){//250
                         this.robot.claw.setPosition(Claw.OPEN);
                         stateArm=4;
                         timerr.reset();
@@ -404,9 +459,13 @@ public class BlueBackStageAprilFast {
                         OKtarget=true;
                         this.robot.arm.setPower(0);
                         armtarget=true;
-                        this.robot.move.lateral(LEFT,0.8,45);
+                        this.robot.move.lateral(parking,0.8,parkDist);
                     }
                     break;
+
+                case 10:
+                    break;
+
 
             }
 
@@ -419,7 +478,7 @@ public class BlueBackStageAprilFast {
                 OKtarget=false;
             }
             if(!OKtarget){
-                this.robot.arm.armTask();
+                robot.arm.armTask();
             }
             this.telemetry.addLine("Pos: "+this.robot.arm.getPosition());
             this.telemetry.addLine("Target: "+TargetPosInDegrees);
@@ -439,7 +498,23 @@ public class BlueBackStageAprilFast {
     }
     public void backStageRightProp(int parking, double timer) throws IOException {
 
+        int parkDist;
+
+        if(parking==-1){
+
+            parkDist=40;
+
+        }else{
+
+            parkDist=70;
+
+        }
+
+        AUTO.reset();
+
         this.robot.camera.openBackCam();
+
+        setManualExposure(1,1);
 
         /*
         this.robot.claw.setPosition(Claw.INTERMEDIARY);
@@ -498,11 +573,17 @@ public class BlueBackStageAprilFast {
         boolean armtarget=false,OKtarget=false;
 
 
-        while(!armtarget){
+        while(!armtarget && !FALSE){
 
-            if(AUTO.seconds()>27){
+            if(AUTO.seconds()>26){
 
-                stateArm=5;
+                this.robot.arm.setPosition(ZERO_OFFSET,0.4);
+
+                this.robot.move.lateral(parking,0.8,parkDist);
+
+                stateArm =10;
+
+                armtarget=true;
             }
 
             switch (stateArm){
@@ -529,7 +610,7 @@ public class BlueBackStageAprilFast {
 
                 case 3:
 
-                    if(timerr.milliseconds()>250){
+                    if(timerr.milliseconds()>350){//250
                         this.robot.claw.setPosition(Claw.OPEN);
                         stateArm=4;
                         timerr.reset();
@@ -559,9 +640,13 @@ public class BlueBackStageAprilFast {
                         OKtarget=true;
                         this.robot.arm.setPower(0);
                         armtarget=true;
-                        this.robot.move.lateral(LEFT,0.8,45);
+                        this.robot.move.lateral(parking,0.8,parkDist);
                     }
                     break;
+
+                case 10:
+                    break;
+
 
             }
 
@@ -574,7 +659,7 @@ public class BlueBackStageAprilFast {
                 OKtarget=false;
             }
             if(!OKtarget){
-                this.robot.arm.armTask();
+                robot.arm.armTask();
             }
             this.telemetry.addLine("Pos: "+this.robot.arm.getPosition());
             this.telemetry.addLine("Target: "+TargetPosInDegrees);
@@ -775,14 +860,66 @@ public class BlueBackStageAprilFast {
 
             this.robot.move.lateral(RIGHT,0.8,45);
 
-            while(exit){
+            FALSE=true;
 
-            }
 
         }
 
 
     }
+
+    private boolean   setManualExposure(int exposureMS, int gain) {
+        // Ensure Vision Portal has been setup.
+        if (this.robot.camera.vision == null) {
+            return false;
+        }
+
+        // Wait for the camera to be open
+        if (this.robot.camera.vision.getCameraState() != VisionPortal.CameraState.STREAMING) {
+            this.telemetry.addData("Camera", "Waiting");
+            this.telemetry.update();
+            while ((this.robot.camera.vision.getCameraState() != VisionPortal.CameraState.STREAMING)) {
+                sleep(20);
+            }
+            this.telemetry.addData("Camera", "Ready");
+            this.telemetry.update();
+        }
+
+        // Set camera controls unless we are stopping.
+        if (!false)
+        {
+            // Set exposure.  Make sure we are in Manual Mode for these values to take effect.
+            ExposureControl exposureControl = this.robot.camera.vision.getCameraControl(ExposureControl.class);
+            if (exposureControl.getMode() != ExposureControl.Mode.Manual) {
+                exposureControl.setMode(ExposureControl.Mode.Manual);
+                sleep(50);
+            }
+            exposureControl.setExposure(7, TimeUnit.MILLISECONDS);
+            sleep(20);
+
+            this.telemetry.addLine("Exposure Ceva: "+exposureControl.getExposure(TimeUnit.MILLISECONDS));
+
+            // Set Gain.
+            GainControl gainControl = this.robot.camera.vision.getCameraControl(GainControl.class);
+
+            this.telemetry.addLine("Gain Ceva: "+gainControl);
+
+
+            if(gainControl!=null){
+                boolean haide= gainControl.setGain(255);
+                this.telemetry.addLine("Gain: "+gainControl.getGain());
+
+            }
+            sleep(20);
+            return (true);
+        } else {
+            return (false);
+        }
+    }
+
+
+
+
 }
 
 //759 lines and 40 warnings 331 lines and 27 warnings

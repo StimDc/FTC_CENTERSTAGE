@@ -11,7 +11,9 @@ import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
-public class RedPropThreshold_Backstage implements VisionProcessor {
+public class
+
+RedPropThreshold_Backstage implements VisionProcessor {
 
 
     private double left,center;

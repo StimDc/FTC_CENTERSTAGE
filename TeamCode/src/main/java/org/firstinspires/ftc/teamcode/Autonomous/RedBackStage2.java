@@ -33,6 +33,7 @@ import static org.firstinspires.ftc.teamcode.Implementations.Constants.Direction
 import static org.firstinspires.ftc.teamcode.Implementations.Constants.Direction.FORWARD;
 import static org.firstinspires.ftc.teamcode.Implementations.Constants.Direction.RIGHT;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import org.firstinspires.ftc.teamcode.Implementations.Constants.Claw;
@@ -41,6 +42,7 @@ import org.firstinspires.ftc.teamcode.Implementations.Robot.Robot;
 
 import java.io.IOException;
 
+@Disabled
 @Autonomous(name="RED BACKSTAGE DOI", group = "Red Routes")
 
 public class RedBackStage2 extends  LinearOpMode{

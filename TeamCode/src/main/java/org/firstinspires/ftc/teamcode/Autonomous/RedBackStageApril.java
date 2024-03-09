@@ -41,6 +41,7 @@ import com.arcrobotics.ftclib.controller.PIDController;
 import com.outoftheboxrobotics.photoncore.Photon;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -55,6 +56,7 @@ import java.io.IOException;
 import java.util.List;
 
 
+@Disabled
 @Autonomous(name="RED BACKSTAGE April", group = "Red Routes")
 
 public class RedBackStageApril extends  LinearOpMode{

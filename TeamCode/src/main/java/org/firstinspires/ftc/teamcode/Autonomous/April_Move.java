@@ -51,7 +51,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-@Photon
+@Disabled
 @Autonomous(name="April Move", group = "Robot")
 
 public class April_Move extends LinearOpMode {

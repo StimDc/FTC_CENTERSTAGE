@@ -40,9 +40,9 @@ import org.firstinspires.ftc.teamcode.Implementations.Robot.Robot;
 import java.io.IOException;
 import java.util.Dictionary;
 
-@Autonomous(name="AUTONOMIE", group = "Robot")
-@Disabled
-public class Autonomie_Primitive extends LinearOpMode {
+@Autonomous(name="AUTONOMIE FUCK Mov", group = "Robot")
+
+public class Autonomie_Primitive_Mov extends LinearOpMode {
     Dictionary<String,String> paramaters;
     private int tagID;
 
@@ -90,13 +90,13 @@ public class Autonomie_Primitive extends LinearOpMode {
         robot.wheels.setDirection();
         int[] tags = (alliance.equals("RED")) ? new int[]{4, 5, 6} : new int[]{1, 2, 3};
 
-        RedBackStageAprilFast redBack = null;
+        RedBackStageMov redBack = null;
         BlueBackStageAprilFast blueBack = null;
-        RedFrontStage redFront = null;
+        RedFrontStageMov redFront = null;
         BlueFrontStage blueFront =null;
 
         if(alliance.equals("RED") && startpoint.equals("BACK_STAGE")){
-            redBack = new RedBackStageAprilFast(robot,telemetry,tagID);
+            redBack = new RedBackStageMov(robot,telemetry,tagID);
             redBack.init();
 
         }
@@ -105,7 +105,7 @@ public class Autonomie_Primitive extends LinearOpMode {
             blueBack.init();
         }
         else if(alliance.equals("RED") && startpoint.equals("FRONT_STAGE")){
-            redFront = new RedFrontStage(robot,telemetry,tagID);
+            redFront = new RedFrontStageMov(robot,telemetry,tagID);
             redFront.init();
         }
         else if (alliance.equals("BLUE") && startpoint.equals("FRONT_STAGE")){
@@ -169,7 +169,7 @@ public class Autonomie_Primitive extends LinearOpMode {
             if (alliance.equals("RED") && propPosition.equals("center")) {
                 redBack.passTag(tagID);
                 try {
-                    redBack.backStageCenterProp(parkare, 0);
+                    redBack.backStageCenterPropBackup(parkare, 0);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -212,13 +212,13 @@ public class Autonomie_Primitive extends LinearOpMode {
         }
         else if(startpoint.equals("FRONT_STAGE")){
             if(alliance.equals("RED") && propPosition.equals("left")){
-                redFront.frontStageLeftProp(parkare,0);
+               // redFront.frontStageLeftProp(parkare,0);
             }
             else if(alliance.equals("RED") && propPosition.equals("center")){
-                redFront.frontStageCenterProp(parkare,0);
+              //  redFront.frontStageCenterProp(parkare,0);
             }
             else if(alliance.equals("RED") && propPosition.equals("right")){
-                redFront.frontStageRightProp(parkare,0);
+              //  redFront.frontStageRightProp(parkare,0);
             }
             else if(alliance.equals("BLUE") && propPosition.equals("left")){
                 blueFront.frontStageLeftProp(parkare, 0);

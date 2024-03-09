@@ -115,6 +115,7 @@ public class BlueBackStageAprilFast {
 
 
 
+
     public BlueBackStageAprilFast(Robot robot, Telemetry telemetry, int tagID){
         this.robot = robot;
         this.telemetry = telemetry;
@@ -148,6 +149,54 @@ public class BlueBackStageAprilFast {
 
         this.robot.wheels.setDirection();
 
+    }
+
+    public void backStageLeftPropBackup(int parking, int timer)throws IOException{
+        int parkDist;
+
+        if(parking==-1){
+
+            parkDist=70;
+
+        }else{
+
+            parkDist=40;
+
+        }
+
+        AUTO.reset();
+
+        this.robot.camera.openBackCam();
+
+        setManualExposure(1,1);
+    /*
+        this.robot.claw.setPosition(Claw.INTERMEDIARY);
+        sleep(750);
+        this.robot.joint.setPosition(Joint.DOWN);
+        sleep(900);
+        this.robot.claw.setPosition(Claw.CLOSED);
+    */
+        this.robot.claw.setPosition(Claw.CLOSED);
+        sleep(750);
+        this.robot.joint.setPosition(Joint.DOWN);
+        sleep(900);
+
+
+        this.robot.move.lateral(LEFT,0.4,25.5);
+        sleep(175);
+
+        this.robot.move.forward(FORWARD,0.6,36.5);
+        sleep(175);
+        this.robot.claw.setPosition(Claw.INTERMEDIARY);
+        sleep(250);
+        this.robot.move.forward(BACKWARDS,0.5,5.5);
+        sleep(175);
+        this.robot.claw.setPosition(Claw.CLOSED);
+        sleep(250);
+        this.robot.joint.setPosition(Joint.UP);
+
+        this.robot.move.forward(BACKWARDS,0.5,50);
+        this.robot.move.lateral(LEFT,0.5,50);
     }
 
     public void backStageLeftProp(int parking,int timer) throws IOException {
@@ -323,6 +372,55 @@ public class BlueBackStageAprilFast {
          */
     }
 
+    public void backStageCenterPropBackup(int parking, int timer) throws IOException{
+        int parkDist;
+
+        if(parking==-1){
+
+            parkDist=60;
+
+        }else{
+
+            parkDist=60;
+
+        }
+
+        AUTO.reset();
+
+        this.robot.camera.openBackCam();
+
+        setManualExposure(1,1);
+
+        /*
+        this.robot.claw.setPosition(Claw.INTERMEDIARY);
+        sleep(750);
+        this.robot.joint.setPosition(Joint.DOWN);
+        sleep(900);
+        this.robot.claw.setPosition(Claw.CLOSED);
+*/
+        this.robot.claw.setPosition(Claw.CLOSED);
+        sleep(750);
+        this.robot.joint.setPosition(Joint.DOWN);
+        sleep(900);
+
+
+        this.robot.move.lateral(LEFT,0.4,8);
+        sleep(175);
+
+        this.robot.move.forward(FORWARD,0.6,57);
+        sleep(175);
+        this.robot.claw.setPosition(Claw.INTERMEDIARY);
+        sleep(500);
+        this.robot.move.forward(BACKWARDS,0.5,5.5);
+        sleep(175);
+        this.robot.claw.setPosition(Claw.CLOSED);
+        sleep(500);
+        this.robot.joint.setPosition(Joint.UP);
+
+        this.robot.move.forward(BACKWARDS,0.5,50);
+        this.robot.move.lateral(LEFT, 0.5,50);
+    }
+
     public void backStageCenterProp(int parking,int timer) throws IOException {
 
         int parkDist;
@@ -496,6 +594,67 @@ public class BlueBackStageAprilFast {
          */
 
     }
+
+    public void backStageRightPropBackup(int parking,int timer) throws IOException{
+        int parkDist;
+
+        if(parking==-1){
+
+            parkDist=40;
+
+        }else{
+
+            parkDist=70;
+
+        }
+
+        AUTO.reset();
+
+        this.robot.camera.openBackCam();
+
+        setManualExposure(1,1);
+
+        /*
+        this.robot.claw.setPosition(Claw.INTERMEDIARY);
+        sleep(750);
+        this.robot.joint.setPosition(Joint.DOWN);
+        sleep(900);
+        this.robot.claw.setPosition(Claw.CLOSED);
+
+
+         */
+        this.robot.claw.setPosition(Claw.CLOSED);
+        sleep(750);
+        this.robot.joint.setPosition(Joint.DOWN);
+        sleep(900);
+
+
+        this.robot.move.forward(FORWARD,0.6,39);
+        sleep(175);
+
+        this.robot.move.rotate(1,0.6,51.5);
+        sleep(500);
+
+
+        this.robot.move.forward(FORWARD,0.5,10);
+        sleep(500);
+
+        this.robot.claw.setPosition(Claw.INTERMEDIARY);
+        sleep(750);
+
+
+        this.robot.move.forward(BACKWARDS,0.5,5.5);
+        sleep(175);
+        this.robot.claw.setPosition(Claw.CLOSED);
+        sleep(500);
+        this.robot.joint.setPosition(Joint.UP);
+        sleep(500);
+
+        this.robot.move.rotate(-1,0.6,51.5);
+        this.robot.move.forward(BACKWARDS,0.5, 50);
+        this.robot.move.lateral(LEFT,0.5,50);
+    }
+
     public void backStageRightProp(int parking, double timer) throws IOException {
 
         int parkDist;

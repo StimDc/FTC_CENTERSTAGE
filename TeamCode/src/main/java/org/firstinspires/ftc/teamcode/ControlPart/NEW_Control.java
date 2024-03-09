@@ -144,7 +144,7 @@ public class NEW_Control extends OpMode {
         timerr=new ElapsedTime();
         timerr.reset();
 
-        setManualExposure(1,1);
+        //setManualExposure(1,1);
         
 
     }
@@ -153,79 +153,78 @@ public class NEW_Control extends OpMode {
     public void loop() {
         robot.arm.armTaskC();
         robot.wheels.setDirection();
-        if(!once){
+        if (!once) {
             robot.joint.setPosition(UP);
             robot.claw.setPosition(INTERMEDIARY);//CLAWINTERMEDIARY
             hangLeft.setPosition(0.35);
             hangRight.setPosition(0.65);
-            once=true;
+            once = true;
             //da
         }
 
-        if(gamepad2.dpad_up){
+        if (gamepad2.dpad_up) {
 
             hangLeft.setPosition(0.7561111);
             hangRight.setPosition(0.24399999);
 
-        }if(gamepad2.dpad_down){
+        }
+        if (gamepad2.dpad_down) {
 
             hangLeft.setPosition(0.35);
             hangRight.setPosition(0.65);
 
 
         }
-        if(gamepad2.y){
+        if (gamepad2.y) {
             plane.setPosition(0.3172);
 
         }
-        if(gamepad2.x){
+        if (gamepad2.x) {
             plane.setPosition(0);
         }
 
-        if(gamepad2.b){
-            if(!OKJoint && !PressJoint){
+        if (gamepad2.b) {
+            if (!OKJoint && !PressJoint) {
                 robot.joint.setPosition(UP);
-                OKJoint=true;
+                OKJoint = true;
 
-            }
-            else if(OKJoint && !PressJoint){
+            } else if (OKJoint && !PressJoint) {
                 robot.joint.setPosition(DOWN);
-                OKJoint=false;
+                OKJoint = false;
 
             }
-            PressJoint=true;
+            PressJoint = true;
 
-        }else {
-            PressJoint=false;
+        } else {
+            PressJoint = false;
         }
 
-        if(gamepad2.dpad_right){
+        if (gamepad2.dpad_right) {
             robot.joint.setPosition(0.4);
-            OKJoint=false;
+            OKJoint = false;
         }
 
-        if(gamepad2.dpad_left){
+        if (gamepad2.dpad_left) {
             robot.claw.setPosition(OPEN);//CLAWOPEN
-            OKClaw=false;
+            OKClaw = false;
         }
 
-        if(gamepad2.a){
-            if(!OKClaw && !PressClaw){
+        if (gamepad2.a) {
+            if (!OKClaw && !PressClaw) {
                 robot.claw.setPosition(INTERMEDIARY);//CLAWINTERMEDIARY
-                OKClaw=true;
+                OKClaw = true;
 
-            }
-            else if(OKClaw && !PressClaw){
+            } else if (OKClaw && !PressClaw) {
                 robot.claw.setPosition(CLOSED);//CLAWCLOSED
-                OKClaw=false;
+                OKClaw = false;
 
             }
-            PressClaw=true;
-        }else{
-            PressClaw=false;
+            PressClaw = true;
+        } else {
+            PressClaw = false;
         }
 
-        if(gamepad2.right_stick_y<0){
+        if (gamepad2.right_stick_y < 0) {
 
 
             hang.setPower(-gamepad2.right_stick_y);
@@ -233,61 +232,61 @@ public class NEW_Control extends OpMode {
             hang.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
 
-        }else if(gamepad2.right_stick_y>0){
+        } else if (gamepad2.right_stick_y > 0) {
 
             hang.setPower(-gamepad2.right_stick_y);
 
             hang.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
-        }
-
-        else {
+        } else {
 
             hang.setPower(0);
             hang.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         }
 
-        if(gamepad2.left_stick_y>0){
+        if (gamepad2.left_stick_y > 0) {
 
             viper.setPower(-gamepad2.left_stick_y);
             viper.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
-        }else if (gamepad2.left_stick_y<0){
+        } else if (gamepad2.left_stick_y < 0) {
 
             viper.setPower(-gamepad2.left_stick_y);
             viper.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
-        }
-
-        else{
+        } else {
 
             viper.setPower(0);
             viper.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         }
 
-        double drive =0;
-        double strafe=0;
-        double turn =0;
+        double drive = 0;
+        double strafe = 0;
+        double turn = 0;
 
-        boolean aprilk=false;
+        boolean aprilk = false;
 
-        if(robot.move.anyAprilTags(robot,robot.camera.atag)){
+        /*
+        if (robot.move.anyAprilTags(robot, robot.camera.atag)) {
 
             //change color control hub to gold
-            robot.move.showAprilTags(robot,robot.camera.atag);
+            robot.move.showAprilTags(robot, robot.camera.atag);
 
-        }else{
+        } else {
 
             // change color control hub to red
             telemetry.addLine("No April Tags :(");
 
         }
 
-        if(gamepad1.right_bumper){
-            SENS=SENS*(-1);
+         */
+
+        if (gamepad1.right_bumper) {
+            SENS = SENS * (-1);
         }
+
 
         if (gamepad1.dpad_left) {
 
@@ -301,7 +300,7 @@ public class NEW_Control extends OpMode {
 
            robot.wheels.setDirection();
 
-            Go_to_April();
+            //Go_to_April();
 
 
 
@@ -319,7 +318,7 @@ public class NEW_Control extends OpMode {
 
            robot.wheels.setDirection();
 
-            Go_to_April();
+            //Go_to_April();
 
         }
 
@@ -336,7 +335,7 @@ public class NEW_Control extends OpMode {
 
           robot.wheels.setDirection();
 
-            Go_to_April();
+            //Go_to_April();
         }
 
 
@@ -353,7 +352,7 @@ public class NEW_Control extends OpMode {
 
             robot.wheels.setDirection();
 
-            Go_to_April();
+            //Go_to_April();
         }
         else{
 
@@ -393,7 +392,7 @@ public class NEW_Control extends OpMode {
 
         }
 
-        else if(gamepad2.left_bumper){ // arm goes up automatically
+        if(gamepad2.left_bumper){ // arm goes up automatically
 
             armTarget=210;
             robot.arm.setPositionC(armTarget,0.6);
@@ -402,7 +401,7 @@ public class NEW_Control extends OpMode {
 
         }
 
-        else if(gamepad2.right_bumper){ // arm goes down automatically
+        if(gamepad2.right_bumper){ // arm goes down automatically
             armTarget=ZERO_OFFSET;
 
             robot.arm.setPositionC(ZERO_OFFSET,0.45);
@@ -411,7 +410,7 @@ public class NEW_Control extends OpMode {
 
         }
 
-        else if(gamepad2.right_trigger>0){ // arm goes down
+        if(gamepad2.right_trigger>0){ // arm goes down
 
             if(timerr.seconds()>0.1 && armTarget-gamepad2.right_trigger*10>ZERO_OFFSET){
                 armTarget-=gamepad2.right_trigger*10;
@@ -462,7 +461,7 @@ public class NEW_Control extends OpMode {
         robot.wheels.setPower(frontLeftPower,frontRightPower,backLeftPower,backRightPower);
 
     }
-
+/*
 
     private double ForwardPID(){
 
@@ -545,7 +544,8 @@ public class NEW_Control extends OpMode {
         //  robot.wheels.setPower(-power,power,-power,power);
 
     }
-
+*/
+    /*
     public void AprilPID(){
 
         double powerForward=ForwardPID();
@@ -585,6 +585,9 @@ public class NEW_Control extends OpMode {
 
     }
 
+     */
+
+    /*
     public void Go_to_April(){
             try{
                 AprilTagDetection detection=robot.camera.returnAprilTAg(tagID);
@@ -607,14 +610,14 @@ public class NEW_Control extends OpMode {
 
 
 
-                /*
+
 
                 telemetry.addLine("Range: "+detection.ftcPose.range);
                 telemetry.addLine("Bearing: "+detection.ftcPose.bearing);
                 telemetry.addLine("Yaw: "+detection.ftcPose.yaw);
 
 
-                 */
+
                     telemetry.update();
 
 
@@ -631,8 +634,9 @@ public class NEW_Control extends OpMode {
 
 
     }
+    */
 
-
+/*
     private boolean   setManualExposure(int exposureMS, int gain) {
         // Ensure Vision Portal has been setup.
         if (robot.camera.vision == null) {
@@ -679,6 +683,7 @@ public class NEW_Control extends OpMode {
             return (false);
         }
     }
+    */
 
 
 }

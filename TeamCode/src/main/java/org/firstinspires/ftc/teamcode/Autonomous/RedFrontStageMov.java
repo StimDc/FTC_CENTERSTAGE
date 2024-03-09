@@ -64,7 +64,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 
-public class RedBackStageAprilFast {
+public class RedFrontStageMov {
 
     private int PARKING = 1; //-1 for left parking and 1 for right
 
@@ -72,7 +72,6 @@ public class RedBackStageAprilFast {
     private Robot robot;
 
     private int tagID;
-
 
     private boolean FALSE = false;
 
@@ -105,7 +104,7 @@ public class RedBackStageAprilFast {
 
     private int hope = 0;
 
-    public RedBackStageAprilFast(Robot robot, Telemetry telemetry, int tagID) {
+    public RedFrontStageMov(Robot robot, Telemetry telemetry, int tagID) {
         this.robot = robot;
         this.telemetry = telemetry;
         this.tagID = tagID;
@@ -452,7 +451,7 @@ public class RedBackStageAprilFast {
 
         this.robot.move.forward(BACKWARDS,0.6, 50);
         this.robot.move.lateral(RIGHT, 0.6,50);
-}
+    }
     public void backStageCenterProp(int parking,int timer) throws IOException {
 
         int parkDist;
@@ -1091,7 +1090,7 @@ public class RedBackStageAprilFast {
 
             if(gainControl!=null){
                 boolean haide= gainControl.setGain(255);
-              this.telemetry.addLine("Gain: "+gainControl.getGain());
+                this.telemetry.addLine("Gain: "+gainControl.getGain());
 
             }
             sleep(20);

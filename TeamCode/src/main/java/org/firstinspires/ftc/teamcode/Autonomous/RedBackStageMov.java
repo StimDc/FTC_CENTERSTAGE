@@ -36,6 +36,8 @@ import static org.firstinspires.ftc.teamcode.Implementations.Constants.Direction
 import static org.firstinspires.ftc.teamcode.Implementations.Constants.Direction.RIGHT;
 
 
+import android.os.Environment;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.controller.PIDController;
@@ -56,79 +58,80 @@ import org.firstinspires.ftc.teamcode.Implementations.Robot.Robot;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 
-public class RedFrontStage{
+public class RedBackStageMov {
 
-    private int PARKING=1; //-1 for left parking and 1 for right
+    private int PARKING = 1; //-1 for left parking and 1 for right
 
     public static double target;
-    private  Robot robot;
+    private Robot robot;
 
     private int tagID;
 
-    private   final double ZERO_OFFSET = 70.0-3.85;
-    private   double TargetPosInDegrees=70.0-3.85;
+    private boolean FALSE = false;
+
+    private final double ZERO_OFFSET = 70.0 - 3.85;
+    private double TargetPosInDegrees = 70.0 - 3.85;
     private Telemetry telemetry;
 
     private ElapsedTime AUTO;
-
-
 
 
     public MathFunc mate;
 
 
     public FtcDashboard dashboard;
-    private PIDController forward,strafe,turn;
+    private PIDController forward, strafe, turn;
 
-    public static double Pf=0.02d, If=0d, Df=0d;
-    public static double Ps=0.045d, Is=0d, Ds=0d;
-    public static double Pt=0.02d, It=0.01d, Dt=0.00005d;
-
-
-    private static double Targetf=0,Targets=0,Targett;
-
-    public double val=0;
+    public static double Pf = 0.02d, If = 0d, Df = 0d;
+    public static double Ps = 0.045d, Is = 0d, Ds = 0d;
+    public static double Pt = 0.02d, It = 0.01d, Dt = 0.00005d;
 
 
+    private static double Targetf = 0, Targets = 0, Targett;
 
-    public static double Distancef =8,Distances=6,Distancet=6;
+    public double val = 0;
 
-    public static double POWER_LiMIT=0.4;
 
-    private int hope=0;
+    public static double Distancef = 7, Distances = 6, Distancet = 6;
 
-    public RedFrontStage(Robot robot, Telemetry telemetry,int tagID) {
-        this.robot =robot;
+    public static double POWER_LiMIT = 0.4;
+
+    private int hope = 0;
+
+    public RedBackStageMov(Robot robot, Telemetry telemetry, int tagID) {
+        this.robot = robot;
         this.telemetry = telemetry;
         this.tagID = tagID;
     }
 
-    public void passTag(int tagID){
+    public void passTag(int tagID) {
         this.tagID = tagID;
     }
-    public void init () {
+
+    public void init() {
         // this.robot.camera.openFrontCam();
-        target=this.robot.arm.ZERO_OFFSET;
+        target = this.robot.arm.ZERO_OFFSET;
 
-        AUTO=new ElapsedTime();
+        AUTO = new ElapsedTime();
 
-        dashboard=FtcDashboard.getInstance();
+        dashboard = FtcDashboard.getInstance();
 
-        forward=new PIDController(Pf,If,Df);
-        forward.setPID(Pf,If,Df);
+        forward = new PIDController(Pf, If, Df);
+        forward.setPID(Pf, If, Df);
 
-        strafe=new PIDController(Ps,Is,Ds);
-        strafe.setPID(Ps,Is,Ds);
+        strafe = new PIDController(Ps, Is, Ds);
+        strafe.setPID(Ps, Is, Ds);
 
-        turn=new PIDController(Pt,It,Dt);
-        turn.setPID(Pt,It,Dt);
+        turn = new PIDController(Pt, It, Dt);
+        turn.setPID(Pt, It, Dt);
 
-        this.telemetry=new MultipleTelemetry(this.telemetry, dashboard.getTelemetry());
+        this.telemetry = new MultipleTelemetry(this.telemetry, dashboard.getTelemetry());
 
 
         //  String propPosition=this.robot.camera.GetPropPosition();
@@ -136,48 +139,296 @@ public class RedFrontStage{
         //  this.telemetry.addLine("Prop: "+propPosition);
         //  this.telemetry.update();
 
-        boolean once=true;
+        boolean once = true;
 
         this.robot.wheels.GetDirection(this.telemetry);
         this.telemetry.update();
 
 
+    }
+
+    public void backStageLeftProp(int parking, int timer) throws IOException {
+
+        int parkDist;
+
+        if (parking == -1) {
+
+            parkDist = 70;
+
+        } else {
+
+            parkDist = 40;
+
+        }
+
+        this.AUTO.reset();
+
+        POWER_LiMIT = 0.35;
+
+        this.robot.camera.openBackCam();
+
+        setManualExposure(1, 1);
+
+
+        this.robot.wheels.GetDirection(this.telemetry);
+        this.telemetry.update();
+
+        robot.claw.setPosition(Claw.CLOSED);
+        sleep(750);
+        robot.joint.setPosition(Joint.DOWN);
+        sleep(900);
+        robot.claw.setPosition(Claw.CLOSED);
+        sleep(900);
+
+        this.robot.wheels.GetDirection(telemetry);
+        telemetry.update();
+
+        this.robot.claw.setPosition(Claw.CLOSED);
+        sleep(500);
+
+        this.robot.joint.setPosition(Joint.DOWN);
+
+
+        this.robot.move.forward(FORWARD, 0.6, 45);
+        sleep(175);
+
+        this.robot.move.rotate(-1, 0.6, 51.5);
+        sleep(200);
+
+
+        this.robot.move.forward(FORWARD, 0.4, 12);
+        sleep(200);
+
+        this.robot.claw.setPosition(Claw.INTERMEDIARY);
+        sleep(500);
+
+
+        this.robot.move.forward(BACKWARDS, 0.5, 5);
+        sleep(175);
+        this.robot.claw.setPosition(Claw.CLOSED);
+        sleep(500);
+        this.robot.joint.setPosition(Joint.UP);
+        sleep(1500);
+
+        this.robot.move.rotate(-1, 0.6, 90-51.5);
+        sleep(200);
+
+        this.robot.move.forward(BACKWARDS, 0.5, 30);
+        sleep(500);
+
+        this.robot.move.lateral(LEFT,0.4,20);
+
+        this.robot.claw.setPosition(Claw.OPEN);
+
+
+
+
+
 
     }
 
-    public void frontStageLeftProp(int parking,int timer){
+    public void backStageCenterPropBackup(int parking, int timer) throws IOException{
+        int parkDist;
+
+        if(parking==-1){
+
+            parkDist=60;
+
+        }else{
+
+            parkDist=60;
+
+        }
+
+        this.AUTO.reset();
+
+
+        this.robot.camera.openBackCam();
+
+        setManualExposure(1,1);
+
+
+        this.robot.wheels.GetDirection(this.telemetry);
+        this.telemetry.update();
+
+        robot.claw.setPosition(Claw.CLOSED);
+        sleep(900);
+        robot.joint.setPosition(Joint.DOWN);
+        sleep(900);
+        robot.claw.setPosition(Claw.CLOSED);
+        sleep(900);
+
+
+        this.robot.move.lateral(RIGHT,0.4,8);
+        sleep(175);
+
+        this.robot.move.forward(FORWARD,0.6,60);//57
+        sleep(175);
+        this.robot.joint.setPosition(Joint.DOWN);
+        sleep(500);
+        this.robot.claw.setPosition(Claw.INTERMEDIARY);
+        sleep(500);
+        this.robot.move.forward(BACKWARDS,0.5,5.5);
+        sleep(175);
+        this.robot.claw.setPosition(Claw.CLOSED);
+        sleep(500);
+        this.robot.joint.setPosition(Joint.UP);
+
+        this.robot.move.forward(BACKWARDS,0.6, 50);
+        this.robot.move.lateral(RIGHT, 0.6,50);
+    }
+    public void backStageCenterProp(int parking,int timer) throws IOException {
 
         int parkDist;
 
         if(parking==-1){
 
-            parkDist=70;
+            parkDist=60;
 
         }else{
 
-            parkDist=40;
+            parkDist=60;
 
         }
 
-        AUTO.reset();
+        this.AUTO.reset();
+
 
         this.robot.camera.openBackCam();
 
         setManualExposure(1,1);
-    /*
+
+
+        this.robot.wheels.GetDirection(this.telemetry);
+        this.telemetry.update();
+
+        robot.claw.setPosition(Claw.CLOSED);
+        sleep(900);
+        robot.joint.setPosition(Joint.DOWN);
+        sleep(900);
+        robot.claw.setPosition(Claw.CLOSED);
+        sleep(900);
+
+
+        this.robot.move.lateral(RIGHT,0.4,8);
+        sleep(175);
+
+        this.robot.move.forward(FORWARD,0.6,60);//57
+        sleep(175);
+        this.robot.joint.setPosition(Joint.DOWN);
+        sleep(500);
         this.robot.claw.setPosition(Claw.INTERMEDIARY);
+        sleep(500);
+        this.robot.move.forward(BACKWARDS,0.5,5.5);
+        sleep(175);
+        this.robot.claw.setPosition(Claw.CLOSED);
+        sleep(500);
+        this.robot.joint.setPosition(Joint.UP);
+
+        this.robot.move.forward(BACKWARDS,0.5,60-3.5);
+        sleep(500);
+
+        this.robot.move.lateral(RIGHT,0.4,50);
+        this.robot.claw.setPosition(Claw.OPEN);
+    }
+    public void backStageRightPropBackup(int parking,double timer) throws IOException{
+        int parkDist;
+
+        if(parking==-1){
+
+            parkDist=40;
+
+        }else{
+
+            parkDist=70;
+
+        }
+
+        this.robot.camera.openBackCam();
+
+        setManualExposure(1,1);
+
+
+        this.robot.wheels.GetDirection(this.telemetry);
+        this.telemetry.update();
+
+
+        robot.claw.setPosition(Claw.CLOSED);
         sleep(750);
-        this.robot.joint.setPosition(Joint.DOWN);
+        robot.joint.setPosition(Joint.DOWN);
         sleep(900);
-        this.robot.claw.setPosition(Claw.CLOSED);
-    */
-        this.robot.claw.setPosition(Claw.CLOSED);
-        sleep(750);
-        this.robot.joint.setPosition(Joint.DOWN);
+        robot.claw.setPosition(Claw.CLOSED);
         sleep(900);
 
 
-        this.robot.move.lateral(LEFT,0.4,25.5);
+        this.robot.wheels.GetDirection(this.telemetry);
+        this.telemetry.update();
+
+        this.robot.claw.setPosition(Claw.CLOSED);
+        sleep(500);
+
+        this.robot.joint.setPosition(Joint.DOWN);
+
+
+
+        this.robot.move.lateral(RIGHT,0.4,24);
+        sleep(175);
+
+        this.robot.move.forward(FORWARD,0.6,40);
+        sleep(175);
+        this.robot.claw.setPosition(Claw.INTERMEDIARY);
+        sleep(250);
+        this.robot.move.forward(BACKWARDS,0.5,5.5);
+        sleep(175);
+        this.robot.claw.setPosition(Claw.CLOSED);
+        sleep(250);
+        this.robot.joint.setPosition(Joint.UP);
+
+        this.robot.move.forward(BACKWARDS,0.6,50-7.5);
+        this.robot.move.forward(RIGHT,0.6,50);
+    }
+    public void backStageRightProp(int parking, double timer) throws IOException {
+
+        int parkDist;
+
+        if(parking==-1){
+
+            parkDist=40;
+
+        }else{
+
+            parkDist=70;
+
+        }
+
+        this.robot.camera.openBackCam();
+
+        setManualExposure(1,1);
+
+
+        this.robot.wheels.GetDirection(this.telemetry);
+        this.telemetry.update();
+
+
+        robot.claw.setPosition(Claw.CLOSED);
+        sleep(750);
+        robot.joint.setPosition(Joint.DOWN);
+        sleep(900);
+        robot.claw.setPosition(Claw.CLOSED);
+        sleep(900);
+
+
+        this.robot.wheels.GetDirection(this.telemetry);
+        this.telemetry.update();
+
+        this.robot.claw.setPosition(Claw.CLOSED);
+        sleep(500);
+
+        this.robot.joint.setPosition(Joint.DOWN);
+
+
+
+        this.robot.move.lateral(RIGHT,0.4,24);
         sleep(175);
 
         this.robot.move.forward(FORWARD,0.6,36.5);
@@ -190,122 +441,12 @@ public class RedFrontStage{
         sleep(250);
         this.robot.joint.setPosition(Joint.UP);
 
-        this.robot.move.forward(BACKWARDS,0.5,50);
-        //this.robot.move.lateral(RIGHT,0.5,100);
-    }
-
-    public void frontStageCenterProp(int parking,int timer){
-
-        int parkDist;
-
-        if(parking==-1){
-
-            parkDist=60;
-
-        }else{
-
-            parkDist=60;
-
-        }
-
-        AUTO.reset();
-
-        this.robot.camera.openBackCam();
-
-        setManualExposure(1,1);
-
-        /*
-        this.robot.claw.setPosition(Claw.INTERMEDIARY);
-        sleep(750);
-        this.robot.joint.setPosition(Joint.DOWN);
-        sleep(900);
-        this.robot.claw.setPosition(Claw.CLOSED);
-*/
-        this.robot.claw.setPosition(Claw.CLOSED);
-        sleep(750);
-        this.robot.joint.setPosition(Joint.DOWN);
-        sleep(900);
-
-
-        this.robot.move.lateral(LEFT,0.4,8);
-        sleep(175);
-
-        this.robot.move.forward(FORWARD,0.6,57);
-        sleep(175);
-        this.robot.claw.setPosition(Claw.INTERMEDIARY);
-        sleep(500);
-        this.robot.move.forward(BACKWARDS,0.5,5.5);
-        sleep(175);
-        this.robot.claw.setPosition(Claw.CLOSED);
-        sleep(500);
-        this.robot.joint.setPosition(Joint.UP);
-
-        this.robot.move.forward(BACKWARDS,0.5,50);
-        //this.robot.move.lateral(RIGHT, 0.5,100);
-
-    }
-    public void frontStageRightProp(int parking, double timer){
-
-        int parkDist;
+        this.robot.move.forward(BACKWARDS,0.6,36.5-7.5);
+        this.robot.move.forward(RIGHT,0.6,50);
 
 
 
 
-        if(parking==-1){
-
-            parkDist=40;
-
-        }else{
-
-            parkDist=70;
-
-        }
-
-        AUTO.reset();
-
-        this.robot.camera.openBackCam();
-
-        setManualExposure(1,1);
-
-        /*
-        this.robot.claw.setPosition(Claw.INTERMEDIARY);
-        sleep(750);
-        this.robot.joint.setPosition(Joint.DOWN);
-        sleep(900);
-        this.robot.claw.setPosition(Claw.CLOSED);
-
-
-         */
-        this.robot.claw.setPosition(Claw.CLOSED);
-        sleep(750);
-        this.robot.joint.setPosition(Joint.DOWN);
-        sleep(900);
-
-
-        this.robot.move.forward(FORWARD,0.6,39);
-        sleep(175);
-
-        this.robot.move.rotate(1,0.6,51.5);
-        sleep(500);
-
-
-        this.robot.move.forward(FORWARD,0.5,10);
-        sleep(500);
-
-        this.robot.claw.setPosition(Claw.INTERMEDIARY);
-        sleep(750);
-
-
-        this.robot.move.forward(BACKWARDS,0.5,5.5);
-        sleep(175);
-        this.robot.claw.setPosition(Claw.CLOSED);
-        sleep(500);
-        this.robot.joint.setPosition(Joint.UP);
-        sleep(500);
-
-        this.robot.move.rotate(-1,0.6,51.5);
-        this.robot.move.forward(BACKWARDS,0.5, 50);
-        //this.robot.move.lateral(RIGHT,0.5,100);
     }
 
     private double ForwardPID(){
@@ -427,7 +568,7 @@ public class RedFrontStage{
 
     }
 
-    public void Go_to_April(){
+    public void Go_to_April() throws IOException {
 
         ElapsedTime emergency=new ElapsedTime();
         emergency.reset();
@@ -456,15 +597,18 @@ public class RedFrontStage{
 
                 }
 
-                /*
+
                 telemetry.addLine("Range: "+detection.ftcPose.range);
                 telemetry.addLine("Bearing: "+detection.ftcPose.bearing);
                 telemetry.addLine("Yaw: "+detection.ftcPose.yaw);
 
 
-                 */
 
-                //  telemetry.update();
+
+                telemetry.update();
+                String logFilePath = String.format("%s/FIRST/data/debug.txt", Environment.getExternalStorageDirectory().getAbsolutePath());
+                FileWriter fw = new FileWriter(logFilePath);
+                fw.write(detection.ftcPose.toString());
 
             }else{
 
@@ -487,9 +631,7 @@ public class RedFrontStage{
 
             this.robot.move.lateral(RIGHT,0.8,45);
 
-            while(exit){
-
-            }
+            FALSE=true;
 
         }
 
